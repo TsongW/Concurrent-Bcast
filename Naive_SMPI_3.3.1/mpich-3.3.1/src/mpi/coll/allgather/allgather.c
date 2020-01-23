@@ -517,4 +517,65 @@ int MPI_SEC_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 
     return mpi_errno;
 }
+
+
+void init_crypto(){
+    nonceCounter=0;
+    ctx = EVP_AEAD_CTX_new(EVP_aead_aes_256_gcm_siv(),
+                            key,
+                            32, 0);
+    return;                        
+}
+
+
+void init_boringssl_256_siv(){
+    //unsigned char key_boringssl_siv_32 [32] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','a','b','c','d','e','f'};
+    nonceCounter=0;
+    ctx = EVP_AEAD_CTX_new(EVP_aead_aes_256_gcm_siv(),
+                            key,
+                            32, 0);
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  if (world_rank == 0) printf("\n\t\t****** Secure MPI with BoringSSL  256  GCM-SIV ********\n");
+    return;                        
+}
+
+void init_boringssl_128_siv(){
+   // unsigned char key_boringssl_siv_16 [16] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'};
+    nonceCounter=0;
+    ctx = EVP_AEAD_CTX_new(EVP_aead_aes_128_gcm_siv(),
+                            key,
+                            16, 0);
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  if (world_rank == 0) printf("\n\t\t****** Secure MPI with BoringSSL  128  GCM-SIV ********\n");
+    return;                        
+}
+
+void init_boringssl_128(){
+   // unsigned char key_boringssl_16 [16] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'};
+    nonceCounter=0;
+    ctx = EVP_AEAD_CTX_new(EVP_aead_aes_128_gcm(),
+                            key,
+                            16, 0);
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  //if (world_rank == 0) printf("\n\t\t****** Secure MPI with BoringSSL  128  GCM ********\n");
+    return;                        
+}
+
+void init_boringssl_256(){
+    //unsigned char key_boringssl_32 [32] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','a','b','c','d','e','f'};
+    nonceCounter=0;
+    ctx = EVP_AEAD_CTX_new(EVP_aead_aes_256_gcm(),
+                            key,
+                            32, 0);
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  //if (world_rank == 0) printf("\n\t\t****** Secure MPI with BoringSSL  256  GCM ********\n");
+    return;                        
+}
+
+
+
 /**************************/
