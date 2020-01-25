@@ -915,29 +915,6 @@ typedef int (MPI_Datarep_extent_function)(MPI_Datatype datatype, MPI_Aint *,
 /* Begin Prototypes */
 
 /* Added by Abu Naser, an16e@my.fsu.edu */
-int MPI_SEC_Isend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag,
-        MPI_Comm comm, MPI_Request *request);
-int MPI_SEC_Irecv(void *buf, int count, MPI_Datatype datatype, int source,
-        int tag, MPI_Comm comm, MPI_Request *request);
-int MPI_SEC_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag,
-       MPI_Comm comm);
-int MPI_SEC_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
-       MPI_Comm comm, MPI_Status *status); 
-int MPI_SEC_Bcast( void *buffer, int count, MPI_Datatype datatype, int root, 
-               MPI_Comm comm);
-int MPI_SEC_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
-                  void *recvbuf, int recvcount, MPI_Datatype recvtype,
-                  MPI_Comm comm);
-int MPI_SEC_Alltoall(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
-                  void *recvbuf, int recvcount, MPI_Datatype recvtype,
-                  MPI_Comm comm);
-int MPI_SEC_Alltoallv(const void *sendbuf, const int *sendcounts,
-                  const int *sdispls, MPI_Datatype sendtype, void *recvbuf,
-                  const int *recvcounts, const int *rdispls, MPI_Datatype recvtype,
-                  MPI_Comm comm);  
-int MPI_SEC_Wait(MPI_Request *request, MPI_Status *status);
-int MPI_SEC_Waitall(int count, MPI_Request req[], MPI_Status sta[]);
-int MPI_SEC_Waitsome(int count, MPI_Request req[], int *outcount, int array_of_indices[], MPI_Status sta[]);                                                                   
 
 void init_crypto();
 void init_boringssl_256_siv();
