@@ -136,7 +136,7 @@ int MPIR_Allgather_intra (
     int j, i, pof2, src, rem;
     void *tmp_buf = NULL;
     int curr_cnt, dst, type_size, left, right, jnext;
-    MPI_Status status;
+    MPI_Status *status;
     int mask, dst_tree_root, my_tree_root, is_homogeneous,  
         send_offset, recv_offset, last_recv_cnt = 0, nprocs_completed, k,
         offset, tmp_mask, tree_root;
@@ -593,7 +593,8 @@ int MPIR_Allgather_intra (
              * no. of processes. use ring algorithm. */
 
             /*added by Mehran*/
-            int sendtype_sz, recvtype_sz, enc_recv_size;
+            printf("Ring is being used!\n");
+            int sendtype_sz, recvtype_sz, enc_recv_size, context_id;
             unsigned long  ciphertext_sendbuf_len = 0;
             sendtype_sz= recvtype_sz= 0;
 
@@ -613,8 +614,12 @@ int MPIR_Allgather_intra (
             t = (unsigned long)(sendtype_sz*sendcount);
             unsigned long   max_out_len = (unsigned long) (16 + (sendtype_sz*sendcount));
             
-            char* ciphertext_recvbuf = new char[max_out_len*(comm_size-1)];
-            char* ciphertext_sendbuf = new char[max_out_len];
+
+            //#TODO: Dynamically allocate memory
+
+            // char* ciphertext_recvbuf , *ciphertext_sendbuf;
+            // ciphertext_recvbuf = (char *) malloc(max_out_len*(comm_size-1) * size_of(char));
+            // ciphertext_sendbuf = (char *) malloc(max_out_len * size_of(char));
 
             enc_recv_size = (recvcount*recvtype_sz)+16+12;
 
@@ -633,13 +638,14 @@ int MPIR_Allgather_intra (
             */
             left = (comm_size + rank - 1) % comm_size;
             right = (rank + 1) % comm_size;
-            MPIR_Request *recv_req_ptr[comm_size-1], *send_req_ptr[comm_size-1];
-            for(int p=0; p<comm_size-1; ++p){
-              recv_req_ptr[p]=NULL;
-              send_req_ptr[p]=NULL;
+            MPID_Request *recv_req_ptr[comm_size-1], *send_req_ptr[comm_size-1];
+            int p;
+            for(p=0; p<comm_size-1; ++p){
+              (recv_req_ptr[p])=NULL;
+              (send_req_ptr[p])=NULL;
             }
-            context_id = (comm_ptr->comm_kind == MPIR_COMM_KIND__INTRACOMM) ?
-                  MPIR_CONTEXT_INTRA_COLL : MPIR_CONTEXT_INTER_COLL;
+            context_id = (comm_ptr->comm_kind == MPID_INTRACOMM) ?
+                  MPID_CONTEXT_INTRA_COLL : MPID_CONTEXT_INTER_COLL;
 
 
               mpi_errno = MPID_Isend(ciphertext_sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
@@ -673,17 +679,17 @@ int MPIR_Allgather_intra (
             */
             
 
-              mpi_errno = MPIC_Wait(recv_req_ptr[0], errflag);
+              mpi_errno = MPIC_Wait((recv_req_ptr[0]), errflag);
               if (mpi_errno)
                   MPIR_ERR_POPFATAL(mpi_errno);
 
-              *status = recv_req_ptr[0]->status;
+              *status = (recv_req_ptr[0])->status;
 
               if (mpi_errno == MPI_SUCCESS) {
                   mpi_errno = recv_req_ptr[0]->status.MPI_ERROR;
               }
 
-              MPIR_Request_free(recv_req_ptr[0]);
+              MPID_Request_release(recv_req_ptr[0]);
 
             /*added by Mehran*/
 
@@ -750,7 +756,7 @@ int MPIR_Allgather_intra (
 
 
 
-              mpi_errno = MPIC_Wait(recv_req_ptr[i-1], errflag);
+              mpi_errno = MPIC_Wait((recv_req_ptr[i-1]), errflag);
                 if (mpi_errno)
                     MPIR_ERR_POPFATAL(mpi_errno);
 
@@ -760,7 +766,7 @@ int MPIR_Allgather_intra (
                     mpi_errno = recv_req_ptr[i-1]->status.MPI_ERROR;
                 }
 
-                MPIR_Request_free(recv_req_ptr[i-1]);
+                MPID_Request_release(recv_req_ptr[i-1]);
 
                 
               j = jnext;
@@ -783,8 +789,9 @@ int MPIR_Allgather_intra (
               }
 
               //post wait for each of the sends
-              for(int i=0; i<comm_size-1; ++i){
-                mpi_errno = MPIC_Wait(send_req_ptr[i], errflag);
+              int i;
+              for(i=0; i<comm_size-1; ++i){
+                mpi_errno = MPIC_Wait((send_req_ptr[i]), errflag);
                 if (mpi_errno)
                     MPIR_ERR_POP(mpi_errno);
                 
@@ -793,7 +800,7 @@ int MPIR_Allgather_intra (
                     mpi_errno = send_req_ptr[i]->status.MPI_ERROR;
                 }
 
-                MPIR_Request_free(send_req_ptr[i]);
+                MPID_Request_release(send_req_ptr[i]);
               }
 
 
@@ -860,10 +867,10 @@ int MPIR_Allgather_intra (
         MPIR_ERR_SET(mpi_errno, *errflag, "**coll_fail");
 
     /*Added by Mehran*/  
-    delete [] ciphertext_sendbuf;
-    delete [] ciphertext_recvbuf;
+    // free(&ciphertext_sendbuf);
+    // free(&ciphertext_recvbuf);
     /***************/
-    
+
     return mpi_errno;
 
  fn_fail:
