@@ -1,0 +1,19 @@
+test/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+test/commands/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+src/binding/fortran/use_mpi/buildiface:# Provide DERIVED TYPES for MPI_STATUS and all handles (as in the mpi_f08
+src/include/mpi.h.in:/* C type for MPI_STATUS in F08.
+src/hwloc/include/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+src/hwloc/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+src/hwloc/hwloc/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+configure:        as_fn_arith $SIZEOF_MPI_STATUS / $ac_cv_sizeof_int && MPI_STATUS_SIZE=$as_val
+examples/Makefile.in:SIZEOF_MPI_STATUS = @SIZEOF_MPI_STATUS@
+man/man3/MPI_Test.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Waitsome.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Testall.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Wait.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Testany.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Waitall.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Waitany.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+man/man3/MPI_Testsome.3:.SH NOTES ON THE MPI_STATUS ARGUMENT
+configure.ac:        AS_VAR_ARITH([MPI_STATUS_SIZE],[$SIZEOF_MPI_STATUS / $ac_cv_sizeof_int])

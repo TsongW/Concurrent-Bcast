@@ -136,7 +136,8 @@ int MPIR_Allgather_intra (
     int j, i, pof2, src, rem;
     void *tmp_buf = NULL;
     int curr_cnt, dst, type_size, left, right, jnext;
-    MPI_Status *status;
+    MPI_Status status;
+    //MPI_Status *ring_status[comm_size];
     int mask, dst_tree_root, my_tree_root, is_homogeneous,  
         send_offset, recv_offset, last_recv_cnt = 0, nprocs_completed, k,
         offset, tmp_mask, tree_root;
@@ -593,7 +594,6 @@ int MPIR_Allgather_intra (
              * no. of processes. use ring algorithm. */
 
             /*added by Mehran*/
-            printf("Ring is being used!\n");
             int sendtype_sz, recvtype_sz, enc_recv_size, context_id;
             unsigned long  ciphertext_sendbuf_len = 0;
             sendtype_sz= recvtype_sz= 0;
@@ -633,6 +633,7 @@ int MPIR_Allgather_intra (
             fflush(stdout);
             }
 
+
             /*
             * Posting the first send
             */
@@ -654,15 +655,17 @@ int MPIR_Allgather_intra (
                   MPIR_ERR_POP(mpi_errno);
 
 
+
               j=rank;
               jnext= left;
               mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+(jnext*(enc_recv_size)), enc_recv_size, MPI_CHAR, left, MPIR_ALLGATHER_TAG,
                                      comm_ptr, context_id, &(recv_req_ptr[0]));
               if (mpi_errno)
                   MPIR_ERR_POP(mpi_errno);
+              
 
 
-
+            
 
             /* Now, load the "local" version in the recvbuf. */
             if (sendbuf != MPI_IN_PLACE) {
@@ -673,7 +676,6 @@ int MPIR_Allgather_intra (
                 MPIR_ERR_POP(mpi_errno);
               }
             }
-
             /*
             * Posting the first receive and waiting for the receive
             */
@@ -683,7 +685,10 @@ int MPIR_Allgather_intra (
               if (mpi_errno)
                   MPIR_ERR_POPFATAL(mpi_errno);
 
-              *status = (recv_req_ptr[0])->status;
+
+              *(&status) = (recv_req_ptr[0])->status;
+
+
 
               if (mpi_errno == MPI_SUCCESS) {
                   mpi_errno = recv_req_ptr[0]->status.MPI_ERROR;
@@ -708,23 +713,24 @@ int MPIR_Allgather_intra (
 
               mpi_errno = MPID_Isend((char*)ciphertext_recvbuf + j*(enc_recv_size), ciphertext_sendbuf_len+12, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                      comm_ptr, context_id, &(send_req_ptr[i-1]));
-                if (mpi_errno)
-                    MPIR_ERR_POP(mpi_errno);
+              if (mpi_errno)
+                  MPIR_ERR_POP(mpi_errno);
 
 
-                mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+(jnext*(enc_recv_size)), enc_recv_size, MPI_CHAR, left, MPIR_ALLGATHER_TAG,
-                                       comm_ptr, context_id, &(recv_req_ptr[i-1]));
-                if (mpi_errno)
-                    MPIR_ERR_POP(mpi_errno);
+              mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+(jnext*(enc_recv_size)), enc_recv_size, MPI_CHAR, left, MPIR_ALLGATHER_TAG,
+                                     comm_ptr, context_id, &(recv_req_ptr[i-1]));
+              if (mpi_errno)
+                  MPIR_ERR_POP(mpi_errno);
 
-                if (mpi_errno) {
-                  /* for communication errors, just record the error but continue */
-                *errflag =
-                MPIX_ERR_PROC_FAILED ==
-                MPIR_ERR_GET_CLASS(mpi_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
-                MPIR_ERR_SET(mpi_errno, *errflag, "**fail");
-                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-              }
+
+              if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+              *errflag =
+              MPIX_ERR_PROC_FAILED ==
+              MPIR_ERR_GET_CLASS(mpi_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
+              MPIR_ERR_SET(mpi_errno, *errflag, "**fail");
+              MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
 
 
               // mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
@@ -740,7 +746,7 @@ int MPIR_Allgather_intra (
               //Decrypt Previously received data and move to the recv_buffer 
                 
               next =(unsigned long )(j*enc_recv_size);
-                  dest =(unsigned long )(j*(recvcount*recvtype_sz));
+              dest =(unsigned long )(j*(recvcount*recvtype_sz));
 
               if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
                                   &count, (unsigned long )((recvcount*recvtype_sz)+16),
@@ -754,13 +760,11 @@ int MPIR_Allgather_intra (
 
 
 
-
-
               mpi_errno = MPIC_Wait((recv_req_ptr[i-1]), errflag);
                 if (mpi_errno)
                     MPIR_ERR_POPFATAL(mpi_errno);
-
-                *status = recv_req_ptr[i-1]->status;
+               
+                *(&status) = recv_req_ptr[i-1]->status;
 
                 if (mpi_errno == MPI_SUCCESS) {
                     mpi_errno = recv_req_ptr[i-1]->status.MPI_ERROR;
@@ -802,8 +806,6 @@ int MPIR_Allgather_intra (
 
                 MPID_Request_release(send_req_ptr[i]);
               }
-
-
 
 
 
