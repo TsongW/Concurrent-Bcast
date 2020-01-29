@@ -160,6 +160,12 @@ extern int nonceCounter;
 
 /* end of add*/
 
+
+/*Added by Mehran*/
+#define SECURE_MPI true
+
+/*****************/
+
 /* ------------------------------------------------------------------------- */
 /* mpidebug.h */
 /* ------------------------------------------------------------------------- */
@@ -3903,6 +3909,21 @@ int MPIR_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 int MPIR_Allgather_intra(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
                          void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                          MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag );
+
+/*added by Mehran*/
+
+int MPIR_Allgather_intra_original(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+                         void *recvbuf, int recvcount, MPI_Datatype recvtype, 
+                         MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag );
+
+
+
+int MPIR_SEC_Allgather_intra(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+                         void *recvbuf, int recvcount, MPI_Datatype recvtype, 
+                         MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag );
+
+/***********************************************************/
+
 int MPIR_Allgather_inter(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
                          void *recvbuf, int recvcount, MPI_Datatype recvtype, 
                          MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag );
