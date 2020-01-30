@@ -1,0 +1,12 @@
+SMPI_3.3.2/mpich-3.3.2/www/www3/MPI_Allgather.html:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+
+SMPI_3.3.2/mpich-3.3.2/src/mpi/coll/allgather/allgather.c:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf,
+
+SMPI_3.3.2/mpich-3.3.2/src/mpi/coll/allgather/allgather.c:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+
+SMPI_3.3.2/mpich-3.3.2/src/include/mpi.h.in:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf,
+
+SMPI_3.3.2/mpich-3.3.2/allAllgathers.txt:SMPI_3.3.2/mpich-3.3.2/src/mpi/coll/allgather/allgather.c:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf,
+
+SMPI_3.3.2/mpich-3.3.2/allAllgathers.txt:SMPI_3.3.2/mpich-3.3.2/src/mpi/coll/allgather/allgather.c:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+SMPI_3.3.2/mpich-3.3.2/man/man3/MPI_Allgather.3:int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
