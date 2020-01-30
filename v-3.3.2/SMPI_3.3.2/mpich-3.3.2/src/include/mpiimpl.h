@@ -122,6 +122,11 @@ extern int nonceCounter;
 
 /* end of add*/
 
+/*Added by Mehran*/
+#define SECURE_MPI true
+
+/*****************/
+
 
 /*****************************************************************************
  * We use the following ordering of information in this file:

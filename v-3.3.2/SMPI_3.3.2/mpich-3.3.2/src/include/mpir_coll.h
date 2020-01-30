@@ -65,9 +65,18 @@ int MPIR_Allgather_intra_ring(const void *sendbuf, int sendcount, MPI_Datatype s
                               void *recvbuf, int recvcount, MPI_Datatype recvtype,
                               MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag);
 
+/*Added by Mehran*/
+// int MPIR_SEC_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+//                    void *recvbuf, int recvcount, MPI_Datatype recvtype,
+//                    MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag);
+
+
 int MPIR_SEC_Allgather_intra_ring(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
                               void *recvbuf, int recvcount, MPI_Datatype recvtype,
                               MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag);
+
+
+
 
 /* intercomm-only functions */
 int MPIR_Allgather_inter_auto(const void *sendbuf, int sendcount, MPI_Datatype sendtype,

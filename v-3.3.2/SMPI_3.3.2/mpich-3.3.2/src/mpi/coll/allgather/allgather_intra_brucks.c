@@ -44,7 +44,10 @@ int MPIR_Allgather_intra_brucks(const void *sendbuf,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-
+    if(rank==0){
+      printf("Bruck is called!\n");
+      fflush(stdout);
+    }
     MPIR_Datatype_get_extent_macro(recvtype, recvtype_extent);
 
     /* This is the largest offset we add to recvbuf */

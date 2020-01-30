@@ -8,15 +8,7 @@
 #include "mpiimpl.h"
 
 
-/*Added by Mehran*/
 
-unsigned char ciphertext[4194304+18];
-EVP_AEAD_CTX *ctx = NULL;
-unsigned char key [32] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','a','b','c','d','e','f'};
-unsigned char nonce[12] = {'1','2','3','4','5','6','7','8','9','0','1','2'};  
-int nonceCounter; 
-
-/****************/
 
 /*
 === BEGIN_MPI_T_CVAR_INFO_BLOCK ===
@@ -131,7 +123,6 @@ int MPIR_Allgather_intra_auto(const void *sendbuf,
         return MPI_SUCCESS;
 
     comm_size = comm_ptr->local_size;
-
     MPIR_Datatype_get_size_macro(recvtype, type_size);
 
     tot_bytes = (MPI_Aint) recvcount *comm_size * type_size;
@@ -144,9 +135,15 @@ int MPIR_Allgather_intra_auto(const void *sendbuf,
             MPIR_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
                                         comm_ptr, errflag);
     } else {
+      if(SECURE_MPI){
         mpi_errno =
             MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
                                       comm_ptr, errflag);
+      }else{
+        mpi_errno =
+            MPIR_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
+                                      comm_ptr, errflag);
+      }
     }
     if (mpi_errno)
         MPIR_ERR_POP(mpi_errno);
@@ -191,9 +188,47 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
                         MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag)
 {
     int mpi_errno = MPI_SUCCESS;
-
+    
     if (comm_ptr->comm_kind == MPIR_COMM_KIND__INTRACOMM) {
         /* intracommunicator */
+        
+        /*Added by Mehran*/
+        if(SECURE_MPI){
+          switch (MPIR_Allgather_intra_algo_choice) {
+
+            // case MPIR_ALLGATHER_INTRA_ALGO_BRUCKS:
+            //     mpi_errno =
+            //         MPIR_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+            //                                     recvtype, comm_ptr, errflag);
+            //     break;
+            // case MPIR_ALLGATHER_INTRA_ALGO_RECURSIVE_DOUBLING:
+            //     mpi_errno =
+            //         MPIR_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,
+            //                                                 recvcount, recvtype, comm_ptr, errflag);
+            //     break;
+            case MPIR_ALLGATHER_INTRA_ALGO_RING:
+                mpi_errno =
+                    MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+                                              recvtype, comm_ptr, errflag);
+                break;
+            // case MPIR_ALLGATHER_INTRA_ALGO_NB:
+            //     mpi_errno =
+            //         MPIR_Allgather_allcomm_nb(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+            //                                   recvtype, comm_ptr, errflag);
+            //     break;
+            // case MPIR_ALLGATHER_INTRA_ALGO_AUTO:
+            //     MPL_FALLTHROUGH;
+            default:
+                mpi_errno =
+                    MPIR_Allgather_intra_auto(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+                                              recvtype, comm_ptr, errflag);
+                break;
+          }//end switch
+        }//end if
+        else{
+
+
+        /************************/
         switch (MPIR_Allgather_intra_algo_choice) {
             case MPIR_ALLGATHER_INTRA_ALGO_BRUCKS:
                 mpi_errno =
@@ -207,7 +242,7 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
                 break;
             case MPIR_ALLGATHER_INTRA_ALGO_RING:
                 mpi_errno =
-                    MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+                    MPIR_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount,
                                               recvtype, comm_ptr, errflag);
                 break;
             case MPIR_ALLGATHER_INTRA_ALGO_NB:
@@ -222,7 +257,10 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
                     MPIR_Allgather_intra_auto(sendbuf, sendcount, sendtype, recvbuf, recvcount,
                                               recvtype, comm_ptr, errflag);
                 break;
-        }
+        }//end switch
+        /*Added by Mehran*/
+      }//end else SEC_MPI
+      /*****************/
     } else {
         /* intercommunicator */
         switch (MPIR_Allgather_inter_algo_choice) {
@@ -275,6 +313,69 @@ int MPIR_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 
     return mpi_errno;
 }
+
+
+/***Added by Mehran***
+#undef FUNCNAME
+#define FUNCNAME MPIR_SEC_Allgather
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_SEC_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+                   void *recvbuf, int recvcount, MPI_Datatype recvtype,
+                   MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag)
+{
+    printf("Naive Secure Allgather!\n");
+    fflush(stdout);
+
+    int var, sendtype_sz, recvtype_sz, mpi_errno = MPI_SUCCESS;
+    unsigned long  ciphertext_sendbuf_len = 0;
+    sendtype_sz= recvtype_sz= 0;
+     
+    var=MPI_Type_size(sendtype, &sendtype_sz);
+    var=MPI_Type_size(recvtype, &recvtype_sz);
+    // Set the nonce in send_ciphertext 
+    RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce    
+
+    unsigned long t=0;
+    t = (unsigned long)(sendtype_sz*sendcount);
+    unsigned long   max_out_len = (unsigned long) (16 + (sendtype_sz*sendcount));
+    
+    if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
+                         &ciphertext_sendbuf_len, max_out_len,
+                         ciphertext_sendbuf, 12,
+                         sendbuf,  t,
+                        NULL, 0)){
+        printf("Error in encryption: allgather\n");
+        fflush(stdout);
+    }         
+
+    mpi_errno=MPIR_Allgather(ciphertext_sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR,
+                  ciphertext_recvbuf, ((recvcount*recvtype_sz) + 16+12), MPI_CHAR, comm_ptr, errflag);
+    
+    unsigned long count=0;
+    unsigned long next, dest;
+    unsigned int i;
+    for( i = 0; i < comm_ptr->local_size; i++){
+        next =(unsigned long )(i*((recvcount*recvtype_sz) + 16+12));
+        dest =(unsigned long )(i*(recvcount*recvtype_sz));
+        
+
+        if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                        &count, (unsigned long )((recvcount*recvtype_sz)+16),
+                         (ciphertext_recvbuf+next), 12,
+                        (ciphertext_recvbuf+next+12), (unsigned long )((recvcount*recvtype_sz)+16),
+                        NULL, 0)){
+            printf("Decryption error: allgather\n");
+            fflush(stdout);        
+        }                               
+       
+    }
+
+    return mpi_errno;
+}
+
+/*********************/
+
 
 #endif
 
@@ -412,8 +513,16 @@ int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 #endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
-    mpi_errno = MPIR_Allgather(sendbuf, sendcount, sendtype,
+    /*Added by Mehran*/
+    /*if(NAIVE_SECURE_MPI){
+        mpi_errno = MPIR_SEC_Allgather(sendbuf, sendcount, sendtype,
                                recvbuf, recvcount, recvtype, comm_ptr, &errflag);
+    }else{*/
+
+        mpi_errno = MPIR_Allgather(sendbuf, sendcount, sendtype,
+                               recvbuf, recvcount, recvtype, comm_ptr, &errflag);
+    //}
+    
     if (mpi_errno)
         goto fn_fail;
 
@@ -444,47 +553,47 @@ int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 /*Added by Mehran*/
 
 
-#undef FUNCNAME
-#define FUNCNAME MPI_MyAllgather
-#undef FCNAME
-#define FCNAME MPL_QUOTE(FUNCNAME)
+// #undef FUNCNAME
+// #define FUNCNAME MPI_MyAllgather
+// #undef FCNAME
+// #define FCNAME MPL_QUOTE(FUNCNAME)
 
-int MPI_MyAllgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
-                  void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm)
-{
-    int mpi_errno = MPI_SUCCESS;
-    MPIR_Comm *comm_ptr = NULL;
-    MPIR_Errflag_t errflag = MPIR_ERR_NONE;
-    MPIR_FUNC_TERSE_STATE_DECL(MPID_STATE_MPI_ALLGATHER);
+// int MPI_MyAllgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+//                   void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm)
+// {
+//     int mpi_errno = MPI_SUCCESS;
+//     MPIR_Comm *comm_ptr = NULL;
+//     MPIR_Errflag_t errflag = MPIR_ERR_NONE;
+//     MPIR_FUNC_TERSE_STATE_DECL(MPID_STATE_MPI_ALLGATHER);
 
-    MPIR_ERRTEST_INITIALIZED_ORDIE();
+//     MPIR_ERRTEST_INITIALIZED_ORDIE();
 
-    MPID_THREAD_CS_ENTER(GLOBAL, MPIR_THREAD_GLOBAL_ALLFUNC_MUTEX);
-    MPIR_FUNC_TERSE_COLL_ENTER(MPID_STATE_MPI_ALLGATHER);
+//     MPID_THREAD_CS_ENTER(GLOBAL, MPIR_THREAD_GLOBAL_ALLFUNC_MUTEX);
+//     MPIR_FUNC_TERSE_COLL_ENTER(MPID_STATE_MPI_ALLGATHER);
 
-    /* Validate parameters, especially handles needing to be converted */
-#ifdef HAVE_ERROR_CHECKING
-    {
-        MPID_BEGIN_ERROR_CHECKS;
-        {
-            MPIR_ERRTEST_COMM(comm, mpi_errno);
-        }
-        MPID_END_ERROR_CHECKS;
-    }
-#endif /* HAVE_ERROR_CHECKING */
+//     /* Validate parameters, especially handles needing to be converted */
+// #ifdef HAVE_ERROR_CHECKING
+//     {
+//         MPID_BEGIN_ERROR_CHECKS;
+//         {
+//             MPIR_ERRTEST_COMM(comm, mpi_errno);
+//         }
+//         MPID_END_ERROR_CHECKS;
+//     }
+// #endif /* HAVE_ERROR_CHECKING */
 
-    /* Convert MPI object handles to object pointers */
-    MPIR_Comm_get_ptr(comm, comm_ptr);
+//     /* Convert MPI object handles to object pointers */
+//     MPIR_Comm_get_ptr(comm, comm_ptr);
 
-    printf("Hi from MyAllgather\n");
-    fn_exit:
-    MPIR_FUNC_TERSE_COLL_EXIT(MPID_STATE_MPI_ALLGATHER);
-    MPID_THREAD_CS_EXIT(GLOBAL, MPIR_THREAD_GLOBAL_ALLFUNC_MUTEX);
-    return mpi_errno;
+//     printf("Hi from MyAllgather\n");
+//     fn_exit:
+//     MPIR_FUNC_TERSE_COLL_EXIT(MPID_STATE_MPI_ALLGATHER);
+//     MPID_THREAD_CS_EXIT(GLOBAL, MPIR_THREAD_GLOBAL_ALLFUNC_MUTEX);
+//     return mpi_errno;
 
-  fn_fail:
-    goto fn_exit;
-  }
+//   fn_fail:
+//     goto fn_exit;
+//   }
 
 
 

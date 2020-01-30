@@ -18,6 +18,9 @@ int MPIR_Allgather_allcomm_nb(const void *sendbuf, int sendcount, MPI_Datatype s
     MPI_Request req = MPI_REQUEST_NULL;
     MPIR_Request *req_ptr = NULL;
 
+      printf("Allcomm NB is called!\n");
+      fflush(stdout);
+
     /* just call the nonblocking version and wait on it */
     mpi_errno =
         MPIR_Iallgather(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr,
