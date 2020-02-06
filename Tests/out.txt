@@ -1,0 +1,32 @@
+
+**************** Rank 0 *****************
+prev_dst = 1
+prev_send_offset = 0, prev_recv_offset = 428
+Rank 0 Decrypts from 440 for 416 and copies to 400 for 400
+prev_dst = 2
+Rank 0 Decrypts from 868 for 416 and copies to 800 for 400
+Rank 0 Decrypts from 868 for 416 and copies to 1200 for 400
+
+**************** Rank 1 *****************
+prev_dst = 0
+prev_send_offset = 428, prev_recv_offset = 0
+Rank 1 Decrypts from 12 for 416 and copies to 0 for 400
+prev_dst = 3
+Rank 1 Decrypts from 868 for 416 and copies to 800 for 400
+Rank 1 Decrypts from 868 for 416 and copies to 1200 for 400
+
+**************** Rank 2 *****************
+prev_dst = 3
+prev_send_offset = 856, prev_recv_offset = 1284
+Rank 2 Decrypts from 1296 for 416 and copies to 1200 for 400
+prev_dst = 0
+Rank 2 Decrypts from 12 for 416 and copies to 0 for 400
+Rank 2 Decrypts from 12 for 416 and copies to 400 for 400
+
+**************** Rank 3 *****************
+prev_dst = 2
+prev_send_offset = 1284, prev_recv_offset = 856
+Rank 3 Decrypts from 868 for 416 and copies to 800 for 400
+prev_dst = 1
+Rank 3 Decrypts from 12 for 416 and copies to 0 for 400
+Rank 3 Decrypts from 12 for 416 and copies to 400 for 400

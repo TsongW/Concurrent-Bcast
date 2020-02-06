@@ -193,9 +193,6 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
                   MPIR_ERR_POP(mpi_errno);
 
 
-              
-
-
               if (mpi_errno) {
                 /* for communication errors, just record the error but continue */
               *errflag =
@@ -206,29 +203,19 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
             }
 
 
-              // mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
-              //  j * recvcount * recvtype_extent),
-              // recvcount, recvtype, right,
-              // MPIR_ALLGATHER_TAG,
-              // ((char *) recvbuf +
-              //  jnext * recvcount * recvtype_extent),
-              // recvcount, recvtype, left,
-              // MPIR_ALLGATHER_TAG, comm_ptr, MPI_STATUS_IGNORE, errflag);
-
-
               //Decrypt Previously received data and move to the recv_buffer 
                 
               next =(unsigned long )(j*enc_recv_size);
               dest =(unsigned long )(j*(recvcount*recvtype_sz));
 
-              if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
-                                  &count, (unsigned long )((recvcount*recvtype_sz)+16),
-                                   (ciphertext_recvbuf+next), 12,
-                                  (ciphertext_recvbuf+next+12), (unsigned long )((recvcount*recvtype_sz)+16),
-                                  NULL, 0)){
-                              printf("Decryption error: allgather\n");
-                            fflush(stdout);        
-                  }
+              if(!EVP_AEAD_CTX_open(ctx, (recvbuf+dest),
+                    &count, (unsigned long )((recvcount*recvtype_sz)+16),
+                     (ciphertext_recvbuf+next), 12,
+                    (ciphertext_recvbuf+next+12), (unsigned long )((recvcount*recvtype_sz)+16),
+                    NULL, 0)){
+                printf("Decryption error: allgather\n");
+              fflush(stdout);        
+              }
 
 
 

@@ -18,6 +18,7 @@ mpi_sources +=                             \
 mpi_core_sources +=											\
     src/mpi/coll/allgather/allgather_allcomm_nb.c	\
     src/mpi/coll/allgather/allgather_intra_recursive_doubling.c	\
+    src/mpi/coll/allgather/sec_allgather_intra_recursive_doubling.c	\
     src/mpi/coll/allgather/allgather_intra_brucks.c				\
     src/mpi/coll/allgather/allgather_intra_ring.c					\
     src/mpi/coll/allgather/sec_allgather_intra_ring.c					\

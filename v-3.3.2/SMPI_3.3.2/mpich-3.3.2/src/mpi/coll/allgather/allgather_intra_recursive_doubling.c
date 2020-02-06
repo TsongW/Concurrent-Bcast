@@ -210,7 +210,7 @@ int MPIR_Allgather_intra_recursive_doubling(const void *sendbuf,
 
         mask <<= 1;
         i++;
-    }
+    }//end while
 
   fn_exit:
     if (mpi_errno_ret)
