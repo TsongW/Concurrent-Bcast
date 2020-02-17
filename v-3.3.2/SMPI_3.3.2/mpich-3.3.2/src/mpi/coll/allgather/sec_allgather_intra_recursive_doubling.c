@@ -185,13 +185,17 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 		
 	/*
-	* Posting the first receive and waiting for the receive
+	* Waiting for the receive
 	*/
 	
 
 	  mpi_errno = MPIC_Wait((recv_req_ptr[0]), errflag);
-	  if (mpi_errno)
+	  if (mpi_errno){
 		  MPIR_ERR_POPFATAL(mpi_errno);
+		  printf("Error in Wait 1 at S_RD\n");
+	  }else{
+	  		printf("Successfully received %d size from %d in buffer index %d\n", enc_recv_size, dst, recv_offset);
+	  }
 
 
 	  *(&status) = (recv_req_ptr[0])->status;
@@ -200,6 +204,8 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 	  if (mpi_errno == MPI_SUCCESS) {
 		  mpi_errno = recv_req_ptr[0]->status.MPI_ERROR;
+	  }else{
+	  	printf("Error in status check 1 at S_RD\n");
 	  }
 
 	  MPIR_Request_free(recv_req_ptr[0]);
@@ -271,8 +277,8 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		prev_my_tree_root = rank >> prev_i;
 		prev_my_tree_root <<= prev_i;
 
-		prev_send_offset = prev_my_tree_root * enc_recv_size * recvtype_extent;
-		prev_recv_offset = prev_dst_tree_root * enc_recv_size * recvtype_extent;
+		prev_send_offset = prev_my_tree_root * enc_recv_size;
+		prev_recv_offset = prev_dst_tree_root * enc_recv_size;
 
 
 		//Now, we compute the offsets of the previously received messages in the buffer
@@ -281,30 +287,55 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		int number_of_received_msgs = 1<< prev_i, err_num;
 		dec_begin_offset = prev_recv_offset;
         if(prev_send_offset<prev_recv_offset){
-        	dec_end_offset = prev_recv_offset + number_of_received_msgs * (enc_recv_size * recvtype_extent);
+        	dec_end_offset = prev_recv_offset + number_of_received_msgs * (enc_recv_size);
         }else{
         	dec_end_offset = prev_send_offset;
         }
 
  		unsigned long decrypted_msg_begin_offset = prev_dst_tree_root * recvcount * recvtype_extent;
- 		unsigned long decrypted_msg_len = recvcount * recvtype_extent;
+ 		unsigned long decrypted_msg_len = 0;
         for (int idx=0; idx<number_of_received_msgs; ++idx){
-        	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset),
-	              &decrypted_msg_len, (unsigned long )((decrypted_msg_len)+16),
+        	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset+(idx*recvcount * recvtype_extent)),
+	              &decrypted_msg_len, (unsigned long )((recvcount * recvtype_extent)+16),
 	               (ciphertext_recvbuf+dec_begin_offset), 12,
-	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )((enc_recv_size * recvtype_extent)+16),
+	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )(enc_recv_size -12),
 	              NULL, 0);
         	if(!err_num){
-	        printf("Decryption error: allgather (sRD-1)\nError: %d\n", err_num);
-	        fflush(stdout);        
+		        printf("Decryption error: allgather (sRD-1)\nError: %d\n", err_num);
+		        printf("Failed Decryption #%d in iteration %d by %d\n", idx, i, rank);
+		        printf("decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
+		        fflush(stdout);        
+	      }else{
+	      	printf("Successful Decryption #%d in iteration %d by %d\n", idx, i, rank);
+	      	printf("decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
 	      }
-        }
+        }//end for
 		
 
 
 
 		mask <<= 1;
         i++;
+
+
+
+
+        /*
+		* Waiting for the receives
+		*/
+
+		mpi_errno = MPIC_Wait((recv_req_ptr[i]), errflag);
+		if (mpi_errno)
+		  MPIR_ERR_POPFATAL(mpi_errno);
+
+		*(&status) = (recv_req_ptr[i])->status;
+
+		if (mpi_errno == MPI_SUCCESS) {
+		  mpi_errno = recv_req_ptr[i]->status.MPI_ERROR;
+		}
+
+		MPIR_Request_free(recv_req_ptr[i]);
+
 	}//end while
 
 
@@ -324,8 +355,8 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		prev_my_tree_root = rank >> prev_i;
 		prev_my_tree_root <<= prev_i;
 
-		prev_send_offset = prev_my_tree_root * enc_recv_size * recvtype_extent;
-		prev_recv_offset = prev_dst_tree_root * enc_recv_size * recvtype_extent;
+		prev_send_offset = prev_my_tree_root * enc_recv_size;
+		prev_recv_offset = prev_dst_tree_root * enc_recv_size;
 
 
 		//Now, we compute the offsets of the previously received messages in the buffer
@@ -334,7 +365,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		int number_of_received_msgs = 1<< prev_i, err_num;
 		dec_begin_offset = prev_recv_offset;
         if(prev_send_offset<prev_recv_offset){
-        	dec_end_offset = prev_recv_offset + number_of_received_msgs * (enc_recv_size * recvtype_extent);
+        	dec_end_offset = prev_recv_offset + number_of_received_msgs * (enc_recv_size);
         }else{
         	dec_end_offset = prev_send_offset;
         }
@@ -342,10 +373,10 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
  		unsigned long decrypted_msg_begin_offset = prev_dst_tree_root * recvcount * recvtype_extent;
  		unsigned long decrypted_msg_len = recvcount * recvtype_extent;
         for (int idx=0; idx<number_of_received_msgs; ++idx){
-        	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset),
-	              &decrypted_msg_len, (unsigned long )((decrypted_msg_len)+16),
+        	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset+(idx*recvcount * recvtype_extent)),
+	              &decrypted_msg_len, (unsigned long )((recvcount * recvtype_extent)+16),
 	               (ciphertext_recvbuf+dec_begin_offset), 12,
-	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )((enc_recv_size * recvtype_extent)+16),
+	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )(enc_recv_size -12),
 	              NULL, 0);
         	if(!err_num){
 	        printf("Decryption error: allgather (sRD-2)\nError: %d\n", err_num);
