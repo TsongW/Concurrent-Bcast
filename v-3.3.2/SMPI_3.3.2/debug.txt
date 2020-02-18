@@ -1,0 +1,57 @@
+
+		****** Secure MPI with BoringSSL  128  GCM-SIV ********
+Secure RD is called!
+Rank 0 tried to send 28028 to 1 in the first send
+Rank 6 tried to send 28028 to 7 in the first send
+Rank 1 tried to send 28028 to 0 in the first send
+Rank 0 received 28028 size from 1 in buffer index 28028
+rank 0 wants to receive 168168 from 2 at index 56056
+Rank 4 tried to send 28028 to 5 in the first send
+Rank 0 tried to send 56056 from buffer index 0 to 2 in send number 2
+Rank 1 received 28028 size from 0 in buffer index 0
+rank 1 wants to receive 168168 from 3 at index 56056
+Successful Decryption #0 in iteration 1 by 0 decrypted_msg_begin_offset: 28000, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 28028
+Rank 1 tried to send 56056 from buffer index 0 to 3 in send number 2
+Successful Decryption #0 in iteration 1 by 1 decrypted_msg_begin_offset: 0, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 0
+Rank 3 tried to send 28028 to 2 in the first send
+Rank 2 tried to send 28028 to 3 in the first send
+Rank 3 received 28028 size from 2 in buffer index 56056
+rank 3 wants to receive 224224 from 1 at index 0
+Rank 2 received 28028 size from 3 in buffer index 84084
+rank 2 wants to receive 224224 from 0 at index 0
+Rank 2 tried to send 56056 from buffer index 56056 to 0 in send number 2
+Rank 3 tried to send 56056 from buffer index 56056 to 1 in send number 2
+rank 0 wants to receive 112112 from 4 at index 112112
+Rank 0 tried to send 224224 from buffer index 0 to 4 in send number 3
+Successful Decryption #0 in iteration 1 by 2 decrypted_msg_begin_offset: 84000, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 84084
+rank 2 wants to receive 112112 from 6 at index 112112
+Rank 2 tried to send 280280 from buffer index 0 to 6 in send number 3
+Successful Decryption #0 in iteration 1 by 3 decrypted_msg_begin_offset: 56000, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 56056
+rank 3 wants to receive 112112 from 7 at index 112112
+Rank 3 tried to send 280280 from buffer index 0 to 7 in send number 3
+Rank 7 tried to send 28028 to 6 in the first send
+Failed Decryption #0 in iteration 2 by 0 decrypted_msg_begin_offset: 56000, added by: 0, decrypted_msg_len: 0, dec_begin_offset: 56056
+Successful Decryption #1 in iteration 2 by 0 decrypted_msg_begin_offset: 56000, added by: 28000, decrypted_msg_len: 28000, dec_begin_offset: 56056
+rank 1 wants to receive 112112 from 5 at index 112112
+Rank 1 tried to send 224224 from buffer index 0 to 5 in send number 3
+Successful Decryption #0 in iteration 2 by 1 decrypted_msg_begin_offset: 56000, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 56056
+Failed Decryption #1 in iteration 2 by 1 decrypted_msg_begin_offset: 56000, added by: 28000, decrypted_msg_len: 0, dec_begin_offset: 56056
+Failed Decryption #0 in iteration 2 by 2 decrypted_msg_begin_offset: 0, added by: 0, decrypted_msg_len: 0, dec_begin_offset: 0
+Successful Decryption #1 in iteration 2 by 2 decrypted_msg_begin_offset: 0, added by: 28000, decrypted_msg_len: 28000, dec_begin_offset: 0
+Successful Decryption #0 in iteration 2 by 3 decrypted_msg_begin_offset: 0, added by: 0, decrypted_msg_len: 28000, dec_begin_offset: 0
+Failed Decryption #1 in iteration 2 by 3 decrypted_msg_begin_offset: 0, added by: 28000, decrypted_msg_len: 0, dec_begin_offset: 0
+Rank 4 received 28028 size from 5 in buffer index 140140
+rank 4 wants to receive 56056 from 6 at index 168168
+Rank 5 tried to send 28028 to 4 in the first send
+Rank 4 tried to send 56056 from buffer index 112112 to 6 in send number 2
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 27050 RUNNING AT inv36
+=   EXIT CODE: 139
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11)
+This typically refers to a problem with your application.
+Please see the FAQ page for debugging suggestions

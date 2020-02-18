@@ -36,7 +36,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 											MPIR_Comm * comm_ptr, MPIR_Errflag_t * errflag)
 {
 	int comm_size, rank;
-	int mpi_errno = MPI_SUCCESS;
+	int mpi_errno = MPI_SUCCESS, mpi_rcv_errno=MPI_SUCCESS;
 	int mpi_errno_ret = MPI_SUCCESS;
 	MPI_Aint recvtype_extent;
 	int j, i;
@@ -97,7 +97,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 	// ciphertext_sendbuf = (char *) malloc(max_out_len * size_of(char));
 
 	enc_recv_size = (recvcount*recvtype_sz)+16+12;
-
+	
 	RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce
 	if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
 	  &ciphertext_sendbuf_len, max_out_len,
@@ -113,7 +113,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 	* Posting the first send
 	*/
 
-	curr_cnt = recvcount;
+	curr_cnt = enc_recv_size;
 
 	mask = 0x1;
 	i = 0;
@@ -131,8 +131,8 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 	my_tree_root <<= i;
 
 	/* FIXME: saving an MPI_Aint into an int */
-	send_offset = my_tree_root * enc_recv_size * recvtype_extent;
-	recv_offset = dst_tree_root * enc_recv_size * recvtype_extent;
+	send_offset = my_tree_root * enc_recv_size;
+	recv_offset = dst_tree_root * enc_recv_size;
 
 	
 
@@ -149,27 +149,21 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 	  mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+recv_offset, enc_recv_size, MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
 							 comm_ptr, context_id, &(recv_req_ptr[0]));
-	  if (mpi_errno)
+	  if (mpi_errno){
 		  MPIR_ERR_POP(mpi_errno);
+		  mpi_rcv_errno = mpi_errno;
+	  }
 
+	  
 
 	  mpi_errno = MPID_Isend(ciphertext_sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
 							 comm_ptr, context_id, &(send_req_ptr[0]));
 	  if (mpi_errno)
 		  MPIR_ERR_POP(mpi_errno);
 
-	  if (mpi_errno) {
-			/* for communication errors, just record the error but continue */
-			*errflag =
-				MPIX_ERR_PROC_FAILED ==
-				MPIR_ERR_GET_CLASS(mpi_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
-			MPIR_ERR_SET(mpi_errno, *errflag, "**fail");
-			MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-			last_recv_cnt = 0;
-		} else {
-			MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-		}
-		curr_cnt += last_recv_cnt;
+	  printf("Rank %d tried to send %d to %d in the first send\n", rank, ciphertext_sendbuf_len+12, dst);
+
+	  
 
 	 
 
@@ -194,7 +188,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		  MPIR_ERR_POPFATAL(mpi_errno);
 		  printf("Error in Wait 1 at S_RD\n");
 	  }else{
-	  		printf("Successfully received %d size from %d in buffer index %d\n", enc_recv_size, dst, recv_offset);
+	  		printf("Rank %d received %d size from %d in buffer index %d\n", rank, enc_recv_size, dst, recv_offset);
 	  }
 
 
@@ -210,11 +204,24 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 	  MPIR_Request_free(recv_req_ptr[0]);
 
-
+	  if (mpi_rcv_errno) {
+			/* for communication errors, just record the error but continue */
+			*errflag =
+				MPIX_ERR_PROC_FAILED ==
+				MPIR_ERR_GET_CLASS(mpi_rcv_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
+			MPIR_ERR_SET(mpi_rcv_errno, *errflag, "**fail");
+			MPIR_ERR_ADD(mpi_errno_ret, last_recv_cnt);
+			last_recv_cnt = 0;
+		} else {
+			//MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+			last_recv_cnt = enc_recv_size;
+		}
+		curr_cnt += last_recv_cnt;
+		//printf("For rank %d, current count is %d and last_recv_cnt was %d\n", rank, curr_cnt, last_recv_cnt);
 
 	  mask <<= 1;
 	  i=1;
-
+	  
 	  while (mask < comm_size) {
 		dst = rank ^ mask;
 
@@ -230,34 +237,27 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 		my_tree_root <<= i;
 
 		/* FIXME: saving an MPI_Aint into an int */
-		send_offset = my_tree_root * enc_recv_size * recvtype_extent;
-		recv_offset = dst_tree_root * enc_recv_size * recvtype_extent;
+		send_offset = my_tree_root * enc_recv_size;
+		recv_offset = dst_tree_root * enc_recv_size;
 
 		if (dst < comm_size) {
-
+			printf("rank %d wants to receive (%d - %d) *  %d = %d from %d at index %d\n", rank, comm_size , dst_tree_root,   enc_recv_size, (comm_size - dst_tree_root) *  enc_recv_size, dst, recv_offset);
 			mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+recv_offset, (comm_size - dst_tree_root) *  enc_recv_size, MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
 							 comm_ptr, context_id, &(recv_req_ptr[i]));
-			if (mpi_errno)
+			if (mpi_errno){
 				MPIR_ERR_POP(mpi_errno);
-
+				mpi_rcv_errno = mpi_errno;
+			}
+			//printf("rank %d wants to send %d to %d from index %d\n", rank, curr_cnt, dst, send_offset);
 
 			mpi_errno = MPID_Isend(ciphertext_recvbuf + send_offset, curr_cnt, MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
 								 comm_ptr, context_id, &(send_req_ptr[i]));
 			if (mpi_errno)
 				MPIR_ERR_POP(mpi_errno);
 
-			if (mpi_errno) {
-				/* for communication errors, just record the error but continue */
-				*errflag =
-					MPIX_ERR_PROC_FAILED ==
-					MPIR_ERR_GET_CLASS(mpi_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
-				MPIR_ERR_SET(mpi_errno, *errflag, "**fail");
-				MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-				last_recv_cnt = 0;
-			} else {
-				MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-			}
-			curr_cnt += last_recv_cnt;
+			printf("Rank %d tried to send %d from buffer index %d to %d in send number %d\n", rank, curr_cnt, send_offset, dst, i+1);
+
+			
 		}
 
 
@@ -295,38 +295,35 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
  		unsigned long decrypted_msg_begin_offset = prev_dst_tree_root * recvcount * recvtype_extent;
  		unsigned long decrypted_msg_len = 0;
         for (int idx=0; idx<number_of_received_msgs; ++idx){
+        	//printf("rank %d tries to do decryption #%d in iteration %d\n", rank, idx, i);
         	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset+(idx*recvcount * recvtype_extent)),
 	              &decrypted_msg_len, (unsigned long )((recvcount * recvtype_extent)+16),
-	               (ciphertext_recvbuf+dec_begin_offset), 12,
-	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )(enc_recv_size -12),
+	               (ciphertext_recvbuf+dec_begin_offset+idx*enc_recv_size), 12,
+	              (ciphertext_recvbuf+dec_begin_offset+12+idx*enc_recv_size), (unsigned long )(enc_recv_size -12),
 	              NULL, 0);
         	if(!err_num){
-		        printf("Decryption error: allgather (sRD-1)\nError: %d\n", err_num);
-		        printf("Failed Decryption #%d in iteration %d by %d\n", idx, i, rank);
-		        printf("decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
+		        //printf("Decryption error: allgather (sRD-1)\nError: %d\n", err_num);
+		        printf("Failed Decryption #%d in iteration %d by %d decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", idx, i, rank, decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
 		        fflush(stdout);        
 	      }else{
-	      	printf("Successful Decryption #%d in iteration %d by %d\n", idx, i, rank);
-	      	printf("decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
+	      	  printf("Successful Decryption #%d in iteration %d by %d decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", idx, i, rank, decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset);
 	      }
         }//end for
 		
 
-
-
-		mask <<= 1;
-        i++;
-
-
-
-
+	
         /*
 		* Waiting for the receives
 		*/
 
 		mpi_errno = MPIC_Wait((recv_req_ptr[i]), errflag);
-		if (mpi_errno)
+		if (mpi_errno){
 		  MPIR_ERR_POPFATAL(mpi_errno);
+		}
+		else
+			printf("Rank %d received %d size from %d in buffer index %d and last_recv_cnt = %d\n in iteration #%d", rank, (comm_size - dst_tree_root) *  enc_recv_size, dst, recv_offset, last_recv_cnt, i);
+		
+		
 
 		*(&status) = (recv_req_ptr[i])->status;
 
@@ -336,9 +333,31 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 		MPIR_Request_free(recv_req_ptr[i]);
 
+		
+
+		if (mpi_rcv_errno) {
+				/* for communication errors, just record the error but continue */
+				*errflag =
+					MPIX_ERR_PROC_FAILED ==
+					MPIR_ERR_GET_CLASS(mpi_rcv_errno) ? MPIR_ERR_PROC_FAILED : MPIR_ERR_OTHER;
+				MPIR_ERR_SET(mpi_rcv_errno, *errflag, "**fail");
+				MPIR_ERR_ADD(mpi_errno_ret, mpi_rcv_errno);
+				last_recv_cnt = 0;
+			} else {
+				//MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+				last_recv_cnt = (comm_size - dst_tree_root) *  enc_recv_size;
+			}
+			curr_cnt += last_recv_cnt;
+
+				
+
+
+		mask <<= 1;
+        i++;
+
 	}//end while
 
-
+	printf("\n\nRank %d exitted the while loop!\n\n\n", rank);
 	//Last Decryption
 
 		//first, we need to compute the previous send and recv offsets:
@@ -371,16 +390,20 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
         }
 
  		unsigned long decrypted_msg_begin_offset = prev_dst_tree_root * recvcount * recvtype_extent;
- 		unsigned long decrypted_msg_len = recvcount * recvtype_extent;
+ 		unsigned long decrypted_msg_len = 0;
         for (int idx=0; idx<number_of_received_msgs; ++idx){
+        	//printf("rank %d tries to do decryption #%d in iteration %d\n", rank, idx, i);
         	err_num = EVP_AEAD_CTX_open(ctx, (recvbuf+decrypted_msg_begin_offset+(idx*recvcount * recvtype_extent)),
 	              &decrypted_msg_len, (unsigned long )((recvcount * recvtype_extent)+16),
-	               (ciphertext_recvbuf+dec_begin_offset), 12,
-	              (ciphertext_recvbuf+dec_begin_offset+12), (unsigned long )(enc_recv_size -12),
+	               (ciphertext_recvbuf+dec_begin_offset+idx*enc_recv_size), 12,
+	              (ciphertext_recvbuf+dec_begin_offset+12+idx*enc_recv_size), (unsigned long )(enc_recv_size -12),
 	              NULL, 0);
         	if(!err_num){
-	        printf("Decryption error: allgather (sRD-2)\nError: %d\n", err_num);
-	        fflush(stdout);        
+		        //printf("Decryption error: allgather (sRD-1)\nError: %d\n", err_num);
+		        printf("Failed Decryption #%d in iteration %d by %d decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", idx, i, rank, decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset+idx*enc_recv_size);
+		        fflush(stdout);        
+	      }else{
+	      	printf("Successful Decryption #%d in iteration %d by %d decrypted_msg_begin_offset: %d, added by: %d, decrypted_msg_len: %d, dec_begin_offset: %d\n", idx, i, rank, decrypted_msg_begin_offset, (idx*recvcount * recvtype_extent), decrypted_msg_len, dec_begin_offset+idx*enc_recv_size);
 	      }
         }
 
