@@ -96,6 +96,7 @@ int MPIR_Allgather_intra_recursive_doubling(const void *sendbuf,
         recv_offset = dst_tree_root * recvcount * recvtype_extent;
 
         if (dst < comm_size) {
+          //printf("rank %d wants to receive (%d - %d) *  %d = %d from %d and send %d to it\n", rank, comm_size , dst_tree_root, recvcount, (comm_size - dst_tree_root) * recvcount, dst, curr_cnt);
             mpi_errno = MPIC_Sendrecv(((char *) recvbuf + send_offset),
                                       curr_cnt, recvtype, dst,
                                       MPIR_ALLGATHER_TAG,
