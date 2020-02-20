@@ -138,9 +138,16 @@ int MPIR_Allgather_intra_auto(const void *sendbuf,
         }
         
     } else if (tot_bytes < MPIR_CVAR_ALLGATHER_SHORT_MSG_SIZE) {
-        mpi_errno =
+        if(SECURE_MPI){
+          mpi_errno =
+            MPIR_SEC_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
+                                        comm_ptr, errflag);
+        }else{
+          mpi_errno =
             MPIR_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
                                         comm_ptr, errflag);
+        }
+        
     } else {
       if(SECURE_MPI){
         mpi_errno =
@@ -203,11 +210,11 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
         if(SECURE_MPI){
           switch (MPIR_Allgather_intra_algo_choice) {
 
-            // case MPIR_ALLGATHER_INTRA_ALGO_BRUCKS:
-            //     mpi_errno =
-            //         MPIR_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount,
-            //                                     recvtype, comm_ptr, errflag);
-            //     break;
+            case MPIR_ALLGATHER_INTRA_ALGO_BRUCKS:
+                mpi_errno =
+                    MPIR_SEC_Allgather_intra_brucks(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+                                                recvtype, comm_ptr, errflag);
+                break;
             case MPIR_ALLGATHER_INTRA_ALGO_RECURSIVE_DOUBLING:
                 mpi_errno =
                     MPIR_SEC_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,

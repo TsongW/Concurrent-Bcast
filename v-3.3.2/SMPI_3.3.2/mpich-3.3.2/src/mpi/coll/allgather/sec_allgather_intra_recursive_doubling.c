@@ -102,7 +102,7 @@ int MPIR_SEC_Allgather_intra_recursive_doubling(const void *sendbuf,
 
 
 	/*
-	* Posting the first send
+	* Posting the first send and receive
 	*/
 
 	curr_cnt = enc_recv_size;

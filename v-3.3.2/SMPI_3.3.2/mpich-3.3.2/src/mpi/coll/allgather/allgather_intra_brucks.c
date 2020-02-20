@@ -16,6 +16,10 @@
  * Cost = lgp.alpha + n.((p-1)/p).beta
  * where n is total size of data gathered on each process.
  */
+
+
+
+
 #undef FUNCNAME
 #define FUNCNAME MPIR_Allgather_intra_brucks
 #undef FCNAME
@@ -54,6 +58,10 @@ int MPIR_Allgather_intra_brucks(const void *sendbuf,
     MPIR_Ensure_Aint_fits_in_pointer(MPIR_VOID_PTR_CAST_TO_MPI_AINT recvbuf +
                                      (comm_size * recvcount * recvtype_extent));
 
+
+    
+
+
     /* allocate a temporary buffer of the same size as recvbuf. */
 
     /* get true extent of recvtype */
@@ -83,7 +91,7 @@ int MPIR_Allgather_intra_brucks(const void *sendbuf,
 
     /* do the first \floor(\lg p) steps */
 
-    curr_cnt = recvcount;
+    //curr_cnt = recvcount;
     pof2 = 1;
     while (pof2 <= comm_size / 2) {
         src = (rank + pof2) % comm_size;

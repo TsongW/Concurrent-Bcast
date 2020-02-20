@@ -139,7 +139,7 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
 
             /* Now, load the "local" version in the recvbuf. */
             if (sendbuf != MPI_IN_PLACE) {
-              mpi_errno = c(sendbuf, sendcount, sendtype,
+              mpi_errno = MPIR_Localcopy(sendbuf, sendcount, sendtype,
                 ((char *) recvbuf +
                   rank * recvcount * recvtype_extent), recvcount, recvtype);
               if (mpi_errno) {
