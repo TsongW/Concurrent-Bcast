@@ -66,9 +66,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		++nr;
 		r*=2;
 	}
-	if(rank==0)
-		printf("nd=%d\n", nr);
-
+	
 	MPIR_Request *recv_req_ptr[nr], *send_req_ptr[nr];
 	int p;
 	for(p=0; p<nr; ++p){
@@ -114,7 +112,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 
 	enc_recv_size = (recvcount*recvtype_sz)+16+12;
 
-	//enc_recv_size = (recvcount*recvtype_sz);
+	// enc_recv_size = (recvcount*recvtype_sz);
 
 	RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce
 	if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
@@ -127,7 +125,10 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 	}
 
 	
-	printf("Rank %d reached checkpoint 0\n", rank);
+	// printf("Rank %d reached checkpoint 0\n", rank);
+
+
+
 
 	/*
 	* Posting the first send and receive
@@ -144,6 +145,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 	src = (rank + pof2) % comm_size;
 	dst = (rank - pof2 + comm_size) % comm_size;
 
+	// printf("Rank %d wants to receive %d from %d at %d in receive 1\n",rank, enc_recv_size, src, enc_recv_size);
 	// mpi_errno = MPID_Irecv((char*)tmp_buf+enc_recv_size, enc_recv_size, MPI_CHAR, src, MPIR_ALLGATHER_TAG,
 	// 	comm_ptr, context_id, &(recv_req_ptr[0]));
 	// if (mpi_errno){
@@ -170,9 +172,9 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 	if (mpi_errno)
 		MPIR_ERR_POP(mpi_errno);
 
-	printf("Rank %d reached checkpoint 1\n", rank);
+	// printf("Rank %d reached checkpoint 2\n", rank);
 
-	/* copy local data to the top of tmp_buf */
+		/* copy local data to the top of tmp_buf */
 	if (sendbuf != MPI_IN_PLACE) {
 		mpi_errno = MPIR_Localcopy(sendbuf, sendcount, sendtype, tmp_buf, recvcount, recvtype);
 		if (mpi_errno) {
@@ -187,8 +189,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		}
 	}
 
-	printf("Rank %d reached checkpoint 2\n", rank);
-
+	// printf("Rank %d reached checkpoint 1\n", rank);
 
 	/* Copy the local encrypted piece of data to the ciphertext_recvbuf*/  
 	mpi_errno = MPIR_Localcopy(ciphertext_sendbuf, enc_recv_size, MPI_CHAR,
@@ -197,8 +198,10 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		MPIR_ERR_POP(mpi_errno);
 	}
 
-	printf("Rank %d reached checkpoint 3\n", rank);
+	// printf("Rank %d reached checkpoint 3\n", rank);
 
+
+	
     /*
 	* Waiting for the receive
 	*/
@@ -232,12 +235,12 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 	curr_cnt *= 2;
 	pof2 *= 2;
 
-	printf("Rank %d reached checkpoint 4\n", rank);
+	//printf("Rank %d reached checkpoint 4\n", rank);
 
 
 
 		/* do the \floor(\lg p)-1 steps */
-	int iteration=1, total_number_of_recv_msgs=0, err_num=0, number_of_received_msgs;
+	int iteration=1, total_number_of_recv_msgs=1, err_num=0, number_of_received_msgs;
 	unsigned long decrypted_msg_len = 0;
 	while (pof2 <= comm_size / 2) {
 		src = (rank + pof2) % comm_size;
@@ -274,7 +277,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 
 			  /*Decrypt previously received data*/
 		number_of_received_msgs = (curr_cnt/2)/enc_recv_size;
-		total_number_of_recv_msgs += number_of_received_msgs;
+		
 
 		for (int idx=0; idx<number_of_received_msgs; ++idx){
 			err_num = EVP_AEAD_CTX_open(ctx, (tmp_buf+(total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent)),
@@ -287,6 +290,8 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 				fflush(stdout);        
 			}
 		}//end for
+
+		total_number_of_recv_msgs += number_of_received_msgs;
 
 
 		/*
@@ -320,13 +325,18 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		++iteration;
 	}//end While
 
-	printf("Rank %d reached checkpoint 5\n", rank);
+	//printf("Rank %d reached checkpoint 5\n", rank);
 
 
 
 	/* if comm_size is not a power of two, one more step is needed */
 
 	rem = comm_size - pof2;
+
+	if(rank==0){
+		printf("%d are remaining\n", rem);
+	}
+
 	if (rem) {
 		src = (rank + pof2) % comm_size;
 		dst = (rank - pof2 + comm_size) % comm_size;
@@ -339,7 +349,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		// 	mpi_rcv_errno = mpi_errno;
 		// }
 
-
+		printf("%d wants to recv %d from %d at %d\n", rank, rem*enc_recv_size, src, curr_cnt);
 		mpi_errno = MPID_Irecv((char*)ciphertext_recvbuf+curr_cnt, rem*enc_recv_size, MPI_CHAR, src, MPIR_ALLGATHER_TAG,
 			comm_ptr, context_id, &(recv_req_ptr[iteration]));
 		if (mpi_errno){
@@ -353,7 +363,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		// 	MPIR_ERR_POP(mpi_errno);
 
 
-
+		printf("%d wants to send %d to %d\n", rank, rem*enc_recv_size, dst);
 		mpi_errno = MPID_Isend(ciphertext_recvbuf, rem*enc_recv_size, MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
 			comm_ptr, context_id, &(send_req_ptr[iteration]));
 		if (mpi_errno)
@@ -362,7 +372,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 
 		  /*Decrypt previously received data*/
 		number_of_received_msgs = (curr_cnt/2)/enc_recv_size;
-		total_number_of_recv_msgs += number_of_received_msgs;
+		
 		decrypted_msg_len = 0;
 		for (int idx=0; idx<number_of_received_msgs; ++idx){
 			err_num = EVP_AEAD_CTX_open(ctx, (tmp_buf+(total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent)),
@@ -375,7 +385,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 				fflush(stdout);        
 			}
 		}//end for
-
+		total_number_of_recv_msgs += number_of_received_msgs;
 
 		/*
 		* Waiting for the receives
@@ -409,7 +419,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		/*Do the last decryption*/
 
 		number_of_received_msgs = rem;
-		total_number_of_recv_msgs += number_of_received_msgs;
+		
 		decrypted_msg_len = 0;
 		for (int idx=0; idx<number_of_received_msgs; ++idx){
 			err_num = EVP_AEAD_CTX_open(ctx, (tmp_buf+(total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent)),
@@ -420,10 +430,12 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 			if(!err_num){
 				printf("Failed Decryption #%d in iteration %d by %d\nTried to decrypt at %d and put at (%d+%d)*%d=%d\n", idx, iteration, rank, (total_number_of_recv_msgs+idx)*enc_recv_size, total_number_of_recv_msgs, idx, (recvcount * recvtype_extent), (total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent));
 				fflush(stdout);        
+			}else{
+				printf("%d decrypted %d from %d and copied to %d\n", rank, decrypted_msg_len, (total_number_of_recv_msgs + idx) * (enc_recv_size), (total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent));
 			}
 		}//end for
 
-
+		total_number_of_recv_msgs += number_of_received_msgs;
 		++iteration;
 
 	}//end if(rem)
@@ -432,7 +444,7 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 		/*Do the last decryption*/
 
 		number_of_received_msgs = (curr_cnt/2)/enc_recv_size;
-		total_number_of_recv_msgs += number_of_received_msgs;
+		
 		decrypted_msg_len = 0;
 		for (int idx=0; idx<number_of_received_msgs; ++idx){
 			err_num = EVP_AEAD_CTX_open(ctx, (tmp_buf+(total_number_of_recv_msgs+idx)*(recvcount * recvtype_extent)),
@@ -445,8 +457,9 @@ int MPIR_SEC_Allgather_intra_brucks(const void *sendbuf,
 				fflush(stdout);        
 			}
 		}//end for
+		total_number_of_recv_msgs += number_of_received_msgs;
 	}//end else
-	printf("Rank %d reached checkpoint 6\n", rank);
+	//printf("Rank %d reached checkpoint 6\n", rank);
 
 
 	/* Rotate blocks in tmp_buf down by (rank) blocks and store
