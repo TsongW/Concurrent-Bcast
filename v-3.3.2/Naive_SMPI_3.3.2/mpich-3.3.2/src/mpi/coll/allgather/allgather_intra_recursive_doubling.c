@@ -47,7 +47,9 @@ int MPIR_Allgather_intra_recursive_doubling(const void *sendbuf,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-
+    if(rank==0){
+        printf("RD\n");
+    }
 #ifdef HAVE_ERROR_CHECKING
     /* Currently this algorithm can only handle power-of-2 comm_size.
      * Non power-of-2 comm_size is still experimental */
