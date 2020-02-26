@@ -2,6 +2,6 @@
 
 for(( c=0; c<20; c++ ))
 do
-/home/sadeghil/Installed_Tools/MPICH_3_3_2/bin/mpirun -n 20 ./osu_allgather > out_20.txt
+/home/sadeghil/Installed_Tools/MPICH_3_3_2/bin/mpirun -n 20 ./osu_allgather >> out_20.txt
 done
 printf "\n20 is done \n"
