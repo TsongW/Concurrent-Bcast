@@ -47,10 +47,10 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
 
 	comm_size = comm_ptr->local_size;
 	rank = comm_ptr->rank;
-	if(rank==0){
+	/*if(rank==0){
 	  printf("Base Ring is called!\n");
 	  fflush(stdout);
-	}
+	  }*/
 	MPIR_Datatype_get_extent_macro(recvtype, recvtype_extent);
 
 	/* This is the largest offset we add to recvbuf */
@@ -129,7 +129,7 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
 				  MPIR_ERR_POP(mpi_errno);
 
 
-			  mpi_errno = MPID_Isend(sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+			  mpi_errno = MPID_Isend(sendbuf, enc_recv_size, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
 									 comm_ptr, context_id, &(send_req_ptr[0]));
 			  if (mpi_errno)
 				  MPIR_ERR_POP(mpi_errno);
@@ -192,7 +192,7 @@ int MPIR_SEC_Allgather_intra_ring(const void *sendbuf,
 				  MPIR_ERR_POP(mpi_errno);
 
 
-			  mpi_errno = MPID_Isend((char*)recvbuf + j*(enc_recv_size), ciphertext_sendbuf_len+12, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+			  mpi_errno = MPID_Isend((char*)recvbuf + j*(enc_recv_size), enc_recv_size, MPI_CHAR, right, MPIR_ALLGATHER_TAG,
 									 comm_ptr, context_id, &(send_req_ptr[i-1]));
 			  if (mpi_errno)
 				  MPIR_ERR_POP(mpi_errno);
