@@ -126,28 +126,33 @@ int MPIR_Allgather_intra_auto(const void *sendbuf,
     MPIR_Datatype_get_size_macro(recvtype, type_size);
 
     tot_bytes = (MPI_Aint) recvcount *comm_size * type_size;
-    if (!(comm_size & (comm_size - 1))) {
-        if(SECURE_MPI){
-          mpi_errno =
-            MPIR_SEC_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,
+
+    mpi_errno = MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf,
                                                     recvcount, recvtype, comm_ptr, errflag);
-        }else{
-          mpi_errno =
-            MPIR_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,
-                                                    recvcount, recvtype, comm_ptr, errflag);
-        }
+
+
+    // if (!(comm_size & (comm_size - 1))) {
+    //     if(SECURE_MPI){
+    //       mpi_errno =
+    //         MPIR_SEC_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,
+    //                                                 recvcount, recvtype, comm_ptr, errflag);
+    //     }else{
+    //       mpi_errno =
+    //         MPIR_Allgather_intra_recursive_doubling(sendbuf, sendcount, sendtype, recvbuf,
+    //                                                 recvcount, recvtype, comm_ptr, errflag);
+    //     }
         
-    } else {
-      if(SECURE_MPI){
-        mpi_errno =
-            MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
-                                      comm_ptr, errflag);
-      }else{
-        mpi_errno =
-            MPIR_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
-                                      comm_ptr, errflag);
-      }
-    }
+    // } else {
+    //   if(SECURE_MPI){
+    //     mpi_errno =
+    //         MPIR_SEC_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
+    //                                   comm_ptr, errflag);
+    //   }else{
+    //     mpi_errno =
+    //         MPIR_Allgather_intra_ring(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype,
+    //                                   comm_ptr, errflag);
+    //   }
+    // }
     if (mpi_errno)
         MPIR_ERR_POP(mpi_errno);
 
