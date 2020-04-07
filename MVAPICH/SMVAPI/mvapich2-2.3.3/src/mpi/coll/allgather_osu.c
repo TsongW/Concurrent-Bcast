@@ -108,13 +108,13 @@ int MPIR_Allgather_RD_Allgather_Comm_MV2(const void *sendbuf,
                                  MPIR_Errflag_t *errflag)
 {
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_rd_allgather_comm, 1);
-
+    printf("MPIR_Allgather_RD_Allgather_Comm_MV2\n");
     return 0;
 }
 
 int allgather_tuning(int comm_size, int pof2)
 {
-
+    printf("allgather_tuning\n");
     char *value;
     if (pof2 == 1 && (value = getenv("MV2_ALLGATHER_RD_THRESHOLD")) != NULL) {
         /* pof2 case. User has set the run-time parameter
@@ -206,6 +206,9 @@ int MPIR_Allgather_Direct_MV2(
     int i;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
+    
+    printf("MPIR_Allgather_Direct_MV2\n");
+
     MPIU_CHKLMEM_DECL(2);
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_direct, 1);
@@ -355,6 +358,9 @@ int MPIR_Allgather_DirectSpread_MV2(
     int i;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
+
+    printf("MPIR_Allgather_DirectSpread_MV2\n");
+
     MPIU_CHKLMEM_DECL(2);
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_directspread, 1);
@@ -507,6 +513,9 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
     int j, i;
     int curr_cnt, dst;
     MPI_Status status;
+
+    printf("MPIR_Allgather_RD_MV2\n");
+
     int mask, dst_tree_root, my_tree_root, is_homogeneous,
         send_offset, recv_offset, last_recv_cnt = 0, nprocs_completed, k,
         offset, tmp_mask, tree_root;
@@ -887,6 +896,8 @@ int MPIR_Allgather_Bruck_MV2(const void *sendbuf,
     int curr_cnt, dst;
     int pof2 = 0;
 
+    printf("MPIR_Allgather_Bruck_MV2\n");
+
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_bruck, 1);
 
     comm_size = comm_ptr->local_size;
@@ -1027,6 +1038,8 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
     int j, i;
     int left, right, jnext;
 
+    printf("MPIR_Allgather_Ring_MV2\n");
+
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_ring, 1);
 
     comm_size = comm_ptr->local_size;
@@ -1096,6 +1109,8 @@ int MPIR_Allgather_gather_bcast_MV2(
     int mpi_errno = MPI_SUCCESS;
     int gather_bcast_root = -1;
 
+    printf("MPIR_Allgather_gather_bcast_MV2\n");
+
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_gather_bcast, 1);
 
     comm_size = comm_ptr->local_size;
@@ -1141,6 +1156,8 @@ int MPIR_Allgather_intra_MV2(const void *sendbuf,
     int mpi_errno = MPI_SUCCESS;
     int type_size;
     int comm_size_is_pof2 = 0;
+
+    printf("MPIR_Allgather_intra_MV2\n");
 
     if (((sendcount == 0) && (sendbuf != MPI_IN_PLACE)) || (recvcount == 0)) {
         return MPI_SUCCESS;
@@ -1198,6 +1215,10 @@ int MPIR_2lvl_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendty
     MPI_Aint recvtype_extent = 0;  /* Datatype extent */
     MPI_Comm shmem_comm, leader_comm;
     MPID_Comm *shmem_commptr=NULL, *leader_commptr = NULL;
+
+
+    printf("MPIR_2lvl_Allgather_MV2\n");
+
 
     if (recvcnt == 0) {
         return MPI_SUCCESS;
@@ -1333,6 +1354,9 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
     MPIR_TIMER_START(coll,allgather,2lvl_nonblocked);
     int i;
     int mpi_errno = MPI_SUCCESS;
+
+    printf("MPIR_2lvl_Allgather_nonblocked_MV2\n");
+
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_nonblocked, 1);
 
@@ -1561,7 +1585,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int i;
-
+    printf("MPIR_2lvl_Allgather_Ring_nonblocked_MV2\n");
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
@@ -1655,6 +1679,8 @@ int MPIR_2lvl_Allgather_Direct_MV2(
     int i, j;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
+
+    printf("MPIR_2lvl_Allgather_Direct_MV2\n");
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_direct, 1);
 
@@ -1951,6 +1977,9 @@ int MPIR_2lvl_Allgather_Ring_MV2(
     int i, j;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
+
+    printf("MPIR_2lvl_Allgather_Ring_MV2\n");
+
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_ring, 1);
 
@@ -2259,6 +2288,8 @@ int MPIR_Allgather_index_tuned_intra_MV2(const void *sendbuf, int sendcount, MPI
     MPI_Comm shmem_comm;
     MPID_Comm *shmem_commptr=NULL;
 
+    printf("MPIR_Allgather_index_tuned_intra_MV2\n");
+
     /* Get the size of the communicator */
     comm_size = comm_ptr->local_size;
 
@@ -2341,6 +2372,7 @@ int MPIR_Allgather_index_tuned_intra_MV2(const void *sendbuf, int sendcount, MPI
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
     if (mv2_use_old_allgather == 1) {
+    printf("Checkpoint 10\n");
 	MPIR_Allgather_intra_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount,
 				 recvtype, comm_ptr, errflag);
 	goto fn_exit;
@@ -2362,6 +2394,7 @@ int MPIR_Allgather_index_tuned_intra_MV2(const void *sendbuf, int sendcount, MPI
                 (comm_ptr->dev.ch.is_blocked == 0 &&
                 (mv2_allgather_cyclic_algo_threshold <= nbytes ||
                  mv2_allgather_ring_algo_threshold <= nbytes))) {
+                printf("Checkpoint 11\n");
                 /* for large messages or nonblocked hostfiles, use ring-allgather algorithm. */
                 mpi_errno = MPIR_2lvl_Allgather_Ring_nonblocked_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr, errflag);
                 goto fn_cuda_exit;
@@ -2457,10 +2490,12 @@ conf_check_end:
             }
             /* Calling Allgather with temporary buffer and allgather communicator */
             if (sendbuf != MPI_IN_PLACE) {
+                printf("Checkpoint 12\n");
                 mpi_errno = MPIR_Allgather_RD_MV2(sendbuf, sendcount, sendtype,
                                                      tmp_recv_buf, recvcount,
                                                      recvtype, allgather_comm_ptr, errflag);
             } else {
+                printf("Checkpoint 13\n");
                 mpi_errno = MPIR_Allgather_RD_MV2(recvbuf + rank * recvcount *
                                                      recvtype_extent, recvcount,
                                                      recvtype, tmp_recv_buf,
@@ -2500,6 +2535,7 @@ conf_check_end:
             }
             MPIU_Free(tmp_recv_buf);
         } else {
+            printf("Checkpoint 14\n");
             mpi_errno = MPIR_Allgather_RD_MV2(sendbuf, sendcount, sendtype,
                                                 recvbuf, recvcount, recvtype,
                                                 comm_ptr, errflag);
@@ -2512,6 +2548,7 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_Allgather_Ring_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_Allgather_DirectSpread_MV2) {
+            printf("Checkpoint 15\n");
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);
@@ -2523,10 +2560,12 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_nonblocked_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_MV2)) {
+        printf("Checkpoint 16\n");
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);
     } else {
+        printf("Checkpoint 17\n");
         mpi_errno = MPIR_Allgather_intra(sendbuf, sendcount, sendtype,
                                          recvbuf, recvcount, recvtype, comm_ptr, errflag);
     }
@@ -2576,8 +2615,11 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
     int local_size = -1;
     MPI_Comm shmem_comm;
     MPID_Comm *shmem_commptr=NULL;
+
+    printf("MPIR_Allgather_MV2\n");
     
     if (mv2_use_indexed_tuning || mv2_use_indexed_allgather_tuning) {
+        printf("Index Tuning!\n");
 	    return MPIR_Allgather_index_tuned_intra_MV2(sendbuf, sendcount,
                             sendtype, recvbuf, recvcount,
 				            recvtype, comm_ptr, errflag);
@@ -2665,6 +2707,7 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
     if (mv2_use_old_allgather == 1) {
+        printf("OLD!\n");
 	MPIR_Allgather_intra_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount,
 				 recvtype, comm_ptr, errflag);
 	goto fn_exit;
@@ -2723,16 +2766,19 @@ conf_check_end:
         if(comm_ptr->dev.ch.shmem_coll_ok == 1){
             MPIR_T_PVAR_COUNTER_INC(MV2, mv2_num_shmem_coll_calls, 1);
 	   if (1 == comm_ptr->dev.ch.is_blocked) {
+                printf("Checkpoint 1\n");
                 mpi_errno = MPIR_2lvl_Allgather_MV2(sendbuf, sendcount, sendtype,
 						    recvbuf, recvcount, recvtype,
 						    comm_ptr, errflag);
 	   }
 	   else {
+        printf("Checkpoint 2\n");
 	       mpi_errno = MPIR_Allgather_intra(sendbuf, sendcount, sendtype,
 						recvbuf, recvcount, recvtype,
 						comm_ptr, errflag);
 	   }
         } else {
+            printf("Checkpoint 3\n");
             mpi_errno = MPIR_Allgather_RD_MV2(sendbuf, sendcount, sendtype,
                                                 recvbuf, recvcount, recvtype,
                                                 comm_ptr, errflag);
@@ -2760,10 +2806,12 @@ conf_check_end:
             }
             /* Calling Allgather with temporary buffer and allgather communicator */
             if (sendbuf != MPI_IN_PLACE) {
+                printf("Checkpoint 4\n");
                 mpi_errno = MPIR_Allgather_RD_MV2(sendbuf, sendcount, sendtype,
                                                      tmp_recv_buf, recvcount,
                                                      recvtype, allgather_comm_ptr, errflag);
             } else {
+                printf("Checkpoint 5\n");
                 mpi_errno = MPIR_Allgather_RD_MV2(recvbuf + rank * recvcount *
                                                      recvtype_extent, recvcount,
                                                      recvtype, tmp_recv_buf,
@@ -2803,6 +2851,7 @@ conf_check_end:
             }
             MPIU_Free(tmp_recv_buf);
         } else {
+            printf("Checkpoint 6\n");
             mpi_errno = MPIR_Allgather_RD_MV2(sendbuf, sendcount, sendtype,
                                                 recvbuf, recvcount, recvtype,
                                                 comm_ptr, errflag);
@@ -2813,10 +2862,12 @@ conf_check_end:
     } else if(MV2_Allgather_function == &MPIR_Allgather_Bruck_MV2 
             || MV2_Allgather_function == &MPIR_Allgather_RD_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Ring_MV2) {
+        printf("Checkpoint 7\n");
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);
     } else {
+        printf("Checkpoint 8\n");
         mpi_errno = MPIR_Allgather_intra(sendbuf, sendcount, sendtype,
                                          recvbuf, recvcount, recvtype, comm_ptr, errflag);
     }

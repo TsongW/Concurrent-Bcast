@@ -842,12 +842,15 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
     if (comm_ptr->coll_fns != NULL && comm_ptr->coll_fns->Allgather != NULL)
     {
 	/* --BEGIN USEREXTENSION-- */
+      printf("Checkpoint 21\n");
+      
 	mpi_errno = comm_ptr->coll_fns->Allgather(sendbuf, sendcount, sendtype,
                                                   recvbuf, recvcount, recvtype,
                                                   comm_ptr, errflag);
         if (mpi_errno) MPIR_ERR_POP(mpi_errno);
 	/* --END USEREXTENSION-- */
     } else {
+      printf("Checkpoint 23\n");
         mpi_errno = MPIR_Allgather(sendbuf, sendcount, sendtype,
                                    recvbuf, recvcount, recvtype,
                                    comm_ptr, errflag);
@@ -993,7 +996,7 @@ int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
-
+    printf("Checkpoint 20\n");
     mpi_errno = MPIR_Allgather_impl(sendbuf, sendcount, sendtype,
                                     recvbuf, recvcount, recvtype,
                                     comm_ptr, &errflag);
