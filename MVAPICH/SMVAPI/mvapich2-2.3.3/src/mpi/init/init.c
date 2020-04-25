@@ -198,7 +198,7 @@ int MPI_Init( int *argc, char ***argv )
     if (MPIR_CVAR_ASYNC_PROGRESS)
         threadLevel = MPI_THREAD_MULTIPLE;
 
-    mpi_errno = MPIR_Init_thread( argc, argv, threadLevel, &provided );
+    mpi_errno =  MPIR_Init_thread( argc, argv, threadLevel, &provided );
     if (mpi_errno != MPI_SUCCESS) goto fn_fail;
 
     if (MPIR_CVAR_ASYNC_PROGRESS) {
@@ -215,6 +215,7 @@ int MPI_Init( int *argc, char ***argv )
 
 #if defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)
     /* initialize the two level communicator for MPI_COMM_WORLD  */
+    
     if (mv2_use_osu_collectives && 
             mv2_enable_shmem_collectives) {
 
@@ -236,8 +237,8 @@ int MPI_Init( int *argc, char ***argv )
             if(mpi_errno) {
                MPIR_ERR_POP(mpi_errno);
             }
-       } 
-    }
+       } //end if flag==0 ...
+    }//end if
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /* ... end of body of routine ... */

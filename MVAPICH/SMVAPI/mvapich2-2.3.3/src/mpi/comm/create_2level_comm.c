@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2001-2019, The Ohio State University. All rights
  * reserved.
  *
@@ -565,6 +566,11 @@ int create_intra_sock_comm(MPI_Comm comm)
     MPID_Group *group_ptr=NULL;
     MPID_Comm *shmem_ptr=NULL;
     MPID_Comm *intra_sock_commptr=NULL;
+
+    /******************* Added by Mehran *******************/
+    int numLeadersPerSocket =0;
+    /*******************************************************/
+    
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_ptr);
     mpi_errno = PMPI_Comm_rank(comm_ptr->dev.ch.shmem_comm, &my_local_id);
     if (mpi_errno) {
@@ -655,9 +661,28 @@ int create_intra_sock_comm(MPI_Comm comm)
             }
 
             intra_sock_commptr->dev.ch.shmem_comm_rank = mv2_shmem_coll_blk_stat;
-            if (intra_comm_rank == 0) {
-                intra_socket_leader_id=1;
-            }
+
+
+	    /******************* Added by Mehran *******************/
+            if(use_hierarchical_allgather == 1){
+                if(leaders_per_socket <= numCoresSocket){
+                    numLeadersPerSocket = leaders_per_socket;
+                }else{
+                    PRINT_ERROR("Number of leaders per socket is greater than the number of cores\nNumber of leaders per socket is set to be equal to the number of cores\n");
+                    numLeadersPerSocket = numCoresSocket;
+                }
+                if(intra_comm_rank < numLeadersPerSocket){
+                    intra_socket_leader_id = 1;
+		    
+                }
+            }//end if use_hierarchical_allgather
+            else{
+
+	        if (intra_comm_rank == 0) {
+                    intra_socket_leader_id=1;
+                }
+	    }
+	    /******************************************************/
 
             /*Creating intra-socket leader group*/
             intra_socket_leader_map = MPIU_Malloc(sizeof(int)*my_local_size);
@@ -722,7 +747,7 @@ int create_intra_sock_comm(MPI_Comm comm)
                 MPIR_ERR_POP(mpi_errno);
             }
 
-            if (intra_comm_rank == 0) {
+            if (intra_comm_rank == 0 || (use_hierarchical_allgather == 1 && intra_comm_rank < numLeadersPerSocket)) {
                 mpi_errno = PMPI_Comm_rank(shmem_ptr->dev.ch.intra_sock_leader_comm,
                         &intra_leader_comm_rank);
                 if (mpi_errno) {
@@ -736,7 +761,7 @@ int create_intra_sock_comm(MPI_Comm comm)
             }
 
             /*Check if all the data in sockets are of uniform size*/
-            if (intra_comm_rank == 0) {
+            if (intra_comm_rank == 0 || (use_hierarchical_allgather == 1 && intra_comm_rank < numLeadersPerSocket)) {
                 int array_index=0;
 
                 shmem_ptr->dev.ch.socket_size = MPIU_Malloc(sizeof(int)*
@@ -866,8 +891,10 @@ int create_intra_sock_comm(MPI_Comm comm)
                 intra_sock_leader_comm_ptr->dev.ch.sharp_coll_info = NULL;
             }
 #endif
-
-            if (intra_comm_rank == 0) {
+	    if(intra_comm_rank == 0){
+	      printf("intra_comm_size: %d, intra_socket_leader_cnt: %d, global_socket_leader_cnt: %d\n", intra_comm_size, intra_socket_leader_cnt, global_socket_leader_cnt);
+	    }
+            if (intra_comm_rank == 0 || (use_hierarchical_allgather == 1 && intra_comm_rank<numLeadersPerSocket)) {
 
                 if (intra_sock_leader_comm_ptr != NULL &&
                     intra_sock_leader_comm_ptr->dev.ch.shmem_coll_ok == 0) {
@@ -879,7 +906,6 @@ int create_intra_sock_comm(MPI_Comm comm)
                         intra_sock_leader_comm_ptr->dev.ch.shmem_coll_ok = 1;
                     }
                 }
-
                 int local_leader_shmem_status = intra_sock_leader_comm_ptr->dev.ch.shmem_coll_ok;
                 int global_leader_shmem_status = 0;
                 int allred_flag = mv2_use_socket_aware_allreduce;
@@ -896,7 +922,6 @@ int create_intra_sock_comm(MPI_Comm comm)
             }
         }
     }
-
 fn_exit:
     if (intra_socket_leader_map != NULL) {
         MPIU_Free(intra_socket_leader_map);
@@ -1373,7 +1398,7 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     int down = 0;
     int prev = -1;
     int shmem_size;
-
+    int numLeadersPerSocket = leaders_per_socket;
     MPIU_THREADPRIV_DECL;
     MPIU_THREADPRIV_GET;
 
@@ -1430,7 +1455,7 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     }
     shmem_size = grp_index;
 
-    if (local_rank == 0){
+    if (local_rank == 0 || (use_hierarchical_allgather == 1 && local_rank<numLeadersPerSocket && comm_ptr->dev.ch.tried_to_create_leader_shmem != 0)){
         lock_shmem_region();
         mv2_shmem_coll_blk_stat = MPIDI_CH3I_SHMEM_Coll_get_free_block();
         if (mv2_shmem_coll_blk_stat >= 0) {
@@ -1440,7 +1465,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     } else {
         input_flag = 1;
     }
-
     mpi_errno = MPIR_Allreduce_impl(&input_flag, &output_flag, 1, 
             MPI_INT, MPI_LAND, comm_ptr, 
             &errflag);
@@ -1458,7 +1482,7 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     if (!output_flag) {
         /* None of the shmem-coll-blocks are available. We cannot support
          * shared-memory collectives for this communicator */
-        if (local_rank == 0 && mv2_shmem_coll_blk_stat >= 0) {
+      if ((local_rank == 0 || (use_hierarchical_allgather == 1 && local_rank<numLeadersPerSocket && comm_ptr->dev.ch.tried_to_create_leader_shmem != 0)) && mv2_shmem_coll_blk_stat >= 0) {
             /*relese the slot if it is aquired */ 
             lock_shmem_region();
             MPIDI_CH3I_SHMEM_Coll_Block_Clear_Status(mv2_shmem_coll_blk_stat); 
@@ -1488,7 +1512,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     if(mpi_errno) {
        MPIR_ERR_POP(mpi_errno);
     }
-
     int* leader_group = MPIU_Malloc(sizeof(int) * size);
     if (NULL == leader_group){
        mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPI_ERR_OTHER,
@@ -1521,7 +1544,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
     }
     leader_group_size = grp_index;
     comm_ptr->dev.ch.leader_group_size = leader_group_size;
-
     mpi_errno = PMPI_Comm_group(comm, &comm_group);
     if(mpi_errno) {
        MPIR_ERR_POP(mpi_errno);
@@ -1544,7 +1566,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
          * it again */ 
         leader_ptr->dev.ch.shmem_coll_ok = -1; 
     } 
-       
     MPIU_Free(leader_group);
     MPID_Group_get_ptr( subgroup1, group_ptr );
     if(group_ptr != NULL) { 
@@ -1588,7 +1609,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
        MPIR_ERR_POP(mpi_errno);
     }
     comm_ptr->dev.ch.intra_node_done = 0;
-
     if(my_local_id == 0) { 
            int array_index=0;
            mpi_errno = PMPI_Comm_size(comm_ptr->dev.ch.leader_comm, &leader_comm_size);
@@ -1622,7 +1642,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
                 }
            }
      }
-
     comm_ptr->dev.ch.is_global_block = 0; 
     /* We need to check to see if the ranks are block or not. Each node leader
      * gets the global ranks of all of its children processes. It scans through
@@ -1661,7 +1680,6 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
            MPIR_ERR_POP(mpi_errno);
         } 
     }      
-
     /* bcast uniformity info to node local processes for tuning selection
        later */
     mpi_errno = MPIR_Bcast_impl(&(comm_ptr->dev.ch.is_uniform),1, MPI_INT, 0,
@@ -1701,6 +1719,7 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
         shmem_ptr->dev.ch.shmem_info = comm_ptr->dev.ch.shmem_info;
     }
     comm_ptr->dev.ch.shmem_coll_ok = 1;
+
 
 #if defined(_SMP_LIMIC_)
     if(comm_ptr->dev.ch.shmem_coll_ok == 1) {

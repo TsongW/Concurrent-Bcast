@@ -466,6 +466,19 @@ int MPIU_Handle_free( void *((*)[]), int );
      }									\
 }
 
+/******************************************************
+ ***      Parameters for Hierarchical Allgather     ***
+ ***                 Added my Mehran                ***
+ ******************************************************/
+
+#define use_hierarchical_allgather 1
+#define leaders_per_socket 2
+
+/******************************************************
+ ***  End of Parameters for Hierarchical Allgather  ***
+ ******************************************************/
+
+
 /* FIXME: the masks should be defined with the handle definitions instead
    of inserted here as literals */
 #define MPID_Comm_get_ptr(a,ptr)       MPID_Getb_ptr(Comm,a,0x03ffffff,ptr)
