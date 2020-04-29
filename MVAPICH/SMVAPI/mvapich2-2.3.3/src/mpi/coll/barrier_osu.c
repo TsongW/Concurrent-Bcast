@@ -179,7 +179,7 @@ static int MPIR_socket_aware_shmem_barrier_MV2(MPID_Comm * comm_ptr, MPIR_Errfla
                                              shmem_comm_rank);
     }
 
-    if (intra_sock_rank == 0) {
+    if (intra_sock_rank == 0 || (use_hierarchical_allgather == 1 && intra_sock_rank < leaders_per_socket)) {
 
         MPID_Comm *shmem_leader_commptr = NULL;
         MPID_Comm_get_ptr(shmem_commptr->dev.ch.intra_sock_leader_comm,shmem_leader_commptr);
