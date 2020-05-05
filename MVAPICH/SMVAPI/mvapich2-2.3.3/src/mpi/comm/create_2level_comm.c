@@ -1739,6 +1739,87 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
             if(mpi_errno) {
                 MPIR_ERR_POP(mpi_errno);
             }
+	    /******************* Added by Mehran *******************/
+            if(use_hierarchical_allgather == 1 ){
+	      /* Gives the mapping to any process's leader in comm */
+	      comm_ptr->dev.ch.rank_list = MPIU_Malloc(sizeof(int) * size);
+	      if (NULL == comm_ptr->dev.ch.rank_list){
+		mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPI_ERR_OTHER,
+		FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", "%s: %s",
+                "memory allocation failed", strerror(errno));
+                MPIR_ERR_POP(mpi_errno);
+	      }
+                /* gather full rank list on leader processes, the rank list is ordered
+                * by node based on leader rank, and then by rank within the node according
+                * to the shmem_group list */
+                if (my_local_id == 0) {
+                    /* execute allgather or allgatherv across leaders */
+                    if (comm_ptr->dev.ch.is_uniform != 1) {
+                        /* allocate memory for displacements and counts */
+                        int* displs = MPIU_Malloc(sizeof(int) * leader_comm_size);
+                        int* counts = MPIU_Malloc(sizeof(int) * leader_comm_size);
+                        if (!displs || !counts) {
+                            mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
+                                    MPIR_ERR_RECOVERABLE,
+                                    FCNAME, __LINE__,
+                                    MPI_ERR_OTHER,
+                                    "**nomem", 0);
+                            return mpi_errno;
+                        }
+
+                        /* get pointer to array of node sizes */
+                        int* node_sizes = comm_ptr->dev.ch.node_sizes;
+
+                        /* compute values for displacements and counts arrays */
+                        displs[0] = 0;
+                        counts[0] = node_sizes[0];
+                        for (i = 1; i < leader_comm_size; i++) {
+                            displs[i] = displs[i - 1] + node_sizes[i - 1];
+                            counts[i] = node_sizes[i];
+                        }
+
+                        /* execute the allgatherv to collect full rank list */
+			//if(leader_comm_size>1){
+			  mpi_errno = MPIR_Allgatherv_impl(
+			      shmem_group, my_local_size, MPI_INT,
+                              comm_ptr->dev.ch.rank_list, counts, displs, MPI_INT,
+                              leader_ptr, &errflag
+			      );
+                        /* free displacements and counts arrays */
+                        MPIU_Free(displs);
+                        MPIU_Free(counts);
+                    } else {
+                        /* execute the allgather to collect full rank list */
+		      //if(leader_comm_size > 1){
+			mpi_errno = MPIR_Allgather_impl(
+                            shmem_group, my_local_size, MPI_INT,
+                            comm_ptr->dev.ch.rank_list, my_local_size, MPI_INT,
+                            leader_ptr, &errflag
+                        );
+                    }
+
+                    if (mpi_errno) {
+                        MPIR_ERR_POP(mpi_errno);
+                    }
+                }
+
+                /* broadcast rank list to other ranks on this node */
+                mpi_errno = MPIR_Bcast_impl(comm_ptr->dev.ch.rank_list, size, MPI_INT, 0, shmem_ptr, &errflag);
+                if(mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+
+                /* lookup and record our index within the rank list */
+                for (i = 0; i < size; i++) {
+                    if (my_rank == comm_ptr->dev.ch.rank_list[i]) {
+                        /* found ourself in the list, record the index */
+                        comm_ptr->dev.ch.rank_list_index = i;
+                        break;
+                    }
+                }
+
+            }//end if use_hierarchical_allgather
+            /************************************************/
         }
     }
 

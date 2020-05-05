@@ -897,7 +897,7 @@ int MPIR_Allgather_Bruck_MV2(const void *sendbuf,
     int pof2 = 0;
 
     printf("MPIR_Allgather_Bruck_MV2\n");
-
+    
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_bruck, 1);
 
     comm_size = comm_ptr->local_size;
@@ -2371,6 +2371,15 @@ int MPIR_Allgather_index_tuned_intra_MV2(const void *sendbuf, int sendcount, MPI
     }
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
+    /******************* Added by Mehran *******************/
+    if(comm_ptr->ready_for_hierarchical_algorithms == 1 && use_hierarchical_allgather == 1){
+        mpi_errno = Hierarchical_Allgather(sendbuf, sendcount, sendtype,
+                                          recvbuf, recvcount, recvtype,
+                                          comm_ptr, errflag);
+        goto fn_exit;
+    }
+    /*******************************************************/
+
     if (mv2_use_old_allgather == 1) {
     printf("Checkpoint 10\n");
 	MPIR_Allgather_intra_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount,
@@ -2707,7 +2716,6 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
     if (mv2_use_old_allgather == 1) {
-        printf("OLD!\n");
 	MPIR_Allgather_intra_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount,
 				 recvtype, comm_ptr, errflag);
 	goto fn_exit;
@@ -2896,3 +2904,215 @@ conf_check_end:
   fn_fail:
     goto fn_exit;
 }
+
+
+
+
+
+
+/******************* Added by Mehran *******************/
+
+
+/*********************************************************************************************************************
+ *                  #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *  *              #TODO: CHANGE THIS 
+ *              #TODO: CHANGE THIS
+ *********************************************************************************************************************/
+/* In this implementation, we ...
+.
+.
+.
+.
+ */
+
+#undef FUNCNAME
+#define FUNCNAME Hierarchical_Allgather
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int Hierarchical_Allgather(
+    const void *sendbuf, int sendcnt, MPI_Datatype sendtype,
+          void *recvbuf, int recvcnt, MPI_Datatype recvtype,
+    MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
+{
+    MPIR_TIMER_START(coll,allgather,2lvl_ring);
+    int i, j;
+    int mpi_errno = MPI_SUCCESS;
+    int mpi_errno_ret = MPI_SUCCESS;
+    MPID_Comm *shmem_ptr=NULL;
+    MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_ptr);
+    
+    printf("Hierarchical_Allgather\n");
+
+    if (recvcnt == 0) {
+        return MPI_SUCCESS;
+    }
+
+    MPIU_CHKLMEM_DECL(2);
+
+    /* get our rank and the size of this communicator */
+    int rank = comm_ptr->rank;
+    int size = comm_ptr->local_size;
+
+    /* get extent of receive type */
+    MPI_Aint recvtype_extent;
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    
+    /* get info about communicator for ranks on the same node */
+    MPID_Comm* intra_sock_commptr;
+    //MPI_Comm intra_sock_comm = shmem_ptr->dev.ch.intra_sock_comm;
+    
+    MPID_Comm_get_ptr(shmem_ptr->dev.ch.intra_sock_comm, intra_sock_commptr);
+    int local_rank = intra_sock_commptr->rank;
+    int local_size = intra_sock_commptr->local_size;
+    
+    /** #TODO: allocate proper amount of requests for non rank 0 on each socket and others
+     * 
+     * */
+    int gather_msgs = 1;
+    if(local_rank == 0){
+        gather_msgs += (local_size - 2);
+    }
+
+    MPID_Request **reqarray = NULL;
+    MPIU_CHKLMEM_MALLOC(reqarray, MPID_Request **,
+                        gather_msgs * sizeof (MPID_Request*),
+                        mpi_errno, "reqarray");
+
+    /* allocate array of status objects */
+    MPI_Status *starray = NULL;
+    MPIU_CHKLMEM_MALLOC(starray, MPI_Status *,
+                        gather_msgs * sizeof (MPI_Status),
+                        mpi_errno, "starray");
+
+    /****************************
+    * Gather data to leaders 
+    ****************************/
+    int  socket_bound = -1, numSocketsNode = 0, numCoresSocket = 0, is_uniform;
+    int err = get_socket_bound_info(&socket_bound, &numSocketsNode, &numCoresSocket, &is_uniform);
+    int output_err = 0;
+    mpi_errno = MPIR_Allreduce_impl(&err, &output_err, 1,
+                                        MPI_INT, MPI_LOR, comm_ptr,
+                                        &errflag);
+    if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+    }
+
+    if (output_err != 0) {
+
+        PRINT_INFO(comm_ptr->rank == 0, "Failed to get correct process to socket binding info."
+                                        "Proceeding by disabling socket aware collectives support.");
+        return MPI_SUCCESS;
+    }
+
+    int reqs = 0;
+    
+    /* gather data to one of the leaders  (local_rank = 0) on each socket */
+    int rank_index = comm_ptr->dev.ch.rank_list_index;
+    if (local_rank == 0) {
+        /* post receives for incoming data from procs on our node */
+        for (i = 1; i < local_size; i++) {
+            /* get global rank of this process */
+            
+            /** #TODO: fix the src rank
+             * for the case that there are more than one sockets per node
+             * */
+            int srcrank = comm_ptr->dev.ch.rank_list[rank_index + socket_bound * numCoresSocket + i];
+            /* compute pointer in receive buffer for incoming data from this rank */
+            void* rbuf = (void*)((char*) recvbuf + srcrank * recvcnt * recvtype_extent);
+
+            /* post receive for data from this rank on shared mem comm */
+            
+            mpi_errno = MPIC_Irecv(rbuf, recvcnt, recvtype,
+                i, MPIR_ALLGATHER_TAG, intra_sock_commptr, &reqarray[reqs++]
+            );
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+       }//end for (local_size)
+       /* copy our data to our receive buffer if needed */
+       if (sendbuf != MPI_IN_PLACE) {
+           /* compute location in receive buffer for our data */
+           void* rbuf = (void*)((char*) recvbuf + rank * recvcnt * recvtype_extent);
+           mpi_errno = MPIR_Localcopy(
+               sendbuf, sendcnt, sendtype,
+               rbuf, recvcnt, recvtype
+           );
+           if (mpi_errno) {
+               MPIR_ERR_POP(mpi_errno);
+           }
+       }
+    } else {
+        /* get parameters for sending data */
+        const void* sbuf   = sendbuf;
+        int scnt           = sendcnt;
+        MPI_Datatype stype = sendtype;
+        if (sendbuf == MPI_IN_PLACE) {
+            /* use receive params if IN_PLACE */
+            sbuf   = (void*)((char*) recvbuf + rank * recvcnt * recvtype_extent);
+            scnt   = recvcnt;
+            stype  = recvtype;
+        }
+
+        /* send data to leader of our node */
+        MPIR_PVAR_INC(allgather, 2lvl_ring, send, scnt, stype); 
+        mpi_errno = MPIC_Isend(sbuf, scnt, stype,
+           0, MPIR_ALLGATHER_TAG, intra_sock_commptr, &reqarray[reqs++], errflag
+        );
+        if (mpi_errno) {
+            /* for communication errors, just record the error but continue */
+            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+        }
+   }
+
+   /* wait for all outstanding requests to complete */
+   mpi_errno = MPIC_Waitall(reqs, reqarray, starray, errflag);
+   if (mpi_errno && mpi_errno != MPI_ERR_IN_STATUS) {
+          MPIR_ERR_POP(mpi_errno);
+   }
+   /* --BEGIN ERROR HANDLING-- */
+   if (mpi_errno == MPI_ERR_IN_STATUS) {
+       for (i = 0; i < reqs; i++) {
+           if (starray[i].MPI_ERROR != MPI_SUCCESS) {
+               mpi_errno = starray[i].MPI_ERROR;
+               if (mpi_errno) {
+                   /* for communication errors, just record the error but continue */
+                   *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                   MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                   MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+               }
+           }
+       }
+   }
+
+   if (mpi_errno) {
+       MPIR_ERR_POP(mpi_errno);
+   }
+
+    fn_exit:
+        MPIU_CHKLMEM_FREEALL();
+
+    fn_fail:
+        MPIR_TIMER_END(coll,allgather,2lvl_ring);
+        return (mpi_errno);
+
+}
+
+
+/*******************************************************/
+

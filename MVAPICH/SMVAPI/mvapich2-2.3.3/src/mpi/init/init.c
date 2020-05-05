@@ -221,6 +221,9 @@ int MPI_Init( int *argc, char ***argv )
 
        MPID_Comm *comm_ptr = NULL;
        MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
+       /******************* Added by Mehran *******************/
+       comm_ptr->ready_for_hierarchical_algorithms = 0;
+       /*******************************************************/
        int flag=0; 
        PMPI_Comm_test_inter(comm_ptr->handle, &flag);
 
@@ -233,6 +236,12 @@ int MPI_Init( int *argc, char ***argv )
             if(mpi_errno) {
                MPIR_ERR_POP(mpi_errno);
             }
+            /******************* Added by Mehran *******************/
+            if(mv2_enable_socket_aware_collectives){
+                comm_ptr->ready_for_hierarchical_algorithms = 1;
+            }
+            /*******************************************************/
+            
             enable_split_comm(pthread_self());
             if(mpi_errno) {
                MPIR_ERR_POP(mpi_errno);

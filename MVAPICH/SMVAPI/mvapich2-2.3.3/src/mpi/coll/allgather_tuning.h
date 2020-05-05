@@ -191,6 +191,19 @@ int MPIR_2lvl_Allgather_Ring_MV2(const void *sendbuf,
 								MPID_Comm *comm_ptr,
 								MPIR_Errflag_t *errflag);
 
+
+/******************* Added by Mehran *******************/
+
+int Hierarchical_Allgather(const void *sendbuf,
+								int sendcnt,
+								MPI_Datatype sendtype,
+								void *recvbuf,
+								int recvcnt, MPI_Datatype recvtype,
+								MPID_Comm *comm_ptr,
+								MPIR_Errflag_t *errflag);
+
+/*******************************************************/
+
 /* Architecture detection tuning */
 int MV2_set_allgather_tuning_table(int heterogeneity, struct coll_info *colls_arch_hca);
 

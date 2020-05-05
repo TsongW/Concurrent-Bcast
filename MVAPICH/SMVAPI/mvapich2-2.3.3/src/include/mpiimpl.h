@@ -1324,6 +1324,9 @@ typedef struct MPID_Comm {
                                      * has been revoked */
     MPID_Info *info;                /* Hints to the communicator */
 
+    /******************* Added by Mehran *******************/
+    int ready_for_hierarchical_algorithms;
+    /*******************************************************/
 #ifdef MPID_HAS_HETERO
     int is_hetero;
 #endif
