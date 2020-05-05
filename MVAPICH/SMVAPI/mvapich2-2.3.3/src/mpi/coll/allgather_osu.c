@@ -2975,7 +2975,7 @@ int Hierarchical_Allgather(
     MPID_Comm_get_ptr(shmem_ptr->dev.ch.intra_sock_comm, intra_sock_commptr);
     int local_rank = intra_sock_commptr->rank;
     int local_size = intra_sock_commptr->local_size;
-    
+
     /** #TODO: allocate proper amount of requests for non rank 0 on each socket and others
      * 
      * */
@@ -2983,7 +2983,6 @@ int Hierarchical_Allgather(
     if(local_rank == 0){
         gather_msgs += (local_size - 2);
     }
-
     MPID_Request **reqarray = NULL;
     MPIU_CHKLMEM_MALLOC(reqarray, MPID_Request **,
                         gather_msgs * sizeof (MPID_Request*),
@@ -3012,13 +3011,14 @@ int Hierarchical_Allgather(
 
         PRINT_INFO(comm_ptr->rank == 0, "Failed to get correct process to socket binding info."
                                         "Proceeding by disabling socket aware collectives support.");
-        return MPI_SUCCESS;
+	return MPI_SUCCESS;
     }
 
     int reqs = 0;
     
     /* gather data to one of the leaders  (local_rank = 0) on each socket */
     int rank_index = comm_ptr->dev.ch.rank_list_index;
+
     if (local_rank == 0) {
         /* post receives for incoming data from procs on our node */
         for (i = 1; i < local_size; i++) {
@@ -3027,8 +3027,8 @@ int Hierarchical_Allgather(
             /** #TODO: fix the src rank
              * for the case that there are more than one sockets per node
              * */
-            int srcrank = comm_ptr->dev.ch.rank_list[rank_index + socket_bound * numCoresSocket + i];
-            /* compute pointer in receive buffer for incoming data from this rank */
+            int srcrank = comm_ptr->dev.ch.rank_list[rank_index + i];
+	    /* compute pointer in receive buffer for incoming data from this rank */
             void* rbuf = (void*)((char*) recvbuf + srcrank * recvcnt * recvtype_extent);
 
             /* post receive for data from this rank on shared mem comm */
@@ -3036,6 +3036,7 @@ int Hierarchical_Allgather(
             mpi_errno = MPIC_Irecv(rbuf, recvcnt, recvtype,
                 i, MPIR_ALLGATHER_TAG, intra_sock_commptr, &reqarray[reqs++]
             );
+
             if (mpi_errno) {
                 /* for communication errors, just record the error but continue */
                 *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
@@ -3078,6 +3079,7 @@ int Hierarchical_Allgather(
             MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
             MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
         }
+
    }
 
    /* wait for all outstanding requests to complete */
