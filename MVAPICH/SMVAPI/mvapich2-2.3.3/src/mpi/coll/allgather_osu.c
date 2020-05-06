@@ -2970,15 +2970,11 @@ int Hierarchical_Allgather(
     
     /* get info about communicator for ranks on the same node */
     MPID_Comm* intra_sock_commptr;
-    //MPI_Comm intra_sock_comm = shmem_ptr->dev.ch.intra_sock_comm;
     
     MPID_Comm_get_ptr(shmem_ptr->dev.ch.intra_sock_comm, intra_sock_commptr);
     int local_rank = intra_sock_commptr->rank;
     int local_size = intra_sock_commptr->local_size;
 
-    /** #TODO: allocate proper amount of requests for non rank 0 on each socket and others
-     * 
-     * */
     int gather_msgs = 1;
     if(local_rank == 0){
         gather_msgs += (local_size - 2);
@@ -2997,6 +2993,14 @@ int Hierarchical_Allgather(
     /****************************
     * Gather data to leaders 
     ****************************/
+
+   /************************
+     * 
+     * Step 1
+     * Gathering from intra_sock_comm to rank 0
+     * 
+     ************************/
+
     int  socket_bound = -1, numSocketsNode = 0, numCoresSocket = 0, is_uniform;
     int err = get_socket_bound_info(&socket_bound, &numSocketsNode, &numCoresSocket, &is_uniform);
     int output_err = 0;
@@ -3024,9 +3028,6 @@ int Hierarchical_Allgather(
         for (i = 1; i < local_size; i++) {
             /* get global rank of this process */
             
-            /** #TODO: fix the src rank
-             * for the case that there are more than one sockets per node
-             * */
             int srcrank = comm_ptr->dev.ch.rank_list[rank_index + i];
 	    /* compute pointer in receive buffer for incoming data from this rank */
             void* rbuf = (void*)((char*) recvbuf + srcrank * recvcnt * recvtype_extent);
@@ -3101,10 +3102,36 @@ int Hierarchical_Allgather(
            }
        }
    }
+    if (mpi_errno) {
+        MPIR_ERR_POP(mpi_errno);
+    }
 
-   if (mpi_errno) {
-       MPIR_ERR_POP(mpi_errno);
-   }
+
+
+
+    /************************
+     * 
+     * Step 2
+     * Broadcasting from rank 0 to other socket-leaders
+     * 
+     ************************/
+
+    if(local_rank == 0){
+
+        void* rbuf = (void*)((char*) recvbuf + rank * recvcnt * recvtype_extent);
+        MPI_Datatype stype = sendtype;
+        printf("Check 1\n");
+        MPID_Comm* intra_sock_leader_commptr;
+        MPID_Comm_get_ptr(shmem_ptr->dev.ch.intra_sock_leader_comm, intra_sock_leader_commptr);
+        printf("Check 2\n");
+        mpi_errno=MPIR_Bcast_impl(rbuf, local_size, stype, 0, intra_sock_leader_commptr, errflag);
+        if(mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+        printf("Check 3\n");
+    } //end if local_rank==0
+
+   
 
     fn_exit:
         MPIU_CHKLMEM_FREEALL();
