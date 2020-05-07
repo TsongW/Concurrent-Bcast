@@ -3116,22 +3116,29 @@ int Hierarchical_Allgather(
      * 
      ************************/
 
-    if(local_rank == 0){
+    int numLeadersPerSocket = 0;
 
-        void* rbuf = (void*)((char*) recvbuf + rank * recvcnt * recvtype_extent);
-        MPI_Datatype stype = sendtype;
-        printf("Check 1\n");
-        MPID_Comm* intra_sock_leader_commptr;
-        MPID_Comm_get_ptr(shmem_ptr->dev.ch.intra_sock_leader_comm, intra_sock_leader_commptr);
-        printf("Check 2\n");
-        mpi_errno=MPIR_Bcast_impl(rbuf, local_size, stype, 0, intra_sock_leader_commptr, errflag);
+    if(leaders_per_socket <= numCoresSocket){
+        numLeadersPerSocket = leaders_per_socket;
+    }else{
+        PRINT_ERROR("Number of leaders per socket is greater than the number of cores\nNumber of leaders per socket is set to be equal to the number of cores\n");
+        numLeadersPerSocket = numCoresSocket;
+    }
+    if(local_rank < numLeadersPerSocket){
+
+	
+	MPI_Datatype rtype = recvtype;
+
+        MPID_Comm* sock_leader_commptr;
+        MPID_Comm_get_ptr(shmem_ptr->dev.ch.sock_leader_comm, sock_leader_commptr);
+
+        mpi_errno=MPIR_Bcast_impl(recvbuf, comm_ptr->local_size * recvcnt, rtype, 0, sock_leader_commptr, errflag);
         if(mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
-        printf("Check 3\n");
-    } //end if local_rank==0
 
-   
+    } //if(local_rank < numLeadersPerSocket)
+
 
     fn_exit:
         MPIU_CHKLMEM_FREEALL();

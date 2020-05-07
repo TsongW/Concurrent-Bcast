@@ -107,6 +107,10 @@ typedef struct {
     void    *shmem_info; /* intra node shmem info */
     MPI_Comm     intra_sock_comm;
     MPI_Comm     intra_sock_leader_comm;
+    /*****************************************   Added by Mehran *****************************************/
+    MPI_Comm     sock_leader_comm; /* leaders of each socket are in this communicator*/
+    int socket_leader_rank; //global rank of first socket-leader for this process
+    /*****************************************************************************************************/
     MPI_Comm     global_sock_leader_comm;
     int*         socket_size;
     int          is_socket_uniform;
