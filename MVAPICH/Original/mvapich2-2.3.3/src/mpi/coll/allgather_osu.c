@@ -114,7 +114,7 @@ int MPIR_Allgather_RD_Allgather_Comm_MV2(const void *sendbuf,
 
 int allgather_tuning(int comm_size, int pof2)
 {
-
+    printf("allgather_tuning\n");
     char *value;
     if (pof2 == 1 && (value = getenv("MV2_ALLGATHER_RD_THRESHOLD")) != NULL) {
         /* pof2 case. User has set the run-time parameter
@@ -198,6 +198,7 @@ one in some cases */
 #undef FCNAME
 #define FCNAME MPL_QUOTE(FUNCNAME)
 int MPIR_Allgather_Direct_MV2(
+    printf("MPIR_Allgather_Direct_MV2\n");
     const void *sendbuf, int sendcnt, MPI_Datatype sendtype,
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
@@ -351,6 +352,7 @@ int MPIR_Allgather_DirectSpread_MV2(
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_DirectSpread_MV2\n");
     MPIR_TIMER_START(coll,allgather,directspread);
     int i;
     int mpi_errno = MPI_SUCCESS;
@@ -499,6 +501,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                           MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                           MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_RD_MV2\n");
     MPIR_TIMER_START(coll,allgather,rd);
     int comm_size, rank;
     int mpi_errno = MPI_SUCCESS;
@@ -876,6 +879,7 @@ int MPIR_Allgather_Bruck_MV2(const void *sendbuf,
                              MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                              MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_Bruck_MV2\n");
     MPIR_TIMER_START(coll,allgather,bruck);
     int comm_size, rank;
     int mpi_errno = MPI_SUCCESS;
@@ -1091,6 +1095,7 @@ int MPIR_Allgather_gather_bcast_MV2(
           void *recvbuf, int recvcount, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_gather_bcast_MV2\n");
     MPIR_TIMER_START(coll,allgather,gather_bcast);
     int comm_size;
     int mpi_errno = MPI_SUCCESS;
@@ -1137,6 +1142,7 @@ int MPIR_Allgather_intra_MV2(const void *sendbuf,
                              int recvcount,
                              MPI_Datatype recvtype, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_intra_MV2\n");
     int comm_size;
     int mpi_errno = MPI_SUCCESS;
     int type_size;
@@ -1191,6 +1197,7 @@ int MPIR_2lvl_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendty
                             void *recvbuf, int recvcnt,MPI_Datatype recvtype,
                             MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_2lvl_Allgather_MV2\n");
     int rank, size;
     int local_rank, local_size;
     int leader_comm_size = 0; 
@@ -1330,6 +1337,7 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_2lvl_Allgather_nonblocked_MV2\n");
     MPIR_TIMER_START(coll,allgather,2lvl_nonblocked);
     int i;
     int mpi_errno = MPI_SUCCESS;
@@ -1557,6 +1565,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
           void *recvbuf, int recvcount, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_2lvl_Allgather_Ring_nonblocked_MV2\n");
     MPIR_TIMER_START(coll,allgather,2lvl_ring_nonblocked);
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
@@ -1651,6 +1660,7 @@ int MPIR_2lvl_Allgather_Direct_MV2(
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_2lvl_Allgather_Direct_MV2\n");
     MPIR_TIMER_START(coll,allgather,2lvl_direct);
     int i, j;
     int mpi_errno = MPI_SUCCESS;
@@ -1947,6 +1957,7 @@ int MPIR_2lvl_Allgather_Ring_MV2(
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_2lvl_Allgather_Ring_MV2\n");
     MPIR_TIMER_START(coll,allgather,2lvl_ring);
     int i, j;
     int mpi_errno = MPI_SUCCESS;
@@ -2241,7 +2252,7 @@ int MPIR_Allgather_index_tuned_intra_MV2(const void *sendbuf, int sendcount, MPI
                        void *recvbuf, int recvcount, MPI_Datatype recvtype,
                        MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-
+    printf("MPIR_Allgather_index_tuned_intra_MV2\n");
     int mpi_errno = MPI_SUCCESS;
     int nbytes = 0, comm_size, recvtype_size;
     int comm_size_index = 0;
@@ -2565,7 +2576,7 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
                        void *recvbuf, int recvcount, MPI_Datatype recvtype,
                        MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-
+    printf("MPIR_Allgather_MV2\n");
     int mpi_errno = MPI_SUCCESS;
     int nbytes = 0, comm_size, recvtype_size;
     int range = 0;
