@@ -107,6 +107,7 @@ int MPIR_Allgather_RD_Allgather_Comm_MV2(const void *sendbuf,
                                  MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                                  MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_RD_Allgather_Comm_MV2\n");
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_rd_allgather_comm, 1);
 
     return 0;
@@ -198,11 +199,11 @@ one in some cases */
 #undef FCNAME
 #define FCNAME MPL_QUOTE(FUNCNAME)
 int MPIR_Allgather_Direct_MV2(
-    printf("MPIR_Allgather_Direct_MV2\n");
     const void *sendbuf, int sendcnt, MPI_Datatype sendtype,
           void *recvbuf, int recvcnt, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_Direct_MV2\n");
     MPIR_TIMER_START(coll,allgather,direct);
     int i;
     int mpi_errno = MPI_SUCCESS;
@@ -1023,6 +1024,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                             MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                             MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Allgather_Ring_MV2\n");
     MPIR_TIMER_START(coll,allgather,ring);
     int comm_size, rank;
     int mpi_errno = MPI_SUCCESS;
