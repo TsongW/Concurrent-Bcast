@@ -22,8 +22,27 @@
  * For detailed copyright and licensing information, please refer to the
  * copyright file COPYRIGHT in the top level MVAPICH2 directory.
  */
+
+
+
+
 #ifndef MPIIMPL_H_INCLUDED
 #define MPIIMPL_H_INCLUDED
+
+
+/****************************** Added by Mehran *****************************/
+#include <openssl/evp.h>
+#include <openssl/aes.h>
+#include <openssl/err.h>
+#include <openssl/aead.h>
+#include <openssl/rand.h>
+#define NON_BLOCKING_SEND_RECV_SIZE 500 
+#define NON_BLOCKING_SEND_RECV_SIZE_2  2100000
+
+
+
+/****************************************************************************/
+
 
 /* style: define:vsnprintf:1 sig:0 */
 /* style: allow:printf:3 sig:0 */
@@ -3844,6 +3863,23 @@ int MPID_Comm_get_lpid(MPID_Comm *comm_ptr, int idx, int * lpid_ptr, MPIU_BOOL i
 /* tunable cvar values */
 #include "mpich_cvars.h"
 
+
+/****************************** Added by Mehran *****************************/
+extern unsigned char Ideciphertext[NON_BLOCKING_SEND_RECV_SIZE][NON_BLOCKING_SEND_RECV_SIZE_2];
+extern EVP_AEAD_CTX *ctx;
+extern unsigned char key [32];
+extern unsigned char nonce[12];
+//extern unsigned char Ideciphertext[3000][2100000];
+extern unsigned char * bufptr[100000];
+extern int reqCounter;
+extern int waitCounter; 
+extern int nonceCounter;
+
+int security_approach;
+/**************************************************************************/
+
+
+
 //OSU: MERGE_FIXME
 #define MPIR_BCAST_LONG_MSG           524288
 #define MPIR_BCAST_MIN_PROCS          8
@@ -4142,6 +4178,12 @@ int MPIR_Iallgatherv_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendty
 
 int MPIR_Type_is_rma_atomic(MPI_Datatype type);
 int MPIR_Compare_equal(const void *a, const void *b, MPI_Datatype type);
+/****************************** Added by Mehran ***********************/
+int MPIR_Naive_Sec_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+                        void *recvbuf, int recvcount, MPI_Datatype recvtype,
+                             MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag);
+
+/*********************************************************************/
 
 int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
                         void *recvbuf, int recvcount, MPI_Datatype recvtype,
