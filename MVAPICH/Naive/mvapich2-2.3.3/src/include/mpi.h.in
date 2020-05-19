@@ -934,6 +934,14 @@ typedef int (MPI_Datarep_extent_function)(MPI_Datatype datatype, MPI_Aint *,
 #ifndef MPICH_SUPPRESS_PROTOTYPES
 /* We require that the C compiler support prototypes */
 /* Begin Prototypes */
+/****************************** Added by Mehran ***********************/
+void init_crypto();
+void init_boringssl_256_siv();
+void init_boringssl_128_siv();
+void init_boringssl_128();
+void init_boringssl_256();
+/**********************************************************************/
+
 int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag,
              MPI_Comm comm) MPICH_ATTR_POINTER_WITH_TYPE_TAG(1,3);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,

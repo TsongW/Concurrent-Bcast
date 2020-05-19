@@ -240,6 +240,13 @@ int MPI_Init( int *argc, char ***argv )
     }
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
+    /************************** Added by Mehran ***********************/
+    char* value;
+    if ((value = getenv("SECURITY_APPROACH")) != NULL) {
+        security_approach = (atoi(value));
+    }
+    /******************************************************************/
+    
     /* ... end of body of routine ... */
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT);
     return mpi_errno;
