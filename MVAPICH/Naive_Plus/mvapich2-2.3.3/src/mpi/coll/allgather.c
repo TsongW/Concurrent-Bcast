@@ -18,10 +18,11 @@
 
 #include "mpiimpl.h"
 // /****************************** Added by Mehran ***********************/
-
 EVP_AEAD_CTX *ctx = NULL;
 unsigned char key [32] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','a','b','c','d','e','f'};
 unsigned char nonce[12] = {'1','2','3','4','5','6','7','8','9','0','1','2'};  
+
+
 // #include <openssl/evp.h>
 // #include <openssl/aes.h>
 // #include <openssl/err.h>
@@ -855,7 +856,7 @@ int MPIR_Naive_Sec_Allgather(const void *sendbuf, int sendcount, MPI_Datatype se
                         void *recvbuf, int recvcount, MPI_Datatype recvtype,
                         MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
-    printf("MPIR_Naive_Sec_Allgather\n");
+    //printf("MPIR_Naive_Sec_Allgather\n");
     int mpi_errno = MPI_SUCCESS;
     int sendtype_sz, recvtype_sz;
     unsigned long  ciphertext_sendbuf_len = 0;

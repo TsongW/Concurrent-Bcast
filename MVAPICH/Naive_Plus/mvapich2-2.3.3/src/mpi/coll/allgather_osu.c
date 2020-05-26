@@ -21,6 +21,9 @@
 #include "common_tuning.h"
 #include "coll_shmem.h"
 #include "allgather_tuning.h"
+
+
+
 extern struct coll_runtime mv2_coll_param;
 extern int allgather_tuning_algo;
 extern int allgather_algo_num;
@@ -1253,6 +1256,7 @@ int MPIR_2lvl_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendty
     if (local_rank == 0 && (leader_comm_size > 1)) {
         if(security_approach == 2){
             //NAIVE PLUS
+	    //printf("Naive+\n");
             unsigned long count=0;
             unsigned long next, dest;
             unsigned int i;
@@ -1284,7 +1288,7 @@ int MPIR_2lvl_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendty
                     printf("Error in Naive+ encryption: allgather\n");
                     fflush(stdout);
             }
-
+	    
             /*Step 2: Data exchange*/
 
             /*When data in each socket is different*/
@@ -1514,13 +1518,14 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
      * ---------------------------------------------- */
 
     /* gather data to leaders on each node */
+    /* compute number of items to receive ahead of our spot in the buffer */
+    MPI_Aint preceding_count = 0;
+    for (i=0; i < leader_rank; i++) {
+        preceding_count += node_sizes[i] * recvcnt;
+    }
+    
     if (local_rank == 0) {
-        /* compute number of items to receive ahead of our spot in the buffer */
-        MPI_Aint preceding_count = 0;
-        for (i=0; i < leader_rank; i++) {
-            preceding_count += node_sizes[i] * recvcnt;
-        }
-
+    
         /* compute location to receive data from procs on our node */
         void* rbuf = (void*)((char*)tmpbuf + (preceding_count * recvtype_extent));
 
@@ -1564,42 +1569,164 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
 
     /* Exchange the data between the node leaders */
     if (local_rank == 0 && (leader_size > 1)) {
-        /* When data in each socket is different */
-        if (comm_ptr->dev.ch.is_uniform != 1) {
-            /* allocate memory for counts and displacements arrays */
-            int* displs = MPIU_Malloc(sizeof (int) * leader_size);
-            int* counts = MPIU_Malloc(sizeof (int) * leader_size);
-            if (!displs || !counts) {
-                mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-                        MPIR_ERR_RECOVERABLE,
-                        FCNAME, __LINE__,
-                        MPI_ERR_OTHER,
-                        "**nomem", 0);
-                return mpi_errno;
+        if(security_approach == 2){
+            /************** NAIVE PLUS (NB)***************/
+	    //printf("%d @ 0\n", rank);
+            unsigned long count=0;
+            unsigned long next, dest;
+            unsigned int i;
+
+            /*Step 1: Encryption*/
+            int sendtype_sz, recvtype_sz;
+            unsigned long  ciphertext_sendbuf_len = 0;
+            sendtype_sz= recvtype_sz= 0;
+            int var;
+            var=MPI_Type_size(sendtype, &sendtype_sz);
+            var=MPI_Type_size(recvtype, &recvtype_sz);
+
+            RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce
+
+            unsigned long t=0;
+            t = (unsigned long)(local_size*sendtype_sz*sendcnt);
+            unsigned long   max_out_len = (unsigned long) (16 + (local_size*sendtype_sz*sendcnt));
+	    
+            if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
+                                &ciphertext_sendbuf_len, max_out_len,
+                                ciphertext_sendbuf, 12,
+                                tmpbuf + (preceding_count * recvtype_extent),  t,
+                                NULL, 0))
+            {
+                    printf("Error in Naive+ encryption: allgather\n");
+                    fflush(stdout);
+            }
+	    //printf("%d @ 1\n", rank);
+            /*Step 2: Data exchange*/
+
+            /*When data in each socket is different*/
+            if (comm_ptr->dev.ch.is_uniform != 1) {
+                int *displs = NULL;
+                int *recvcnts = NULL;
+                int *node_sizes;
+                int i = 0;
+
+                node_sizes = comm_ptr->dev.ch.node_sizes;
+
+                displs = MPIU_Malloc(sizeof (int) * leader_size);
+                recvcnts = MPIU_Malloc(sizeof (int) * leader_size);
+                if (!displs || !recvcnts) {
+                    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
+                            MPIR_ERR_RECOVERABLE,
+                            FCNAME, __LINE__,
+                            MPI_ERR_OTHER,
+                            "**nomem", 0);
+                    return mpi_errno;
+                }
+                recvcnts[0] = node_sizes[0] * recvcnt * recvtype_extent + 12 + 16;
+                displs[0] = 0;
+
+                for (i = 1; i < leader_size; i++) {
+                    displs[i] = displs[i - 1] + (node_sizes[i - 1] * recvcnt * recvtype_extent + 12 + 16);
+                    recvcnts[i] = node_sizes[i] * recvcnt * recvtype_extent + 12 + 16;
+                }
+
+                mpi_errno = MPIR_Allgatherv_impl(ciphertext_sendbuf, (max_out_len+12), MPI_CHAR, 
+                                        ciphertext_recvbuf, recvcnts, displs, MPI_CHAR,
+                                        leader_commptr, errflag);
+		//MPIU_Free(displs);
+                //MPIU_Free(recvcnts);
+		//printf("%d @ 2 (1)\n", rank);
+                /*Step3: Decryption*/
+
+                for( i = 0; i < leader_size; i++){
+		    if(i!= leader_rank){
+			
+			next =(unsigned long )(displs[i]);
+			dest =(unsigned long )(node_sizes[i]*(recvcnt*recvtype_sz));
+                    
+			//printf("%d is going to decrypt from %d and put at %d, node size = %d\n", rank, next,dest, node_sizes[i] );
+			if(!EVP_AEAD_CTX_open(ctx, ((tmpbuf+dest)),
+					      &count, (unsigned long )((node_sizes[i]*recvcnt*recvtype_sz)),
+					      (ciphertext_recvbuf+next), 12,
+					      (ciphertext_recvbuf+next+12), (unsigned long )((node_sizes[i]*recvcnt*recvtype_sz)+16), NULL, 0)){
+			    printf("Decryption error in Naive+ allgather (NB) 1\n");fflush(stdout);        
+                        }                               
+		    }
+                }
+		//printf("%d @ 3 (1)\n", rank);
+		MPIU_Free(recvcnts);
+		MPIU_Free(displs);
+            } else {
+		
+                mpi_errno = MPIR_Allgather_impl(ciphertext_sendbuf, (max_out_len+12), MPI_CHAR,
+                                                ciphertext_recvbuf, (max_out_len+12), MPI_CHAR,
+                                                leader_commptr, errflag);
+		//printf("%d @ 2 (2)\n", rank);
+		/*Step3: Decryption*/
+                for( i = 0; i < leader_size; i++){
+		    if(i != leader_rank){
+			
+			next =(unsigned long )(i*(max_out_len+12));
+			dest =(unsigned long )(i*(local_size*sendtype_sz*sendcnt));
+                    
+
+			if(!EVP_AEAD_CTX_open(ctx, ((tmpbuf+dest)),
+					      &count, (unsigned long )((local_size*recvcnt*recvtype_sz)),
+					      (ciphertext_recvbuf+next), 12,
+					      (ciphertext_recvbuf+next+12), (unsigned long )((local_size*recvcnt*recvtype_sz)+16), NULL, 0)){
+			    printf("Decryption error in Naive+ allgather (NB) 2\n");fflush(stdout);        
+                        }                               
+		    }
+                }
+		//	printf("%d @ 3 (2)\n", rank);
+
             }
 
-            /* set values in our counts and displacements arrays */
-            displs[0] = 0;
-            counts[0] = node_sizes[0] * recvcnt;
-            for (i = 1; i < leader_size; i++) {
-                displs[i] = displs[i - 1] + node_sizes[i - 1] * recvcnt;
-                counts[i] = node_sizes[i] * recvcnt;
+
+
+
+
+
+            /********* END OF NAIVE PLUS **********/
+        }else{
+
+            /* When data in each socket is different */
+            if (comm_ptr->dev.ch.is_uniform != 1) {
+                /* allocate memory for counts and displacements arrays */
+                int* displs = MPIU_Malloc(sizeof (int) * leader_size);
+                int* counts = MPIU_Malloc(sizeof (int) * leader_size);
+                if (!displs || !counts) {
+                    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
+                            MPIR_ERR_RECOVERABLE,
+                            FCNAME, __LINE__,
+                            MPI_ERR_OTHER,
+                            "**nomem", 0);
+                    return mpi_errno;
+                }
+
+                /* set values in our counts and displacements arrays */
+                displs[0] = 0;
+                counts[0] = node_sizes[0] * recvcnt;
+                for (i = 1; i < leader_size; i++) {
+                    displs[i] = displs[i - 1] + node_sizes[i - 1] * recvcnt;
+                    counts[i] = node_sizes[i] * recvcnt;
+                }
+
+                /* execute allgatherv across leader ranks */
+                mpi_errno = MPIR_Allgatherv_impl(MPI_IN_PLACE, (recvcnt*local_size), recvtype,
+                                                tmpbuf, counts, displs, recvtype,
+                                                leader_commptr, errflag);
+
+                /* free counts and displacements arrays */
+                MPIU_Free(displs);
+                MPIU_Free(counts);
+		//printf("%d @ 4\n", rank);
+            } else {
+                /* execute allgather across leader ranks */
+                mpi_errno = MPIR_Allgather_impl(MPI_IN_PLACE, (recvcnt*local_size), recvtype,
+                                                tmpbuf, (recvcnt*local_size), recvtype,
+                                                leader_commptr, errflag);
+
             }
-
-            /* execute allgatherv across leader ranks */
-            mpi_errno = MPIR_Allgatherv_impl(MPI_IN_PLACE, (recvcnt*local_size), recvtype,
-                                             tmpbuf, counts, displs, recvtype,
-                                             leader_commptr, errflag);
-
-            /* free counts and displacements arrays */
-            MPIU_Free(displs);
-            MPIU_Free(counts);
-        } else {
-            /* execute allgather across leader ranks */
-            mpi_errno = MPIR_Allgather_impl(MPI_IN_PLACE, (recvcnt*local_size), recvtype,
-                                            tmpbuf, (recvcnt*local_size), recvtype,
-                                            leader_commptr, errflag);
-
         }
 
         if (mpi_errno) {
@@ -1641,11 +1768,14 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
             /* update pointer to next spot in temp buffer */
             sbuf += recvcnt * recvtype_extent;
         }
-
+	
         /* free the temporary buffer if we allocated one */
         tmpbuf = (void*)((char*)tmpbuf + recvtype_true_lb);
         MPIU_Free(tmpbuf);
+	
+
     }
+    
 
     /* ----------------------------------------------
      * Broadcast receive buffer from leader to all procs on the node
