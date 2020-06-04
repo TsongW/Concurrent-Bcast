@@ -1809,14 +1809,23 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int i;
-
+    /***********«Added by Mehran************/
+    /* get info about communicator for ranks on the same node */
+    MPID_Comm* shmem_commptr;
+    MPI_Comm shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    int local_rank = shmem_commptr->rank;
+    int local_size = shmem_commptr->local_size;
+    MPI_Status status;
+    /***************************************/
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
 
     /* get extent of receive type */
-    MPI_Aint recvtype_extent;
+    MPI_Aint recvtype_extent, sendtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
 
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_ring_nonblocked, 1);
 
@@ -1834,6 +1843,32 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
             MPIR_ERR_POP(mpi_errno);
         }
     }
+    /***************** Added by Mehran *****************/
+
+    if(security_approach==2 && local_rank==local_size-1){
+        
+        unsigned long  ciphertext_len = 0;
+        //encrypt local data to ciphertext rcvbuffer
+        void* in = (void*)((char*) recvbuf + rank * recvcount * recvtype_extent);
+        void* out = (void*)((char*) ciphertext_recvbuf + rank * (recvcount * recvtype_extent + 12 + 16));
+
+        RAND_bytes(out, 12); // 12 bytes of nonce
+        unsigned long in_size=0;
+        in_size = (unsigned long)(sendcount * sendtype_extent);
+        unsigned long max_out_len = (unsigned long) (16 + in_size);
+        printf("%d (%d) is going to encrypt from %d to %d\n", rank, local_rank, rank * recvcount * recvtype_extent, rank * (recvcount * recvtype_extent + 12 + 16) );
+        if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                            &ciphertext_len, max_out_len,
+                            out, 12,
+                            in, in_size,
+                            NULL, 0))
+        {
+                printf("Error in Naive+ encryption: allgather Ring_NB\n");
+                fflush(stdout);
+        }
+
+    }
+    /***************************************************/
 
     /* Now, send left to right. */
 
@@ -1850,34 +1885,165 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
      * and receiving the data from the rank to our left */
     int send_index = rank_index;
     int recv_index = left_index;
-    for (i = 1; i < size; i++) {
-        /* compute ranks whose data we'll send and receive in this step */
-        int send_rank = comm_ptr->dev.ch.rank_list[send_index];
-        int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+    
+    /***************** Added by Mehran *****************/
+    if(security_approach==2){
+        printf("Naive+ Ring(NB)\n");
+        for (i = 1; i < size; i++) {
+            /* compute ranks whose data we'll send and receive in this step */
+            int send_rank = comm_ptr->dev.ch.rank_list[send_index];
+            int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+            if(local_rank==0){
+                //receive at ciphertext rcvbuffer for extended size
+                void* rbuf = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 12 + 16));
 
-        /* compute position within buffer to send from and receive into */
-        void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
-        void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+                if(local_rank==local_size-1){
+                    //send from ciphertext rcvbuffer for extended size
+                    void* sbuf = (void*)((char*) ciphertext_recvbuf + send_rank * (recvcount * recvtype_extent + 12 + 16));
 
-        /* exchange data with our neighbors in the ring */
-        MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, recvcount, recvtype); 
-        MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, recvcount, recvtype); 
-        mpi_errno = MPIC_Sendrecv(
-           sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
-           rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
-           comm_ptr, MPI_STATUS_IGNORE, errflag
-        );
-        if (mpi_errno) {
-            /* for communication errors, just record the error but continue */
-            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-        }
+                    /* exchange data with our neighbors in the ring */
+                    MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, (sendcount * sendtype_extent + 12 + 16), MPI_CHAR); 
+                    MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, (recvcount * recvtype_extent + 12 + 16), MPI_CHAR); 
+                    printf("%d (%d) is going to send %d to %d, and receive %d from %d\n", rank, local_rank, (sendcount * sendtype_extent + 12 + 16), right, (recvcount * recvtype_extent + 12 + 16), left);
+                    mpi_errno = MPIC_Sendrecv(
+                    sbuf, (sendcount * sendtype_extent + 12 + 16), MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+                    rbuf, (recvcount * recvtype_extent + 12 + 16), MPI_CHAR, left,  MPIR_ALLGATHER_TAG,
+                    comm_ptr, MPI_STATUS_IGNORE, errflag
+                    );
+                    
+                }else{
+                //send from rcvbuffer for non-extended size
+                    void* sbuf = (void*)((char*) recvbuf + send_rank * (recvcount * recvtype_extent));
 
-        /* update index values to account for data we just received */
-        send_index = recv_index;
-        recv_index = (size + recv_index - 1) % size;
-    }
+                    /* exchange data with our neighbors in the ring */
+                    MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, (recvcount * recvtype_extent), MPI_CHAR); 
+                    MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, (recvcount * recvtype_extent + 12 + 16), MPI_CHAR); 
+
+                    printf("%d (%d) is going to send %d to %d, and receive %d from %d\n", rank, local_rank, (sendcount * sendtype_extent), right, (recvcount * recvtype_extent + 12 + 16), left);
+                    printf("%d (%d) is sending from %d and receiving from %d\n", rank, local_rank, send_rank * (recvcount * recvtype_extent), recv_rank * (recvcount * recvtype_extent + 12 + 16));
+                    mpi_errno = MPIC_Sendrecv(
+                    sbuf, (recvcount * recvtype_extent), MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+                    rbuf, (recvcount * recvtype_extent + 12 + 16), MPI_CHAR, left,  MPIR_ALLGATHER_TAG,
+                    comm_ptr, MPI_STATUS_IGNORE, errflag
+                    );
+
+                }
+
+                //decrypt to local rcvbuffer
+                printf("%d (%d) is going to decrypt from %d to %d\n", rank, local_rank, (recv_rank*(sendcount*sendtype_extent+16+12)), send_rank*recvcount*recvtype_extent;
+                if(!EVP_AEAD_CTX_open(ctx, (recvbuf+recv_rank*recvcount*recvtype_extent),
+                        &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                        (ciphertext_recvbuf+(send_rank*(sendcount*sendtype_extent+16+12))), 12,
+                        (ciphertext_recvbuf+(send_rank*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                        NULL, 0)){
+                    printf("Error in Naive+ decryption: allgather Ring_NB\n");
+                fflush(stdout);        
+                }
+            
+            }
+            else if(local_rank==local_size-1){
+                //send from ciphertext recvbuffer for extended size
+                void* sbuf = (void*)((char*) ciphertext_recvbuf + send_rank * (recvcount * recvtype_extent + 12 + 16));
+
+                //recv at recvbuffer for non-extended size
+                void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+
+                /* exchange data with our neighbors in the ring */
+                MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, (sendcount * sendtype_extent + 12 + 16), MPI_CHAR); 
+                MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, (recvcount * recvtype_extent), MPI_CHAR); 
+                
+                printf("%d (%d) is going to send %d to %d, and receive %d from %d\n", rank, local_rank, (sendcount * sendtype_extent + 12 + 16), right, (recvcount * recvtype_extent), left);
+
+                mpi_errno = MPIC_Sendrecv(
+                sbuf, (recvcount * recvtype_extent + 12 + 16), MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+                rbuf, (recvcount * recvtype_extent), MPI_CHAR, left,  MPIR_ALLGATHER_TAG,
+                comm_ptr, MPI_STATUS_IGNORE, errflag
+                );
+
+                //encrypt to ciphertext recvdbuf
+                unsigned long  ciphertext_len = 0;
+
+                void* in = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+                void* out = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 12 + 16));
+
+                RAND_bytes(out, 12); // 12 bytes of nonce
+                unsigned long in_size=0;
+                in_size = (unsigned long)(recvcount * recvtype_extent);
+                unsigned long max_out_len = (unsigned long) (16 + in_size);
+                printf("%d (%d) is going to encrypt from %d to %d\n", rank, local_rank, recv_rank * recvcount * recvtype_extent, recv_rank * (recvcount * recvtype_extent + 12 + 16) );
+                if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                                    &ciphertext_len, max_out_len,
+                                    out, 12,
+                                    in, in_size,
+                                    NULL, 0))
+                {
+                        printf("Error in Naive+ encryption: allgather Ring_NB\n");
+                        fflush(stdout);
+                }
+
+            }else{
+                /* compute position within buffer to send from and receive into */
+                void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
+                void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+            
+                /* exchange data with our neighbors in the ring */
+                MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, recvcount, recvtype); 
+                printf("%d (%d) is going to send %d to %d, and receive %d from %d\n", rank, local_rank, (sendcount * sendtype_extent), right, (recvcount * recvtype_extent), left);
+                mpi_errno = MPIC_Sendrecv(
+                sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
+                rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
+                comm_ptr, MPI_STATUS_IGNORE, errflag
+                );
+            }
+
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+
+            /* update index values to account for data we just received */
+            send_index = recv_index;
+            recv_index = (size + recv_index - 1) % size;
+
+        }//End for
+        //End of Naive+ Ring_NB
+        /***************************************************/
+
+    }else{
+        for (i = 1; i < size; i++) {
+            /* compute ranks whose data we'll send and receive in this step */
+            int send_rank = comm_ptr->dev.ch.rank_list[send_index];
+            int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+            /* compute position within buffer to send from and receive into */
+            void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
+            void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+        
+            /* exchange data with our neighbors in the ring */
+            MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, recvcount, recvtype); 
+            MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, recv, recvcount, recvtype); 
+            mpi_errno = MPIC_Sendrecv(
+            sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
+            rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
+            comm_ptr, MPI_STATUS_IGNORE, errflag
+            );
+        
+        
+        
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+
+            /* update index values to account for data we just received */
+            send_index = recv_index;
+            recv_index = (size + recv_index - 1) % size;
+        }//End for
+    }//End Else (Original implementation)
 
   fn_fail:
     MPIR_TIMER_END(coll,allgather,2lvl_ring_nonblocked);
