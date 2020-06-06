@@ -4,8 +4,8 @@ set key font "Times-Roman,20"
 set xlabel "Message Size (B)" font "Times-Roman,23" offset 0, -1
 set ylabel "Latency (us)" font "Times-Roman,23" offset -3, 0
 
-set term pdfcairo font "Times-Roman"
-set output label.'.pdf'
+set term postscript eps font "Times-Roman" enhanced color
+set output label.'.eps'
 set lmargin 20
 set rmargin 5
 set bmargin 5
