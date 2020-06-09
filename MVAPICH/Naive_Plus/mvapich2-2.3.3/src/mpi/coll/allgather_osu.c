@@ -1060,7 +1060,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
     int node_gateway=0;
     if(security_approach==2){
         
-        
+        MPID_Get_node_id(comm_ptr, rank, &node_id);
         MPID_Get_node_id(comm_ptr, right, &send_node_id);
         MPID_Get_node_id(comm_ptr, left, &recv_node_id);
         if(node_id != send_node_id && node_id != recv_node_id){
@@ -1078,18 +1078,20 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 
     j = rank;
     jnext = left;
+    
     for (i = 1; i < comm_size; i++) {
         if(security_approach==2){//Naive PLus (Default)
             unsigned long  ciphertext_len = 0, count=0, in_size=0;
             in_size = (unsigned long)(recvcount * recvtype_extent);
             unsigned long max_out_len = (unsigned long) (16 + in_size);
-            void* in, out, sbuf, rbuf;
+            char* in, out, sbuf, rbuf;
             switch(node_gateway){
                 case 1:
+		    printf("Case 1 in naive+ ring (default)\n");
                     //Encrypt before sending
-                    in = (void*)((char*) recvbuf + j * recvcount * recvtype_extent);
-                    out = (void*)((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
-                    RAND_bytes(out, 12); // 12 bytes of nonce
+                    in = ((char*) recvbuf + j * recvcount * recvtype_extent);
+                    out = ((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
+                    RAND_bytes((void*)(out), 12); // 12 bytes of nonce
 
                     if(!EVP_AEAD_CTX_seal(ctx, out+12,
                                         &ciphertext_len, max_out_len,
@@ -1111,9 +1113,9 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                     break;
                 case 2:
                     //Decrypt after receiving
-                    
-                    sbuf = (void*)((char*) recvbuf + j * recvcount * recvtype_extent);
-                    rbuf = (void*)((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
+                    printf("Case 2 in naive+ ring (default)\n");
+                    sbuf = ((char*) recvbuf + j * recvcount * recvtype_extent);
+                    rbuf = ((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
 
 
                     MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
@@ -1136,12 +1138,14 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                 case 3:
                     //Encrypt before sending and Decrypt after receiving
                     
-                    
-                    in = (void*)((char*) recvbuf + j * recvcount * recvtype_extent);
-                    out = (void*)((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
-                    rbuf = (void*)((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
-                    RAND_bytes(out, 12); // 12 bytes of nonce
-                    
+                    printf("Case 3 in naive+ ring (default)\n");
+		    in = ((char*) recvbuf + j * recvcount * recvtype_extent);
+		    out = ((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
+		    printf("%d will encrypt from %d to %d\n", rank, j * recvcount * recvtype_extent, j * (recvcount * recvtype_extent + 12 + 16));
+		    rbuf = ((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
+		    printf("%d will receive from %d\n", rank, jnext * (recvcount * recvtype_extent + 12 + 16));
+		    RAND_bytes(out, 12); // 12 bytes of nonce
+                    printf("%d is going to encrypt from %d to %d\n", rank, j * recvcount * recvtype_extent, jnext * (recvcount * recvtype_extent + 12 + 16));
                     if(!EVP_AEAD_CTX_seal(ctx, out+12,
                                         &ciphertext_len, max_out_len,
                                         out, 12,
@@ -1152,14 +1156,15 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                         fflush(stdout);
                     }
                     MPIR_PVAR_INC(allgather, ring, send, recvcount*recvtype_extent+16+12, MPI_CHAR); 
-                    MPIR_PVAR_INC(allgather, ring, recv, recvcount*recvtype_extent+16+12, MPI_CHAR); 
+                    MPIR_PVAR_INC(allgather, ring, recv, recvcount*recvtype_extent+16+12, MPI_CHAR);
+		    printf("%d is going to send %d and receive %d\n", rank, recvcount*recvtype_extent+16+12, recvcount*recvtype_extent+16+12);
                     mpi_errno = MPIC_Sendrecv((char *) out, recvcount*recvtype_extent+16+12, 
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     rbuf, recvcount*recvtype_extent+16+12, MPI_CHAR, left,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
                                     MPI_STATUS_IGNORE, errflag);
 
-
+		    printf("%d is going to decrypt from %d to %d\n", rank, jnext * (recvcount * recvtype_extent + 12 + 16), jnext*recvcount*recvtype_extent);
                     if(!EVP_AEAD_CTX_open(ctx, (recvbuf+jnext*recvcount*recvtype_extent),
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
                         rbuf, 12, rbuf+12, (unsigned long )((recvcount*recvtype_extent)+16),
@@ -1174,7 +1179,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                     break;
                 default:
                     //No encryption/decryption
-
+		    printf("Default case in naive+ ring (default)\n");
                     MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
                     MPIR_PVAR_INC(allgather, ring, recv, recvcount, recvtype); 
                     mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
@@ -2025,7 +2030,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
     /***************** Added by Mehran *****************/
     if(security_approach==2){
         unsigned long count=0;
-        printf("Naive+ Ring(NB)\n");
+        //printf("Naive+ Ring(NB)\n");
         for (i = 1; i < size; i++) {
             /* compute ranks whose data we'll send and receive in this step */
             int send_rank = comm_ptr->dev.ch.rank_list[send_index];
@@ -2067,11 +2072,11 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
                 }
 
                 //decrypt to local rcvbuffer
-                //printf("%d (%d) is going to decrypt from %d to %d\n", rank, local_rank, (recv_rank*(sendcount*sendtype_extent+16+12)), send_rank*recvcount*recvtype_extent;
+                //printf("%d (%d) is going to decrypt from %d to %d\n", rank, local_rank, (recv_rank*(sendcount*sendtype_extent+16+12)), recv_rank*recvcount*recvtype_extent);
                 if(!EVP_AEAD_CTX_open(ctx, (recvbuf+recv_rank*recvcount*recvtype_extent),
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
-                        (ciphertext_recvbuf+(send_rank*(sendcount*sendtype_extent+16+12))), 12,
-                        (ciphertext_recvbuf+(send_rank*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))), 12,
+                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
                         NULL, 0)){
                     printf("Error in Naive+ decryption: allgather Ring_NB\n");
                 fflush(stdout);        
