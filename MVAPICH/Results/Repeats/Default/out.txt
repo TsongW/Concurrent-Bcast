@@ -1,0 +1,1776 @@
+
+		****** Secure Run with BoringSSL  128  GCM-SIV ********
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                       5.48
+2                       4.74
+4                       6.11
+Naive+ Ring(NB)
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 0 and receiving from 252
+Naive+ Ring(NB)
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 32 and receiving from 108
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 108 to 24
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 24 and receiving from 72
+4 (0) is going to decrypt from 72 to 16
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 16 and receiving from 36
+4 (0) is going to decrypt from 36 to 8
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 8 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 0 and receiving from 252
+0 (0) is going to decrypt from 252 to 56
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 56 and receiving from 216
+0 (0) is going to decrypt from 216 to 48
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 48 and receiving from 180
+0 (0) is going to decrypt from 180 to 40
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 40 and receiving from 144
+0 (0) is going to decrypt from 144 to 32
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 32 and receiving from 108
+0 (0) is going to decrypt from 108 to 24
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 24 and receiving from 72
+0 (0) is going to decrypt from 72 to 16
+4 (0) is going to decrypt from 252 to 56
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 56 and receiving from 216
+4 (0) is going to decrypt from 216 to 48
+4 (0) is going to send 8 to 5, and receive 36 from 3
+4 (0) is sending from 48 and receiving from 180
+4 (0) is going to decrypt from 180 to 40
+0 (0) is going to send 8 to 1, and receive 36 from 7
+0 (0) is sending from 16 and receiving from 36
+0 (0) is going to decrypt from 36 to 8
+Naive+ Ring(NB)
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 64 and receiving from 132
+8                    1524.36
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 0 and receiving from 308
+0 (0) is going to decrypt from 308 to 112
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 132 to 48
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 48 and receiving from 88
+4 (0) is going to decrypt from 88 to 32
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 32 and receiving from 44
+4 (0) is going to decrypt from 44 to 16
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 16 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+Naive+ Ring(NB)
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 0 and receiving from 308
+4 (0) is going to decrypt from 308 to 112
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 112 and receiving from 264
+0 (0) is going to decrypt from 264 to 96
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 96 and receiving from 220
+0 (0) is going to decrypt from 220 to 80
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 80 and receiving from 176
+0 (0) is going to decrypt from 176 to 64
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 64 and receiving from 132
+0 (0) is going to decrypt from 132 to 48
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 48 and receiving from 88
+0 (0) is going to decrypt from 88 to 32
+0 (0) is going to send 16 to 1, and receive 44 from 7
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 112 and receiving from 264
+4 (0) is going to decrypt from 264 to 96
+0 (0) is sending from 32 and receiving from 44
+0 (0) is going to decrypt from 44 to 16
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 96 and receiving from 220
+4 (0) is going to decrypt from 220 to 80
+Naive+ Ring(NB)
+4 (0) is going to send 16 to 5, and receive 44 from 3
+Naive+ Ring(NB)
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 0 and receiving from 308
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is sending from 64 and receiving from 132
+4 (0) is going to decrypt from 132 to 48
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 48 and receiving from 88
+4 (0) is going to decrypt from 88 to 32
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 308 to 112
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 112 and receiving from 264
+0 (0) is going to decrypt from 264 to 96
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 96 and receiving from 220
+0 (0) is going to decrypt from 220 to 80
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 80 and receiving from 176
+0 (0) is going to decrypt from 176 to 64
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 64 and receiving from 132
+0 (0) is going to decrypt from 132 to 48
+0 (0) is going to send 16 to 1, and receive 44 from 7
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 32 and receiving from 44
+4 (0) is going to decrypt from 44 to 16
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 16 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 0 and receiving from 308
+0 (0) is sending from 48 and receiving from 88
+0 (0) is going to decrypt from 88 to 32
+0 (0) is going to send 16 to 1, and receive 44 from 7
+0 (0) is sending from 32 and receiving from 44
+0 (0) is going to decrypt from 44 to 16
+4 (0) is going to decrypt from 308 to 112
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 112 and receiving from 264
+16                     52.51
+4 (0) is going to decrypt from 264 to 96
+4 (0) is going to send 16 to 5, and receive 44 from 3
+4 (0) is sending from 96 and receiving from 220
+4 (0) is going to decrypt from 220 to 80
+Naive+ Ring(NB)
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 0 and receiving from 420
+0 (0) is going to decrypt from 420 to 224
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 224 and receiving from 360
+Naive+ Ring(NB)
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 128 and receiving from 180
+4 (0) is going to decrypt from 180 to 96
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 360 to 192
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 192 and receiving from 300
+0 (0) is going to decrypt from 300 to 160
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 160 and receiving from 240
+0 (0) is going to decrypt from 240 to 128
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 128 and receiving from 180
+0 (0) is going to decrypt from 180 to 96
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 96 and receiving from 120
+0 (0) is going to decrypt from 120 to 64
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 64 and receiving from 60
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 96 and receiving from 120
+4 (0) is going to decrypt from 120 to 64
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 64 and receiving from 60
+4 (0) is going to decrypt from 60 to 32
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 32 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 32 to 5, and receive 60 from 3
+0 (0) is going to decrypt from 60 to 32
+Naive+ Ring(NB)
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 0 and receiving from 420
+0 (0) is going to decrypt from 420 to 224
+4 (0) is sending from 0 and receiving from 420
+4 (0) is going to decrypt from 420 to 224
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 224 and receiving from 360
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 360 to 192
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 192 and receiving from 300
+4 (0) is going to decrypt from 300 to 160
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 128 and receiving from 180
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 224 and receiving from 360
+0 (0) is going to decrypt from 360 to 192
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 192 and receiving from 300
+0 (0) is going to decrypt from 300 to 160
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 160 and receiving from 240
+0 (0) is going to decrypt from 240 to 128
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 128 and receiving from 180
+0 (0) is going to decrypt from 180 to 96
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 96 and receiving from 120
+0 (0) is going to decrypt from 120 to 64
+0 (0) is going to send 32 to 1, and receive 60 from 7
+0 (0) is sending from 64 and receiving from 60
+0 (0) is going to decrypt from 60 to 32
+Naive+ Ring(NB)
+32                     53.58
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 0 and receiving from 644
+4 (0) is going to decrypt from 180 to 96
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 96 and receiving from 120
+4 (0) is going to decrypt from 120 to 64
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 64 and receiving from 60
+4 (0) is going to decrypt from 60 to 32
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 32 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+Naive+ Ring(NB)
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 0 and receiving from 420
+4 (0) is going to decrypt from 420 to 224
+Naive+ Ring(NB)
+4 (0) is going to send 32 to 5, and receive 60 from 3
+4 (0) is sending from 224 and receiving from 360
+4 (0) is going to decrypt from 360 to 192
+4 (0) is going to send 32 to 5, and receive 60 from 3
+Naive+ Ring(NB)
+4 (0) is sending from 192 and receiving from 300
+4 (0) is going to decrypt from 300 to 160
+0 (0) is going to decrypt from 644 to 448
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 448 and receiving from 552
+0 (0) is going to decrypt from 552 to 384
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 384 and receiving from 460
+0 (0) is going to decrypt from 460 to 320
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 320 and receiving from 368
+0 (0) is going to decrypt from 368 to 256
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 256 and receiving from 276
+0 (0) is going to decrypt from 276 to 192
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 192 and receiving from 184
+Naive+ Ring(NB)
+4 (0) is going to send 64 to 5, and receive 92 from 3
+0 (0) is going to decrypt from 184 to 128
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 128 and receiving from 92
+0 (0) is going to decrypt from 92 to 64
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 0 and receiving from 644
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is sending from 256 and receiving from 276
+4 (0) is going to decrypt from 276 to 192
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 192 and receiving from 184
+4 (0) is going to decrypt from 184 to 128
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 128 and receiving from 92
+4 (0) is going to decrypt from 92 to 64
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 64 and receiving from 0
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 0 and receiving from 644
+0 (0) is going to decrypt from 644 to 448
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 448 and receiving from 552
+0 (0) is going to decrypt from 552 to 384
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 384 and receiving from 460
+0 (0) is going to decrypt from 460 to 320
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 320 and receiving from 368
+0 (0) is going to decrypt from 368 to 256
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 256 and receiving from 276
+0 (0) is going to decrypt from 276 to 192
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 192 and receiving from 184
+4 (0) is going to decrypt from 644 to 448
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 448 and receiving from 552
+4 (0) is going to decrypt from 552 to 384
+0 (0) is going to decrypt from 184 to 128
+0 (0) is going to send 64 to 1, and receive 92 from 7
+0 (0) is sending from 128 and receiving from 92
+0 (0) is going to decrypt from 92 to 64
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 384 and receiving from 460
+64                     61.30
+4 (0) is going to decrypt from 460 to 320
+Naive+ Ring(NB)
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 256 and receiving from 276
+Naive+ Ring(NB)
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 0 and receiving from 1092
+0 (0) is going to decrypt from 1092 to 896
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 276 to 192
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 192 and receiving from 184
+4 (0) is going to decrypt from 184 to 128
+4 (0) is going to send 64 to 5, and receive 92 from 3
+4 (0) is sending from 128 and receiving from 92
+4 (0) is going to decrypt from 92 to 64
+4 (0) is going to send 64 to 5, and receive 92 from 3
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 896 and receiving from 936
+0 (0) is going to decrypt from 936 to 768
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 768 and receiving from 780
+0 (0) is going to decrypt from 780 to 640
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 640 and receiving from 624
+0 (0) is going to decrypt from 624 to 512
+0 (0) is going to send 128 to 1, and receive 156 from 7
+4 (0) is sending from 64 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 64 to 5, and receive 92 from 3
+0 (0) is sending from 512 and receiving from 468
+0 (0) is going to decrypt from 468 to 384
+0 (0) is going to send 128 to 1, and receive 156 from 7
+4 (0) is sending from 0 and receiving from 644
+4 (0) is going to decrypt from 644 to 448
+4 (0) is going to send 64 to 5, and receive 92 from 3
+0 (0) is sending from 384 and receiving from 312
+0 (0) is going to decrypt from 312 to 256
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 256 and receiving from 156
+4 (0) is sending from 448 and receiving from 552
+4 (0) is going to decrypt from 552 to 384
+4 (0) is going to send 64 to 5, and receive 92 from 3
+0 (0) is going to decrypt from 156 to 128
+Naive+ Ring(NB)4 (0) is sending from 384 and receiving from 460
+4 (0) is going to decrypt from 460 to 320
+
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 0 and receiving from 1092
+0 (0) is going to decrypt from 1092 to 896
+Naive+ Ring(NB)
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 512 and receiving from 468
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 896 and receiving from 936
+0 (0) is going to decrypt from 936 to 768
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 768 and receiving from 780
+0 (0) is going to decrypt from 780 to 640
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 640 and receiving from 624
+0 (0) is going to decrypt from 624 to 512
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 512 and receiving from 468
+0 (0) is going to decrypt from 468 to 384
+4 (0) is going to decrypt from 468 to 384
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 384 and receiving from 312
+4 (0) is going to decrypt from 312 to 256
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 256 and receiving from 156
+4 (0) is going to decrypt from 156 to 128
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 128 and receiving from 0
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 384 and receiving from 312
+0 (0) is going to decrypt from 312 to 256
+0 (0) is going to send 128 to 1, and receive 156 from 7
+0 (0) is sending from 256 and receiving from 156
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 0 and receiving from 1092
+0 (0) is going to decrypt from 156 to 128
+4 (0) is going to decrypt from 1092 to 896
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 896 and receiving from 936
+4 (0) is going to decrypt from 936 to 768
+128                    58.83
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 768 and receiving from 780
+4 (0) is going to decrypt from 780 to 640
+Naive+ Ring(NB)Naive+ Ring(NB)
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 0 and receiving from 1988
+0 (0) is going to decrypt from 1988 to 1792
+0 (0) is going to send 256 to 1, and receive 284 from 7
+
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 512 and receiving from 468
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is sending from 1792 and receiving from 1704
+0 (0) is going to decrypt from 1704 to 1536
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1536 and receiving from 1420
+0 (0) is going to decrypt from 1420 to 1280
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1280 and receiving from 1136
+0 (0) is going to decrypt from 1136 to 1024
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1024 and receiving from 852
+0 (0) is going to decrypt from 852 to 768
+4 (0) is going to decrypt from 468 to 384
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 384 and receiving from 312
+4 (0) is going to decrypt from 312 to 256
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 256 and receiving from 156
+4 (0) is going to decrypt from 156 to 128
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 128 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 768 and receiving from 568
+0 (0) is going to decrypt from 568 to 512
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 0 and receiving from 1092
+4 (0) is going to decrypt from 1092 to 896
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 512 and receiving from 284
+0 (0) is going to decrypt from 284 to 256
+4 (0) is going to send 128 to 5, and receive 156 from 3
+4 (0) is sending from 896 and receiving from 936
+4 (0) is going to decrypt from 936 to 768
+4 (0) is going to send 128 to 5, and receive 156 from 3
+Naive+ Ring(NB)
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 0 and receiving from 1988
+4 (0) is sending from 768 and receiving from 780
+4 (0) is going to decrypt from 780 to 640
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 1024 and receiving from 852
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 1988 to 1792
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1792 and receiving from 1704
+0 (0) is going to decrypt from 1704 to 1536
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1536 and receiving from 1420
+0 (0) is going to decrypt from 1420 to 1280
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 1280 and receiving from 1136
+0 (0) is going to decrypt from 1136 to 1024
+0 (0) is going to send 256 to 1, and receive 284 from 7
+Naive+ Ring(NB)
+0 (0) is sending from 1024 and receiving from 852
+0 (0) is going to decrypt from 852 to 768
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 768 and receiving from 568
+4 (0) is going to decrypt from 852 to 768
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 768 and receiving from 568
+4 (0) is going to decrypt from 568 to 512
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 512 and receiving from 284
+4 (0) is going to decrypt from 284 to 256
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 256 and receiving from 0
+0 (0) is going to decrypt from 568 to 512
+0 (0) is going to send 256 to 1, and receive 284 from 7
+0 (0) is sending from 512 and receiving from 284
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 0 and receiving from 1988
+4 (0) is going to decrypt from 1988 to 1792
+0 (0) is going to decrypt from 284 to 256
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 1792 and receiving from 1704
+4 (0) is going to decrypt from 1704 to 1536
+4 (0) is going to send 256 to 5, and receive 284 from 3
+256                    61.78
+4 (0) is sending from 1536 and receiving from 1420
+4 (0) is going to decrypt from 1420 to 1280
+Naive+ Ring(NB)
+0 (0) is going to send 512 to 1, and receive 540 from 7
+Naive+ Ring(NB)
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 1024 and receiving from 852
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is sending from 0 and receiving from 3780
+0 (0) is going to decrypt from 3780 to 3584
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 3584 and receiving from 3240
+0 (0) is going to decrypt from 3240 to 3072
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 3072 and receiving from 2700
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 852 to 768
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 768 and receiving from 568
+4 (0) is going to decrypt from 568 to 512
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 512 and receiving from 284
+4 (0) is going to decrypt from 284 to 256
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 256 and receiving from 0
+0 (0) is going to decrypt from 2700 to 2560
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 2560 and receiving from 2160
+0 (0) is going to decrypt from 2160 to 2048
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 2048 and receiving from 1620
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 0 and receiving from 1988
+0 (0) is going to decrypt from 1620 to 1536
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 1536 and receiving from 1080
+0 (0) is going to decrypt from 1080 to 1024
+4 (0) is going to decrypt from 1988 to 1792
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 1792 and receiving from 1704
+4 (0) is going to decrypt from 1704 to 1536
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 1024 and receiving from 540
+0 (0) is going to decrypt from 540 to 512
+4 (0) is going to send 256 to 5, and receive 284 from 3
+4 (0) is sending from 1536 and receiving from 1420
+4 (0) is going to decrypt from 1420 to 1280
+Naive+ Ring(NB)
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 0 and receiving from 3780
+Naive+ Ring(NB)
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 2048 and receiving from 1620
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 3780 to 3584
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 3584 and receiving from 3240
+0 (0) is going to decrypt from 3240 to 3072
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 3072 and receiving from 2700
+0 (0) is going to decrypt from 2700 to 2560
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 2560 and receiving from 2160
+0 (0) is going to decrypt from 2160 to 2048
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 2048 and receiving from 1620
+4 (0) is going to decrypt from 1620 to 1536
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 1536 and receiving from 1080
+4 (0) is going to decrypt from 1080 to 1024
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 1024 and receiving from 540
+4 (0) is going to decrypt from 540 to 512
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 512 and receiving from 0
+0 (0) is going to decrypt from 1620 to 1536
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 1536 and receiving from 1080
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 0 and receiving from 3780
+0 (0) is going to decrypt from 1080 to 1024
+0 (0) is going to send 512 to 1, and receive 540 from 7
+0 (0) is sending from 1024 and receiving from 540
+0 (0) is going to decrypt from 540 to 512
+4 (0) is going to decrypt from 3780 to 3584
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 3584 and receiving from 3240
+4 (0) is going to decrypt from 3240 to 3072
+512                    63.69
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 3072 and receiving from 2700
+Naive+ Ring(NB)
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 0 and receiving from 7364
+0 (0) is going to decrypt from 7364 to 7168
+4 (0) is going to decrypt from 2700 to 2560
+Naive+ Ring(NB)
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 2048 and receiving from 1620
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 7168 and receiving from 6312
+0 (0) is going to decrypt from 6312 to 6144
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 6144 and receiving from 5260
+0 (0) is going to decrypt from 5260 to 5120
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 5120 and receiving from 4208
+0 (0) is going to decrypt from 4208 to 4096
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+4 (0) is going to decrypt from 1620 to 1536
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 1536 and receiving from 1080
+4 (0) is going to decrypt from 1080 to 1024
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 1024 and receiving from 540
+4 (0) is going to decrypt from 540 to 512
+4 (0) is going to send 512 to 5, and receive 540 from 3
+0 (0) is sending from 4096 and receiving from 3156
+0 (0) is going to decrypt from 3156 to 3072
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 3072 and receiving from 2104
+4 (0) is sending from 512 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 2104 to 2048
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 2048 and receiving from 1052
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 0 and receiving from 3780
+4 (0) is going to decrypt from 3780 to 3584
+0 (0) is going to decrypt from 1052 to 1024
+4 (0) is going to send 512 to 5, and receive 540 from 3
+4 (0) is sending from 3584 and receiving from 3240
+4 (0) is going to decrypt from 3240 to 3072
+4 (0) is going to send 512 to 5, and receive 540 from 3
+Naive+ Ring(NB)
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 0 and receiving from 7364
+4 (0) is sending from 3072 and receiving from 2700
+4 (0) is going to decrypt from 2700 to 2560
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 4096 and receiving from 3156
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 7364 to 7168
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 7168 and receiving from 6312
+0 (0) is going to decrypt from 6312 to 6144
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 6144 and receiving from 5260
+0 (0) is going to decrypt from 5260 to 5120
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 5120 and receiving from 4208
+0 (0) is going to decrypt from 4208 to 4096
+Naive+ Ring(NB)
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 4096 and receiving from 3156
+0 (0) is going to decrypt from 3156 to 3072
+4 (0) is going to decrypt from 3156 to 3072
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 3072 and receiving from 2104
+4 (0) is going to decrypt from 2104 to 2048
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 2048 and receiving from 1052
+4 (0) is going to decrypt from 1052 to 1024
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 1024 and receiving from 0
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 3072 and receiving from 2104
+0 (0) is going to decrypt from 2104 to 2048
+0 (0) is going to send 1024 to 1, and receive 1052 from 7
+0 (0) is sending from 2048 and receiving from 1052
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+0 (0) is going to decrypt from 1052 to 1024
+4 (0) is sending from 0 and receiving from 7364
+4 (0) is going to decrypt from 7364 to 7168
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+1024                   62.82
+4 (0) is sending from 7168 and receiving from 6312
+4 (0) is going to decrypt from 6312 to 6144
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 6144 and receiving from 5260
+Naive+ Ring(NB)
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 0 and receiving from 14532
+4 (0) is going to decrypt from 5260 to 5120
+Naive+ Ring(NB)Naive+ Ring(NB)
+
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 4096 and receiving from 3156
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 14532 to 14336
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 14336 and receiving from 12456
+0 (0) is going to decrypt from 12456 to 12288
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 12288 and receiving from 10380
+0 (0) is going to decrypt from 10380 to 10240
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+Naive+ Ring(NB)
+0 (0) is sending from 10240 and receiving from 8304
+0 (0) is going to decrypt from 8304 to 8192
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+4 (0) is going to decrypt from 3156 to 3072
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 3072 and receiving from 2104
+4 (0) is going to decrypt from 2104 to 2048
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 2048 and receiving from 1052
+4 (0) is going to decrypt from 1052 to 1024
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 1024 and receiving from 0
+0 (0) is sending from 8192 and receiving from 6228
+0 (0) is going to decrypt from 6228 to 6144
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 6144 and receiving from 4152
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 0 and receiving from 7364
+4 (0) is going to decrypt from 7364 to 7168
+0 (0) is going to decrypt from 4152 to 4096
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 4096 and receiving from 2076
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 7168 and receiving from 6312
+4 (0) is going to decrypt from 6312 to 6144
+0 (0) is going to decrypt from 2076 to 2048
+4 (0) is going to send 1024 to 5, and receive 1052 from 3
+4 (0) is sending from 6144 and receiving from 5260
+Naive+ Ring(NB)
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 0 and receiving from 14532
+4 (0) is going to decrypt from 5260 to 5120
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 8192 and receiving from 6228
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 14532 to 14336
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 14336 and receiving from 12456
+0 (0) is going to decrypt from 12456 to 12288
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 12288 and receiving from 10380
+0 (0) is going to decrypt from 10380 to 10240
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 10240 and receiving from 8304
+0 (0) is going to decrypt from 8304 to 8192
+Naive+ Ring(NB)
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 8192 and receiving from 6228
+0 (0) is going to decrypt from 6228 to 6144
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 6144 and receiving from 4152
+4 (0) is going to decrypt from 6228 to 6144
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 6144 and receiving from 4152
+4 (0) is going to decrypt from 4152 to 4096
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 4096 and receiving from 2076
+4 (0) is going to decrypt from 2076 to 2048
+0 (0) is going to decrypt from 4152 to 4096
+0 (0) is going to send 2048 to 1, and receive 2076 from 7
+0 (0) is sending from 4096 and receiving from 2076
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 2048 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 2076 to 2048
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 0 and receiving from 14532
+4 (0) is going to decrypt from 14532 to 14336
+2048                   73.08
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 14336 and receiving from 12456
+4 (0) is going to decrypt from 12456 to 12288
+Naive+ Ring(NB)
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 0 and receiving from 28868
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 12288 and receiving from 10380
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 10380 to 10240
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 8192 and receiving from 6228
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 28868 to 28672
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 28672 and receiving from 24744
+0 (0) is going to decrypt from 24744 to 24576
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 24576 and receiving from 20620
+0 (0) is going to decrypt from 20620 to 20480
+Naive+ Ring(NB)
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 20480 and receiving from 16496
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 16496 to 16384
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 16384 and receiving from 12372
+0 (0) is going to decrypt from 12372 to 12288
+4 (0) is going to decrypt from 6228 to 6144
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 6144 and receiving from 4152
+4 (0) is going to decrypt from 4152 to 4096
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 4096 and receiving from 2076
+4 (0) is going to decrypt from 2076 to 2048
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 12288 and receiving from 8248
+4 (0) is sending from 2048 and receiving from 0
+0 (0) is going to decrypt from 8248 to 8192
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 8192 and receiving from 4124
+0 (0) is going to decrypt from 4124 to 4096
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 0 and receiving from 14532
+Naive+ Ring(NB)
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 0 and receiving from 28868
+4 (0) is going to decrypt from 14532 to 14336
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 14336 and receiving from 12456
+4 (0) is going to decrypt from 12456 to 12288
+Naive+ Ring(NB)
+4 (0) is going to send 2048 to 5, and receive 2076 from 3
+4 (0) is sending from 12288 and receiving from 10380
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 10380 to 10240
+0 (0) is going to decrypt from 28868 to 28672
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 28672 and receiving from 24744
+0 (0) is going to decrypt from 24744 to 24576
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 24576 and receiving from 20620
+Naive+ Ring(NB)
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 20620 to 20480
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 20480 and receiving from 16496
+0 (0) is going to decrypt from 16496 to 16384
+Naive+ Ring(NB)
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 16384 and receiving from 12372
+0 (0) is going to decrypt from 12372 to 12288
+Naive+ Ring(NB)
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 12288 and receiving from 8248
+0 (0) is going to decrypt from 8248 to 8192
+4 (0) is sending from 16384 and receiving from 12372
+4 (0) is going to decrypt from 12372 to 12288
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 12288 and receiving from 8248
+4 (0) is going to decrypt from 8248 to 8192
+0 (0) is going to send 4096 to 1, and receive 4124 from 7
+0 (0) is sending from 8192 and receiving from 4124
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 8192 and receiving from 4124
+4 (0) is going to decrypt from 4124 to 4096
+0 (0) is going to decrypt from 4124 to 4096
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 4096 and receiving from 0
+4096                   89.05
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 0 and receiving from 57540
+4 (0) is sending from 0 and receiving from 28868
+4 (0) is going to decrypt from 28868 to 28672
+Naive+ Ring(NB)
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 28672 and receiving from 24744
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 24744 to 24576
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 24576 and receiving from 20620
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 20620 to 20480
+0 (0) is going to decrypt from 57540 to 57344
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 57344 and receiving from 49320
+Naive+ Ring(NB)
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 16384 and receiving from 12372
+0 (0) is going to decrypt from 49320 to 49152
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 49152 and receiving from 41100
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 41100 to 40960
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 40960 and receiving from 32880
+4 (0) is going to decrypt from 12372 to 12288
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 12288 and receiving from 8248
+0 (0) is going to decrypt from 32880 to 32768
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+Naive+ Ring(NB)
+0 (0) is sending from 32768 and receiving from 24660
+0 (0) is going to decrypt from 24660 to 24576
+4 (0) is going to decrypt from 8248 to 8192
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 8192 and receiving from 4124
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 24576 and receiving from 16440
+4 (0) is going to decrypt from 4124 to 4096
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 4096 and receiving from 0
+0 (0) is going to decrypt from 16440 to 16384
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 16384 and receiving from 8220
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 0 and receiving from 28868
+0 (0) is going to decrypt from 8220 to 8192
+4 (0) is going to decrypt from 28868 to 28672
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 0 and receiving from 57540
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 28672 and receiving from 24744
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 24744 to 24576
+4 (0) is going to send 4096 to 5, and receive 4124 from 3
+4 (0) is sending from 24576 and receiving from 20620
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 20620 to 20480
+0 (0) is going to decrypt from 57540 to 57344
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 57344 and receiving from 49320
+0 (0) is going to decrypt from 49320 to 49152
+Naive+ Ring(NB)
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 32768 and receiving from 24660
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 49152 and receiving from 41100
+0 (0) is going to decrypt from 41100 to 40960
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 40960 and receiving from 32880
+0 (0) is going to decrypt from 32880 to 32768
+Naive+ Ring(NB)
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 32768 and receiving from 24660
+4 (0) is going to decrypt from 24660 to 24576
+0 (0) is going to decrypt from 24660 to 24576
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 24576 and receiving from 16440
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 24576 and receiving from 16440
+0 (0) is going to decrypt from 16440 to 16384
+4 (0) is going to decrypt from 16440 to 16384
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 16384 and receiving from 8220
+0 (0) is going to send 8192 to 1, and receive 8220 from 7
+0 (0) is sending from 16384 and receiving from 8220
+0 (0) is going to decrypt from 8220 to 8192
+4 (0) is going to decrypt from 8220 to 8192
+8192                  104.10
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 8192 and receiving from 0
+Naive+ Ring(NB)
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 0 and receiving from 114884
+4 (0) is going to decrypt from 0 to 0
+Naive+ Ring(NB)
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 0 and receiving from 57540
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 57540 to 57344
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+Naive+ Ring(NB)
+4 (0) is sending from 57344 and receiving from 49320
+0 (0) is going to decrypt from 114884 to 114688
+4 (0) is going to decrypt from 49320 to 49152
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 114688 and receiving from 98472
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 49152 and receiving from 41100
+4 (0) is going to decrypt from 41100 to 40960
+0 (0) is going to decrypt from 98472 to 98304
+Naive+ Ring(NB)
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 32768 and receiving from 24660
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 98304 and receiving from 82060
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 82060 to 81920
+Naive+ Ring(NB)
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 81920 and receiving from 65648
+4 (0) is going to decrypt from 24660 to 24576
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 24576 and receiving from 16440
+0 (0) is going to decrypt from 65648 to 65536
+Naive+ Ring(NB)
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 65536 and receiving from 49236
+4 (0) is going to decrypt from 16440 to 16384
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 16384 and receiving from 8220
+4 (0) is going to decrypt from 8220 to 8192
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 8192 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 0 and receiving from 57540
+0 (0) is going to decrypt from 49236 to 49152
+4 (0) is going to decrypt from 57540 to 57344
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 49152 and receiving from 32824
+4 (0) is sending from 57344 and receiving from 49320
+4 (0) is going to decrypt from 49320 to 49152
+4 (0) is going to send 8192 to 5, and receive 8220 from 3
+4 (0) is sending from 49152 and receiving from 41100
+4 (0) is going to decrypt from 41100 to 40960
+Naive+ Ring(NB)
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 65536 and receiving from 49236
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 49236 to 49152
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 49152 and receiving from 32824
+0 (0) is going to decrypt from 32824 to 32768
+4 (0) is going to decrypt from 32824 to 32768
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 32768 and receiving from 16412
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 32768 and receiving from 16412
+4 (0) is going to decrypt from 16412 to 16384
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 16384 and receiving from 0
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 0 and receiving from 114884
+4 (0) is going to decrypt from 114884 to 114688
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 114688 and receiving from 98472
+4 (0) is going to decrypt from 98472 to 98304
+0 (0) is going to decrypt from 16412 to 16384
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 98304 and receiving from 82060
+4 (0) is going to decrypt from 82060 to 81920
+Naive+ Ring(NB)
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 65536 and receiving from 49236
+Naive+ Ring(NB)
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 0 and receiving from 114884
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 114884 to 114688
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+4 (0) is going to decrypt from 49236 to 49152
+Naive+ Ring(NB)
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 49152 and receiving from 32824
+0 (0) is sending from 114688 and receiving from 98472
+0 (0) is going to decrypt from 98472 to 98304
+4 (0) is going to decrypt from 32824 to 32768
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 98304 and receiving from 82060
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 32768 and receiving from 16412
+0 (0) is going to decrypt from 82060 to 81920
+4 (0) is going to decrypt from 16412 to 16384
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 81920 and receiving from 65648
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 16384 and receiving from 0
+0 (0) is going to decrypt from 65648 to 65536
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 65536 and receiving from 49236
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 0 and receiving from 114884
+0 (0) is going to decrypt from 49236 to 49152
+4 (0) is going to decrypt from 114884 to 114688
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+0 (0) is sending from 49152 and receiving from 32824
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 114688 and receiving from 98472
+0 (0) is going to decrypt from 32824 to 32768
+0 (0) is going to send 16384 to 1, and receive 16412 from 7
+4 (0) is going to decrypt from 98472 to 98304
+0 (0) is sending from 32768 and receiving from 16412
+4 (0) is going to send 16384 to 5, and receive 16412 from 3
+4 (0) is sending from 98304 and receiving from 82060
+0 (0) is going to decrypt from 16412 to 16384
+4 (0) is going to decrypt from 82060 to 81920
+16384                 199.65
+Naive+ Ring(NB)
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 131072 and receiving from 98388
+Naive+ Ring(NB)
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 0 and receiving from 229572
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 98388 to 98304
+0 (0) is going to decrypt from 229572 to 229376
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 98304 and receiving from 65592
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 229376 and receiving from 196776
+4 (0) is going to decrypt from 65592 to 65536
+0 (0) is going to decrypt from 196776 to 196608
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 65536 and receiving from 32796
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 196608 and receiving from 163980
+0 (0) is going to decrypt from 163980 to 163840
+4 (0) is going to decrypt from 32796 to 32768
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 163840 and receiving from 131184
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 32768 and receiving from 0
+0 (0) is going to decrypt from 131184 to 131072
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 131072 and receiving from 98388
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 0 and receiving from 229572
+0 (0) is going to decrypt from 98388 to 98304
+4 (0) is going to decrypt from 229572 to 229376
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 98304 and receiving from 65592
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 229376 and receiving from 196776
+0 (0) is going to decrypt from 65592 to 65536
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 65536 and receiving from 32796
+4 (0) is going to decrypt from 196776 to 196608
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 196608 and receiving from 163980
+0 (0) is going to decrypt from 32796 to 32768
+4 (0) is going to decrypt from 163980 to 163840
+Naive+ Ring(NB)
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 131072 and receiving from 98388
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 0 and receiving from 229572
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 98388 to 98304
+Naive+ Ring(NB)
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 98304 and receiving from 65592
+0 (0) is going to decrypt from 229572 to 229376
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 65592 to 65536
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 229376 and receiving from 196776
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 65536 and receiving from 32796
+0 (0) is going to decrypt from 196776 to 196608
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 196608 and receiving from 163980
+4 (0) is going to decrypt from 32796 to 32768
+0 (0) is going to decrypt from 163980 to 163840
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 32768 and receiving from 0
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 163840 and receiving from 131184
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 0 and receiving from 229572
+0 (0) is going to decrypt from 131184 to 131072
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 131072 and receiving from 98388
+4 (0) is going to decrypt from 229572 to 229376
+0 (0) is going to decrypt from 98388 to 98304
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 229376 and receiving from 196776
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 98304 and receiving from 65592
+4 (0) is going to decrypt from 196776 to 196608
+0 (0) is going to decrypt from 65592 to 65536
+4 (0) is going to send 32768 to 5, and receive 32796 from 3
+4 (0) is sending from 196608 and receiving from 163980
+0 (0) is going to send 32768 to 1, and receive 32796 from 7
+0 (0) is sending from 65536 and receiving from 32796
+4 (0) is going to decrypt from 163980 to 163840
+0 (0) is going to decrypt from 32796 to 32768
+32768                 315.37
+Naive+ Ring(NB)
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 262144 and receiving from 196692
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 0 and receiving from 458948
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 196692 to 196608
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 196608 and receiving from 131128
+0 (0) is going to decrypt from 458948 to 458752
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 458752 and receiving from 393384
+4 (0) is going to decrypt from 131128 to 131072
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 131072 and receiving from 65564
+0 (0) is going to decrypt from 393384 to 393216
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 393216 and receiving from 327820
+4 (0) is going to decrypt from 65564 to 65536
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 65536 and receiving from 0
+0 (0) is going to decrypt from 327820 to 327680
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 327680 and receiving from 262256
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 0 and receiving from 458948
+0 (0) is going to decrypt from 262256 to 262144
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 262144 and receiving from 196692
+4 (0) is going to decrypt from 458948 to 458752
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 458752 and receiving from 393384
+0 (0) is going to decrypt from 196692 to 196608
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 196608 and receiving from 131128
+4 (0) is going to decrypt from 393384 to 393216
+0 (0) is going to decrypt from 131128 to 131072
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 393216 and receiving from 327820
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 131072 and receiving from 65564
+4 (0) is going to decrypt from 327820 to 327680
+0 (0) is going to decrypt from 65564 to 65536
+Naive+ Ring(NB)
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 262144 and receiving from 196692
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 0 and receiving from 458948
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 196692 to 196608
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 458948 to 458752
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 196608 and receiving from 131128
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 458752 and receiving from 393384
+4 (0) is going to decrypt from 131128 to 131072
+0 (0) is going to decrypt from 393384 to 393216
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 131072 and receiving from 65564
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 393216 and receiving from 327820
+4 (0) is going to decrypt from 65564 to 65536
+0 (0) is going to decrypt from 327820 to 327680
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 65536 and receiving from 0
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 327680 and receiving from 262256
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 262256 to 262144
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 0 and receiving from 458948
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 262144 and receiving from 196692
+4 (0) is going to decrypt from 458948 to 458752
+0 (0) is going to decrypt from 196692 to 196608
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 458752 and receiving from 393384
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 196608 and receiving from 131128
+0 (0) is going to decrypt from 131128 to 131072
+4 (0) is going to decrypt from 393384 to 393216
+0 (0) is going to send 65536 to 1, and receive 65564 from 7
+0 (0) is sending from 131072 and receiving from 65564
+4 (0) is going to send 65536 to 5, and receive 65564 from 3
+4 (0) is sending from 393216 and receiving from 327820
+0 (0) is going to decrypt from 65564 to 65536
+4 (0) is going to decrypt from 327820 to 327680
+65536                 544.34
+Naive+ Ring(NB)
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 524288 and receiving from 393300
+Naive+ Ring(NB)
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 0 and receiving from 917700
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 393300 to 393216
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 393216 and receiving from 262200
+4 (0) is going to decrypt from 262200 to 262144
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 262144 and receiving from 131100
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 917700 to 917504
+4 (0) is going to decrypt from 131100 to 131072
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 131072 and receiving from 0
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 917504 and receiving from 786600
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 786600 to 786432
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 0 and receiving from 917700
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 786432 and receiving from 655500
+4 (0) is going to decrypt from 917700 to 917504
+0 (0) is going to decrypt from 655500 to 655360
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 917504 and receiving from 786600
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 655360 and receiving from 524400
+4 (0) is going to decrypt from 786600 to 786432
+0 (0) is going to decrypt from 524400 to 524288
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 786432 and receiving from 655500
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 524288 and receiving from 393300
+4 (0) is going to decrypt from 655500 to 655360
+0 (0) is going to decrypt from 393300 to 393216
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 393216 and receiving from 262200
+0 (0) is going to decrypt from 262200 to 262144
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 262144 and receiving from 131100
+0 (0) is going to decrypt from 131100 to 131072
+Naive+ Ring(NB)
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 0 and receiving from 917700
+Naive+ Ring(NB)
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 524288 and receiving from 393300
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 393300 to 393216
+0 (0) is going to decrypt from 917700 to 917504
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 393216 and receiving from 262200
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 917504 and receiving from 786600
+4 (0) is going to decrypt from 262200 to 262144
+0 (0) is going to decrypt from 786600 to 786432
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 262144 and receiving from 131100
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 786432 and receiving from 655500
+4 (0) is going to decrypt from 131100 to 131072
+0 (0) is going to decrypt from 655500 to 655360
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 131072 and receiving from 0
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 655360 and receiving from 524400
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 524400 to 524288
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 0 and receiving from 917700
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 524288 and receiving from 393300
+0 (0) is going to decrypt from 393300 to 393216
+4 (0) is going to decrypt from 917700 to 917504
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 393216 and receiving from 262200
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 917504 and receiving from 786600
+0 (0) is going to decrypt from 262200 to 262144
+4 (0) is going to decrypt from 786600 to 786432
+0 (0) is going to send 131072 to 1, and receive 131100 from 7
+0 (0) is sending from 262144 and receiving from 131100
+4 (0) is going to send 131072 to 5, and receive 131100 from 3
+4 (0) is sending from 786432 and receiving from 655500
+0 (0) is going to decrypt from 131100 to 131072
+4 (0) is going to decrypt from 655500 to 655360
+131072                992.57
+Naive+ Ring(NB)
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 0 and receiving from 1835204
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1048576 and receiving from 786516
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 786516 to 786432
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 786432 and receiving from 524344
+4 (0) is going to decrypt from 524344 to 524288
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 524288 and receiving from 262172
+0 (0) is going to decrypt from 1835204 to 1835008
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1835008 and receiving from 1573032
+4 (0) is going to decrypt from 262172 to 262144
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 262144 and receiving from 0
+0 (0) is going to decrypt from 1573032 to 1572864
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1572864 and receiving from 1310860
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 0 and receiving from 1835204
+0 (0) is going to decrypt from 1310860 to 1310720
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1310720 and receiving from 1048688
+0 (0) is going to decrypt from 1048688 to 1048576
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1048576 and receiving from 786516
+0 (0) is going to decrypt from 786516 to 786432
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 786432 and receiving from 524344
+0 (0) is going to decrypt from 524344 to 524288
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 524288 and receiving from 262172
+4 (0) is going to decrypt from 1835204 to 1835008
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1835008 and receiving from 1573032
+0 (0) is going to decrypt from 262172 to 262144
+4 (0) is going to decrypt from 1573032 to 1572864
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1572864 and receiving from 1310860
+4 (0) is going to decrypt from 1310860 to 1310720
+Naive+ Ring(NB)
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1048576 and receiving from 786516
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 0 and receiving from 1835204
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 1835204 to 1835008
+4 (0) is going to decrypt from 786516 to 786432
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1835008 and receiving from 1573032
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 786432 and receiving from 524344
+4 (0) is going to decrypt from 524344 to 524288
+0 (0) is going to decrypt from 1573032 to 1572864
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 524288 and receiving from 262172
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1572864 and receiving from 1310860
+4 (0) is going to decrypt from 262172 to 262144
+0 (0) is going to decrypt from 1310860 to 1310720
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 262144 and receiving from 0
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1310720 and receiving from 1048688
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 1048688 to 1048576
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 0 and receiving from 1835204
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 1048576 and receiving from 786516
+4 (0) is going to decrypt from 1835204 to 1835008
+0 (0) is going to decrypt from 786516 to 786432
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1835008 and receiving from 1573032
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 786432 and receiving from 524344
+4 (0) is going to decrypt from 1573032 to 1572864
+0 (0) is going to decrypt from 524344 to 524288
+4 (0) is going to send 262144 to 5, and receive 262172 from 3
+4 (0) is sending from 1572864 and receiving from 1310860
+0 (0) is going to send 262144 to 1, and receive 262172 from 7
+0 (0) is sending from 524288 and receiving from 262172
+4 (0) is going to decrypt from 1310860 to 1310720
+0 (0) is going to decrypt from 262172 to 262144
+262144               1820.18
+Naive+ Ring(NB)
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 0 and receiving from 3670212
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 2097152 and receiving from 1572948
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 1572948 to 1572864
+Naive+ Ring(NB)
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 1572864 and receiving from 1048632
+4 (0) is going to decrypt from 1048632 to 1048576
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 1048576 and receiving from 524316
+0 (0) is going to decrypt from 3670212 to 3670016
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 3670016 and receiving from 3145896
+4 (0) is going to decrypt from 524316 to 524288
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 524288 and receiving from 0
+0 (0) is going to decrypt from 3145896 to 3145728
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 3145728 and receiving from 2621580
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 0 and receiving from 3670212
+0 (0) is going to decrypt from 2621580 to 2621440
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 2621440 and receiving from 2097264
+0 (0) is going to decrypt from 2097264 to 2097152
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 2097152 and receiving from 1572948
+4 (0) is going to decrypt from 3670212 to 3670016
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 3670016 and receiving from 3145896
+0 (0) is going to decrypt from 1572948 to 1572864
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 1572864 and receiving from 1048632
+4 (0) is going to decrypt from 3145896 to 3145728
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 3145728 and receiving from 2621580
+0 (0) is going to decrypt from 1048632 to 1048576
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 1048576 and receiving from 524316
+4 (0) is going to decrypt from 2621580 to 2621440
+0 (0) is going to decrypt from 524316 to 524288
+Naive+ Ring(NB)
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 2097152 and receiving from 1572948
+Naive+ Ring(NB)
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 0 and receiving from 3670212
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 3670212 to 3670016
+4 (0) is going to decrypt from 1572948 to 1572864
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 3670016 and receiving from 3145896
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 1572864 and receiving from 1048632
+0 (0) is going to decrypt from 3145896 to 3145728
+4 (0) is going to decrypt from 1048632 to 1048576
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 3145728 and receiving from 2621580
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 1048576 and receiving from 524316
+4 (0) is going to decrypt from 524316 to 524288
+0 (0) is going to decrypt from 2621580 to 2621440
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 524288 and receiving from 0
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 2621440 and receiving from 2097264
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to decrypt from 2097264 to 2097152
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 0 and receiving from 3670212
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 2097152 and receiving from 1572948
+4 (0) is going to decrypt from 3670212 to 3670016
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 3670016 and receiving from 3145896
+0 (0) is going to decrypt from 1572948 to 1572864
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 1572864 and receiving from 1048632
+4 (0) is going to decrypt from 3145896 to 3145728
+4 (0) is going to send 524288 to 5, and receive 524316 from 3
+4 (0) is sending from 3145728 and receiving from 2621580
+0 (0) is going to decrypt from 1048632 to 1048576
+0 (0) is going to send 524288 to 1, and receive 524316 from 7
+0 (0) is sending from 1048576 and receiving from 524316
+4 (0) is going to decrypt from 2621580 to 2621440
+0 (0) is going to decrypt from 524316 to 524288
+524288               3586.38
+Naive+ Ring(NB)
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 0 and receiving from 7340228
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 4194304 and receiving from 3145812
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+4 (0) is going to decrypt from 3145812 to 3145728
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 3145728 and receiving from 2097208
+4 (0) is going to decrypt from 2097208 to 2097152
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 2097152 and receiving from 1048604
+0 (0) is going to decrypt from 7340228 to 7340032
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 7340032 and receiving from 6291624
+4 (0) is going to decrypt from 1048604 to 1048576
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 1048576 and receiving from 0
+0 (0) is going to decrypt from 6291624 to 6291456
+4 (0) is going to decrypt from 0 to 0
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 6291456 and receiving from 5243020
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 0 and receiving from 7340228
+0 (0) is going to decrypt from 5243020 to 5242880
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 5242880 and receiving from 4194416
+0 (0) is going to decrypt from 4194416 to 4194304
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 4194304 and receiving from 3145812
+4 (0) is going to decrypt from 7340228 to 7340032
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 7340032 and receiving from 6291624
+0 (0) is going to decrypt from 3145812 to 3145728
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 3145728 and receiving from 2097208
+4 (0) is going to decrypt from 6291624 to 6291456
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 6291456 and receiving from 5243020
+0 (0) is going to decrypt from 2097208 to 2097152
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 2097152 and receiving from 1048604
+4 (0) is going to decrypt from 5243020 to 5242880
+0 (0) is going to decrypt from 1048604 to 1048576
+Naive+ Ring(NB)
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 4194304 and receiving from 3145812
+Naive+ Ring(NB)
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 0 and receiving from 7340228
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+Naive+ Ring(NB)
+0 (0) is going to decrypt from 7340228 to 7340032
+4 (0) is going to decrypt from 3145812 to 3145728
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 7340032 and receiving from 6291624
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 3145728 and receiving from 2097208
+0 (0) is going to decrypt from 6291624 to 6291456
+4 (0) is going to decrypt from 2097208 to 2097152
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 6291456 and receiving from 5243020
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 2097152 and receiving from 1048604
+4 (0) is going to decrypt from 1048604 to 1048576
+0 (0) is going to decrypt from 5243020 to 5242880
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 1048576 and receiving from 0
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 5242880 and receiving from 4194416
+4 (0) is going to decrypt from 0 to 0
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 0 and receiving from 7340228
+0 (0) is going to decrypt from 4194416 to 4194304
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 4194304 and receiving from 3145812
+4 (0) is going to decrypt from 7340228 to 7340032
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 7340032 and receiving from 6291624
+0 (0) is going to decrypt from 3145812 to 3145728
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 3145728 and receiving from 2097208
+4 (0) is going to decrypt from 6291624 to 6291456
+4 (0) is going to send 1048576 to 5, and receive 1048604 from 3
+4 (0) is sending from 6291456 and receiving from 5243020
+0 (0) is going to decrypt from 2097208 to 2097152
+0 (0) is going to send 1048576 to 1, and receive 1048604 from 7
+0 (0) is sending from 2097152 and receiving from 1048604
+4 (0) is going to decrypt from 5243020 to 5242880
+0 (0) is going to decrypt from 1048604 to 1048576
+1048576              7220.48
