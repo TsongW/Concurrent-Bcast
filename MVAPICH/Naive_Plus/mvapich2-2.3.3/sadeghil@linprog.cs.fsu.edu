@@ -502,7 +502,6 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                           MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                           MPIR_Errflag_t *errflag)
 {
-
     MPIR_TIMER_START(coll,allgather,rd);
     int comm_size, rank;
     int mpi_errno = MPI_SUCCESS;
@@ -545,20 +544,17 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
             }
         }
 
+        curr_cnt = recvcount;
 
-	//	printf("starting curr_cnt for %d is %d\n", rank, curr_cnt);
         /******************** Added by Mehran  ********************/
         MPID_Node_id_t node_id, dst_node_id;
-        int last_encrypted_index = -1; //Nothing encrypted so far
+        int last_encrypted_index = rank - 1; //Nothing encrypted so far
         char *in, *out, *rbuf, *sbuf;
         if(security_approach==2){
             MPID_Get_node_id(comm_ptr, rank, &node_id);
-	        curr_cnt = 1;
-        }else{
-	        curr_cnt = recvcount;
-	    }
+        }
 
-        //printf("recvcount=%d & recvtype_extent=%d\n", recvcount, recvtype_extent);
+        
         mask = 0x1;
         i = 0;
         while (mask < comm_size) {
@@ -568,7 +564,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
              * the least significant "i" bits of rank and dst to
              * find root of src and dst subtrees. Use ranks of
              * roots as index to send from and recv into buffer */
-	    
+
             dst_tree_root = dst >> i;
             dst_tree_root <<= i;
 
@@ -582,7 +578,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
             if (dst < comm_size) {
                 if(security_approach==2){
                     //Naive+
-		    
+
                     unsigned long  ciphertext_len = 0, count=0, in_size=0;
                     in_size = (unsigned long)(recvcount * recvtype_extent);
                     unsigned long max_out_len = (unsigned long) (16 + in_size);
@@ -591,18 +587,14 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                     MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                     if(node_id != dst_node_id){
                         //Inter-node
-			//printf("curr_cnt for %d is %d\n", rank, curr_cnt);
+
                         //encrypt all the unencrypted messages so far
-			if(last_encrypted_index == -1){
-			    last_encrypted_index = my_tree_root;
-			}
-			int last_to_send = my_tree_root + (int) (curr_cnt);
-                        //printf("last_to_send for %d is %d\n", rank, last_to_send);
-			//printf("%d is going to encrypt %d - %d\n", rank, last_encrypted_index, last_to_send);
-                        for(; last_encrypted_index<last_to_send; ++last_encrypted_index){
+                        int last_to_send = rank + curr_cnt;
+                        printf("last_to_send for %d is %d\n", rank, last_to_send);
+                        for(; last_encrypted_index<=last_to_send; ++last_encrypted_index){
                             in = (char*)((char*) recvbuf + last_encrypted_index * recvcount * recvtype_extent);
                             out = (char*)((char*) ciphertext_recvbuf + last_encrypted_index * (recvcount * recvtype_extent + 16+12));
-			    // printf("%d is going to encrypt %d\n", rank, last_encrypted_index);
+                            printf("%d is going to encrypt %d\n", rank, last_encrypted_index);
                             RAND_bytes(out, 12);
                             
                             if(!EVP_AEAD_CTX_seal(ctx, out+12,
@@ -614,8 +606,8 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                             }
 
                         }
-                        //--last_encrypted_index;
-                        //printf("now last_encrypted_index for %d is %d\n", rank , last_encrypted_index);
+                        --last_encrypted_index;
+                        printf("last_encrypted_index for %d is %d\n", rank , last_encrypted_index);
 
                         //set the send and recv buffers
                         
@@ -623,14 +615,13 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                         rbuf = (char*)((char*) ciphertext_recvbuf + dst_tree_root * (recvcount * recvtype_extent + 16+12));
 
                         //send recv
-                        printf("%d is going to send %d from %d to %d and receive %d at %d\n", rank, curr_cnt,   my_tree_root, dst, (comm_size - dst_tree_root), dst_tree_root);
-			//changed (comm_size - dst_tree_root) to curr_cnt
-                        MPIR_PVAR_INC(allgather, rd, send, curr_cnt * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
-                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - dst_tree_root) * (recvcount*recvtype_extent + 16+12), MPI_CHAR);
+                        printf("%d is going to send %d from %d and receive %d at %d\n", rank, curr_cnt * (recvcount * recvtype_extent + 16+12),   my_tree_root * (recvcount * recvtype_extent + 16+12) , (comm_size - dst_tree_root) * (recvcount * recvtype_extent + 16+12), dst_tree_root * (recvcount * recvtype_extent + 16+12));
+                        MPIR_PVAR_INC(allgather, rd, send, curr_cnt * (recvcount * recvtype_extent + 16+12), MPI_CHAR); 
+                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - dst_tree_root) * (recvcount * recvtype_extent + 16+12), MPI_CHAR); 
                         mpi_errno =
-                            MPIC_Sendrecv(sbuf, curr_cnt * (recvcount*recvtype_extent + 16+12), 
+                            MPIC_Sendrecv(sbuf, curr_cnt * (recvcount * recvtype_extent + 16+12), 
                                     MPI_CHAR, dst, MPIR_ALLGATHER_TAG,
-                                    rbuf, (comm_size - dst_tree_root) * (recvcount*recvtype_extent + 16+12), 
+                                    rbuf, (comm_size - dst_tree_root) * (recvcount * recvtype_extent + 16+12), 
                                     MPI_CHAR, dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
                         if (mpi_errno) {
                             /* for communication errors, just record the error but
@@ -641,23 +632,22 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                             last_recv_cnt = 0;
                         }
                         MPIR_Get_count_impl(&status, MPI_CHAR, &last_recv_cnt);
-                        int recently_received = (int)(last_recv_cnt/(recvcount*recvtype_extent + 16+12));
+                        int recently_received = (int)(last_recv_cnt/(recvcount * recvtype_extent + 16+12));
                         curr_cnt += recently_received;
-                        printf("%d received %d (or %d) from %d and curr_cnt is now %d\n", rank, recently_received, last_recv_cnt, dst, curr_cnt);
+                        printf("%d received %d and curr_cnt is now %d\n", rank, recently_received, curr_cnt);
 
                         //decrypt the received messages
                         int decryption_index = dst_tree_root;
-			int last_to_decrypt = dst_tree_root + recently_received;
-                        //printf("%d is going to decrypt %d - %d\n", rank, decryption_index, last_to_decrypt);
-                        for(; decryption_index<last_to_decrypt; ++decryption_index){
+                        printf("%d is going to decrypt from %d to %d\n", rank, decryption_index, dst_tree_root+recently_received-1);
+                        for(; decryption_index<dst_tree_root+recently_received; ++decryption_index){
                             in = (char*)((char*) ciphertext_recvbuf + decryption_index * (recvcount * recvtype_extent + 16+12));
-                            out = (char*)((char*) recvbuf + decryption_index * recvcount * recvtype_extent);
-                            //printf("%d is going to decrypt %d from %d to %d\n", rank, decryption_index, decryption_index * (recvcount * recvtype_extent +16 +12), decryption_index * recvcount * recvtype_extent);
+                            out = (char*)((char*) recvbuf + last_encrypted_index * recvcount * recvtype_extent);
+                            printf("%d is going to decrypt %d\n", rank, decryption_index);
                             if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
                                     in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
                                     NULL, 0)){
 
-                                printf("Error in Naive+ decryption: allgather RD (default) while %d tried to decrypt from %d to %d\n", rank, decryption_index * (recvcount * recvtype_extent+16+12), decryption_index * recvcount * recvtype_extent);
+                                printf("Error in Naive+ decryption: allgather RD (default)\n");
                                 fflush(stdout);        
                             }
                         }
@@ -665,15 +655,15 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 
                     }else{
                         //Intra-Node
-			printf("curr_cnt for %d is %d (intra-node)\n", rank, curr_cnt);
-                        MPIR_PVAR_INC(allgather, rd, send, curr_cnt*recvcount, recvtype); 
-                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - dst_tree_root)*recvcount, recvtype); 
+                        MPIR_PVAR_INC(allgather, rd, send, curr_cnt, recvtype); 
+                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - dst_tree_root) * recvcount, recvtype); 
                         mpi_errno =
                             MPIC_Sendrecv(((char *) recvbuf + send_offset),
-                                            curr_cnt*recvcount, recvtype, dst,
+                                            curr_cnt, recvtype, dst,
                                             MPIR_ALLGATHER_TAG,
                                             ((char *) recvbuf + recv_offset),
-                                            (comm_size - dst_tree_root)*recvcount, recvtype,
+                                            (comm_size -
+                                            dst_tree_root) * recvcount, recvtype,
                                             dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
                         if (mpi_errno) {
                             /* for communication errors, just record the error but
@@ -685,7 +675,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                         }
 
                         MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-                        curr_cnt += (int) (last_recv_cnt/recvcount);
+                        curr_cnt += last_recv_cnt;
                     }
                 }//End Naive+
                 else{
@@ -727,10 +717,9 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
              * doubling for non power of two. Mark it as experimental
              * so that it doesn't show up as red in the coverage
              * tests. */
-	    
+
             /* --BEGIN EXPERIMENTAL-- */
             if (dst_tree_root + mask > comm_size) {
-		        
                 nprocs_completed = comm_size - my_tree_root - mask;
                 /* nprocs_completed is the number of processes in this
                  * subtree that have all the data. Send data to others
@@ -761,185 +750,46 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                      * can send if they have the data */
                     if ((dst > rank) && (rank < tree_root + nprocs_completed)
                         && (dst >= tree_root + nprocs_completed)) {
-                            /*if(security_approach==2){
-                                //Naive+
-                                
-                                MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
-                                if(node_id != dst_node_id){
-                                    //Inter Node
-                                    
-                                    int last_to_send = (my_tree_root + mask) + (int) (last_recv_cnt/recvcount);
-                                    int enc_idx = (my_tree_root + mask);
-                                    //printf("last_to_send for %d is %d\n", rank, last_to_send);
-                                    //printf("%d is going to encrypt %d - %d\n", rank, last_encrypted_index, last_to_send);
-                                    for(; enc_idx<last_to_send; ++enc_idx){
-                                        in = (char*)((char*) recvbuf + enc_idx * recvcount * recvtype_extent);
-                                        out = (char*)((char*) ciphertext_recvbuf + enc_idx * (recvcount * recvtype_extent + 16+12));
-                            // printf("%d is going to encrypt %d\n", rank, enc_idx);
-                                        RAND_bytes(out, 12);
-                                        
-                                        if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                                                    &ciphertext_len, max_out_len,
-                                                    out, 12, in, in_size,
-                                                    NULL, 0)){
-                                            printf("Error in Naive+ encryption: allgather RD (Default)\n");
-                                            fflush(stdout);
-                                        }
-
-                                    }
-                                    sbuf = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask) * (recvcount * recvtype_extent + 16+12));
-                                    
-                                    //send
-                                    MPIR_PVAR_INC(allgather, rd, send, curr_cnt * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
-                                    
-                                    mpi_errno =
-                                        MPIC_Send(sbuf,
-                                                (int) (last_recv_cnt/recvcount)* (recvcount * recvtype_extent + 16+12), MPI_CHAR, dst,
-                                                MPIR_ALLGATHER_TAG, comm_ptr, errflag);
-                                    if (mpi_errno) {
-                                        /* for communication errors, just record the error but
-                                        continue */
-                                        /* *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                        MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                        MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                        
-                                    }
-                                    
-                                }else{
-                                    //Intra Node
-                                    MPIR_PVAR_INC(allgather, rd, send, last_recv_cnt, recvtype); 
-                                    mpi_errno =
-                                        MPIC_Send(((char *) recvbuf + offset),
-                                                    last_recv_cnt, recvtype, dst,
-                                                    MPIR_ALLGATHER_TAG, comm_ptr, errflag);
-                                    /* last_recv_cnt was set in the previous
-                                    * receive. that's the amount of data to be
-                                    * sent now. */
-                                    /*if (mpi_errno) {
-                                        /* for communication errors, just record the error
-                                        but continue */
-                                       /* *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                        MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                        MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                    }
-                                    
-                                }
-
-
-                            }//End Naive +
-                            else{*/
-                                MPIR_PVAR_INC(allgather, rd, send, last_recv_cnt, recvtype); 
-                                mpi_errno =
-                                    MPIC_Send(((char *) recvbuf + offset),
-                                                last_recv_cnt, recvtype, dst,
-                                                MPIR_ALLGATHER_TAG, comm_ptr, errflag);
-                                /* last_recv_cnt was set in the previous
-                                * receive. that's the amount of data to be
-                                * sent now. */
-                                if (mpi_errno) {
-                                    /* for communication errors, just record the error
-                                    but continue */
-                                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                }
-                            //}
-                        
-                    }//End send condition
+                        MPIR_PVAR_INC(allgather, rd, send, last_recv_cnt, recvtype); 
+                        mpi_errno =
+                            MPIC_Send(((char *) recvbuf + offset),
+                                         last_recv_cnt, recvtype, dst,
+                                         MPIR_ALLGATHER_TAG, comm_ptr, errflag);
+                        /* last_recv_cnt was set in the previous
+                         * receive. that's the amount of data to be
+                         * sent now. */
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error
+                               but continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                        }
+                    }
                     /* recv only if this proc. doesn't have data and sender
                      * has data */
                     else if ((dst < rank) &&
                              (dst < tree_root + nprocs_completed) &&
                              (rank >= tree_root + nprocs_completed)) {
-			            /*if(security_approach==2){
-                            MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
-                            if(node_id != dst_node_id){
-                                //Inter-Node
-
-                                MPIR_PVAR_INC(allgather, rd, recv, (comm_size - (my_tree_root + mask)) * (recvcount*recvtype + 16+12), MPI_CHAR);
-                                mpi_errno =
-                                    MPIC_Recv(((char *) ciphertext_recvbuf + (my_tree_root + mask)*(recvcount*recvtype + 16+12)),
-                                                (comm_size -
-                                                (my_tree_root +
-                                                mask)) * (recvcount*recvtype + 16+12), MPI_CHAR,
-                                                dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
-                                /* nprocs_completed is also equal to the
-                                * no. of processes whose data we don't have */
-                                /*if (mpi_errno) {
-                                    /* for communication errors, just record the error
-                                    but continue */
-                                   /* *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                    last_recv_cnt = 0;
-                                }
-                                MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-                                int recently_received = (int)(last_recv_cnt/(recvcount*recvtype_extent + 16+12));
-                                curr_cnt += recently_received;
-                                printf("%d received %d (or %d) from %d and curr_cnt is now %d\n", rank, recently_received, last_recv_cnt, dst, curr_cnt);
-
-                                //decrypt the received messages
-                                    int decryption_index = (my_tree_root + mask);
-                                    int last_to_decrypt = (my_tree_root + mask) + recently_received;
-                                    //printf("%d is going to decrypt %d - %d\n", rank, decryption_index, last_to_decrypt);
-                                    for(; decryption_index<last_to_decrypt; ++decryption_index){
-                                        in = (char*)((char*) ciphertext_recvbuf + decryption_index * (recvcount * recvtype_extent + 16+12));
-                                        out = (char*)((char*) recvbuf + decryption_index * recvcount * recvtype_extent);
-                                        //printf("%d is going to decrypt %d from %d to %d\n", rank, decryption_index, decryption_index * (recvcount * recvtype_extent +16 +12), decryption_index * recvcount * recvtype_extent);
-                                        if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
-                                                in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
-                                                NULL, 0)){
-
-                                            printf("Error in Naive+ decryption: allgather RD (default) while %d tried to decrypt from %d to %d\n", rank, decryption_index * (recvcount * recvtype_extent+16+12), decryption_index * recvcount * recvtype_extent);
-                                            fflush(stdout);        
-                                        }
-                                    }
-
-
-                            }else{
-                                //intra-node
-                                MPIR_PVAR_INC(allgather, rd, recv, (comm_size - (my_tree_root + mask)) * recvcount, recvtype);
-                                mpi_errno =
-                                    MPIC_Recv(((char *) recvbuf + offset),
-                                                (comm_size -
-                                                (my_tree_root +
-                                                mask)) * recvcount, recvtype,
-                                                dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
-                                /* nprocs_completed is also equal to the
-                                * no. of processes whose data we don't have */
-                                /*if (mpi_errno) {
-                                    /* for communication errors, just record the error
-                                    but continue */
-                                    /**errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                    last_recv_cnt = 0;
-                                }
-                                MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-                                curr_cnt += (int) (last_recv_cnt/recvcount);
-                            }
-                        }else{*/
-                            MPIR_PVAR_INC(allgather, rd, recv, (comm_size - (my_tree_root + mask)) * recvcount, recvtype);
-                            mpi_errno =
-                                MPIC_Recv(((char *) recvbuf + offset),
-                                            (comm_size -
-                                            (my_tree_root +
-                                            mask)) * recvcount, recvtype,
-                                            dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
-                            /* nprocs_completed is also equal to the
-                            * no. of processes whose data we don't have */
-                            if (mpi_errno) {
-                                /* for communication errors, just record the error
-                                but continue */
-                                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-                                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-                                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-                                last_recv_cnt = 0;
-                            }
-                            MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-                            curr_cnt += last_recv_cnt;
-                        //}
-                        
+                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - (my_tree_root + mask)) * recvcount, recvtype);
+                        mpi_errno =
+                            MPIC_Recv(((char *) recvbuf + offset),
+                                         (comm_size -
+                                          (my_tree_root +
+                                           mask)) * recvcount, recvtype,
+                                         dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
+                        /* nprocs_completed is also equal to the
+                         * no. of processes whose data we don't have */
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error
+                               but continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            last_recv_cnt = 0;
+                        }
+                        MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+                        curr_cnt += last_recv_cnt;
                     }
                     tmp_mask >>= 1;
                     k--;
@@ -950,7 +800,6 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
             mask <<= 1;
             i++;
         }
-	
     }
 #ifdef MPID_HAS_HETERO
     else {
@@ -1126,7 +975,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
         MPIU_Free(tmp_buf);
     }
 #endif                          /* MPID_HAS_HETERO */
-    printf("%d Goodbye\n", rank);
+
   fn_fail:
     MPIR_TIMER_END(coll,allgather,rd);
     return (mpi_errno);
