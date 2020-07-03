@@ -547,7 +547,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
         }
 
 
-	//	printf("starting curr_cnt for %d is %d\n", rank, curr_cnt);
+	    //	printf("starting curr_cnt for %d is %d\n", rank, curr_cnt);
         /******************** Added by Mehran  ********************/
         MPID_Node_id_t node_id, dst_node_id;
         int first_encrypted_index = -1, last_encrypted_index = -1; //Nothing encrypted so far
@@ -785,12 +785,12 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                             if(security_approach==2){
                                 //Naive+
                                 if(comm_size - (my_tree_root+mask) < recently_received)
-				    recently_received = comm_size - (my_tree_root+mask);
+				                recently_received = comm_size - (my_tree_root+mask);
                                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                                 if(node_id != dst_node_id){
                                     //Inter Node
                                     //if(comm_size - (my_tree_root+mask) < recently_received)
-				        //recently_received = comm_size - (my_tree_root+mask);
+				                    //recently_received = comm_size - (my_tree_root+mask);
 
                                     int first_to_send = (my_tree_root + mask);
                                     int last_to_send = (my_tree_root + mask) + recently_received;
