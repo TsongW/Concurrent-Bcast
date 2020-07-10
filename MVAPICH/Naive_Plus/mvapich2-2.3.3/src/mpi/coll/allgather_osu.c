@@ -2183,7 +2183,7 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
     if (local_rank == 0 && (leader_size > 1)) {
         if(security_approach == 2){
             /************** NAIVE PLUS (NB)***************/
-	    //printf("%d @ 0\n", rank);
+	        //printf("%d @ 0\n", rank);
             unsigned long count=0;
             unsigned long next, dest;
             unsigned int i;
@@ -2211,7 +2211,7 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
                     printf("Error in Naive+ encryption: allgather\n");
                     fflush(stdout);
             }
-	    //printf("%d @ 1\n", rank);
+	        //printf("%d @ 1\n", rank);
             /*Step 2: Data exchange*/
 
             /*When data in each socket is different*/
@@ -2244,9 +2244,9 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
                 mpi_errno = MPIR_Allgatherv_impl(ciphertext_sendbuf, (max_out_len+12), MPI_CHAR, 
                                         ciphertext_recvbuf, recvcnts, displs, MPI_CHAR,
                                         leader_commptr, errflag);
-		//MPIU_Free(displs);
+		    //MPIU_Free(displs);
                 //MPIU_Free(recvcnts);
-		//printf("%d @ 2 (1)\n", rank);
+		    //printf("%d @ 2 (1)\n", rank);
                 /*Step3: Decryption*/
 
                 for( i = 0; i < leader_size; i++){
