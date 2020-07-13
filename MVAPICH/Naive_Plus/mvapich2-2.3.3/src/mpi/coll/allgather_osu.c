@@ -2404,6 +2404,234 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
     return (mpi_errno);
 }
 
+/**************** Added by Mehran *****************/
+/**
+ * 
+ * In this function, first, we perform an inter-node 
+ * ring allgather where all the ranks exchange 
+ * their data with their peers on other nodes. 
+ * Then, we perform inter-node allgather where all
+ * the ranks at each node, exchange all the data
+ * that they have through a ring.
+ * 
+ **/
+#undef FUNCNAME
+#define FUNCNAME MPIR_2lvl_Allgather_Multileader_Ring_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
+    const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+          void *recvbuf, int recvcount, MPI_Datatype recvtype,
+    MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
+{
+    MPIR_TIMER_START(coll,allgather,2lvl_multileader_ring);
+    printf("MPIR_2lvl_Allgather_Multileader_Ring_MV2\n");
+    int mpi_errno = MPI_SUCCESS;
+    int mpi_errno_ret = MPI_SUCCESS;
+    int i;
+    
+    /* get info about communicator for ranks on the same node */
+    MPID_Comm* shmem_commptr;
+    MPI_Comm shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    
+    /* get our rank and the size of this communicator */
+    int rank = comm_ptr->rank;
+    int size = comm_ptr->local_size;
+
+    int p = shmem_commptr->local_size; // number of ranks per node
+    int n = (int) (size / p); // number of nodes
+    
+    
+    
+
+    /* get extent of receive type */
+    MPI_Aint recvtype_extent, sendtype_extent;
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
+
+    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_ring_nonblocked, 1);
+
+    /* First, load the "local" version in the recvbuf. */
+    if (sendbuf != MPI_IN_PLACE) {
+        /* compute location in receive buffer for our data */
+        void* rbuf = (void*)((char*) recvbuf + rank * recvcount * recvtype_extent);
+
+        /* copy data from send buffer to receive buffer */
+        mpi_errno = MPIR_Localcopy(
+            sendbuf, sendcount, sendtype,
+            rbuf,    recvcount, recvtype
+        );
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
+
+    /* Inter-Node Ring*/
+    
+    /* lookup our index in the rank list */
+    int rank_index = comm_ptr->dev.ch.rank_list_index;
+
+    /* compute the left and right neighbor ranks in the rank_list */
+    int left_index  = (size + rank_index - p) % size;
+    int right_index = (size + rank_index + p) % size;
+    int left  = comm_ptr->dev.ch.rank_list[left_index];
+    int right = comm_ptr->dev.ch.rank_list[right_index];
+
+    /* execute ring exchange, start by sending our own data to the right
+     * and receiving the data from the rank to our left */
+    int send_index = rank_index;
+    int recv_index = left_index;
+    
+    int i;
+    for (i=1; i < n; ++i){
+
+        int send_rank = comm_ptr->dev.ch.rank_list[send_index];
+        int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+        /* compute position within buffer to send from and receive into */
+        void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
+        void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+    
+        /* exchange data with our neighbors in the ring */
+        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, recvcount, recvtype); 
+        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, recvcount, recvtype); 
+        mpi_errno = MPIC_Sendrecv(
+        sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
+        rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
+        comm_ptr, MPI_STATUS_IGNORE, errflag
+        );
+    
+    
+    
+        if (mpi_errno) {
+            /* for communication errors, just record the error but continue */
+            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+        }
+
+        /* update index values to account for data we just received */
+        send_index = recv_index;
+        recv_index = (size + recv_index - p) % size;
+    }//End for
+
+    /* Intra-node Ring */
+
+    
+    
+    /** #TODO:
+     * allocate a big temp recv buffer
+     * compress local data to the tmp recv buffer
+     **/
+    void* tmpbuf = MPIU_Malloc(size * recvcnt * recvtype_extent);
+    if (!tmpbuf) {
+        mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE,
+                                            FCNAME, __LINE__, MPI_ERR_OTHER,
+                                            "**nomem", 0);
+        return mpi_errno;
+    }
+    /**
+    * We gather local data and all the data received
+    * in the inter-node allgather step, to continigous 
+    * positions on the tmpbuf
+    **/
+   /* lookup our index in the shmem_comm */
+    int rank_index = shmem_commptr->rank;
+
+
+   for(i=0; i<n; ++i){
+       void* src = (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[(left_index-(i*p)+size)%size] * (recvcount));
+       void* dst = (void*)((char*)tmpbuf + ((rank_index * n) + i) * (recvcount));
+       mpi_errno = MPIR_Localcopy(
+            src, sendcount, sendtype,
+            dst, recvcount, recvtype);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+       
+   }
+
+    
+
+    /* compute the left and right neighbor ranks in the shmem_comm */
+    int left_index  = (p + rank_index - 1) % p;
+    int right_index = (p + rank_index + 1) % p;
+    
+
+    /* execute ring exchange, start by sending our own data to the right
+     * and receiving the data from the rank to our left */
+    int send_index = rank_index;
+    int recv_index = left_index;
+
+
+
+    /** #TODO:
+     * 
+     * Define Sendrequests
+     * 
+     **/
+    
+    int i;
+    for (i=1; i < n; ++i){
+
+        int send_rank = comm_ptr->dev.ch.rank_list[send_index];
+        int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+        
+        /* compute position within buffer to send from and receive into */
+        
+        void* sbuf = (void*)((char*) tmpbuf + send_rank * recvcount * recvtype_extent);
+        void* rbuf = (void*)((char*) tmpbuf + recv_rank * recvcount * recvtype_extent);
+    
+        /* exchange data with our neighbors in the ring */
+        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, recvcount, recvtype); 
+        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, recvcount, recvtype); 
+
+        /** #TODO:
+         * 
+         * Add SendrecvPlus
+         * 
+         **/
+
+        mpi_errno = MPIC_Sendrecv_Plus(
+        sbuf, recvcount, recvtype, right_index, MPIR_ALLGATHER_TAG,
+        rbuf, recvcount, recvtype, left_index,  MPIR_ALLGATHER_TAG,
+        comm_ptr, MPI_STATUS_IGNORE, errflag
+        );
+
+        /** #TODO:
+         * 
+         * Scatter copy from tmpbuf to the appropriate location in the recvbuf
+         * 
+         **/
+    
+        if (mpi_errno) {
+            /* for communication errors, just record the error but continue */
+            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+        }
+
+        /* update index values to account for data we just received */
+        send_index = recv_index;
+        recv_index = (p + recv_index - 1) % p;
+    }//End for
+
+
+    /** #TODO:
+     * 
+     * Wait for sends
+     * 
+     **/
+
+    fn_fail:
+        MPIR_TIMER_END(coll,allgather,2lvl_multileader_ring);
+        return (mpi_errno);
+}
+/*****************************************************/
+
+
+
+
 /* Execute an allgather by forwarding data through a ring of
  * processes.  This implementation uses the two-level data
  * structures to account for how procs are assigned to nodes
@@ -3548,6 +3776,7 @@ conf_check_end:
             (MV2_Allgather_function == &MPIR_Allgather_gather_bcast_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_nonblocked_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_nonblocked_MV2
+            || MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_Ring_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_MV2)) {
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
