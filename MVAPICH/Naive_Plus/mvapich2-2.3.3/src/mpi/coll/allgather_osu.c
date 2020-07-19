@@ -2425,10 +2425,10 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
     MPIR_TIMER_START(coll,allgather,2lvl_multileader_ring);
-    printf("MPIR_2lvl_Allgather_Multileader_Ring_MV2\n");
+
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
-    int i;
+    int i, j;
     
     /* get info about communicator for ranks on the same node */
     MPID_Comm* shmem_commptr;
@@ -2441,8 +2441,6 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
 
     int p = shmem_commptr->local_size; // number of ranks per node
     int n = (int) (size / p); // number of nodes
-    
-    
     
 
     /* get extent of receive type */
@@ -2469,9 +2467,38 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
 
     /* Inter-Node Ring*/
     
-    /* lookup our index in the rank list */
+
     int rank_index = comm_ptr->dev.ch.rank_list_index;
 
+    //If naive+ encryption is selected, each rank needs to encrypt its local data first
+
+    if(security_approach==2){
+        
+        unsigned long  ciphertext_len = 0;
+        //encrypt local data to ciphertext rcvbuffer
+        void* in = (void*)((char*) recvbuf + comm_ptr->dev.ch.rank_list[rank_index] * recvcount * recvtype_extent);
+        void* out = (void*)((char*) ciphertext_recvbuf + comm_ptr->dev.ch.rank_list[rank_index] * (recvcount * recvtype_extent + 12 + 16));
+
+        RAND_bytes(out, 12); // 12 bytes of nonce
+        unsigned long in_size=0;
+        in_size = (unsigned long)(sendcount * sendtype_extent);
+        unsigned long max_out_len = (unsigned long) (16 + in_size);
+        //printf("%d (%d) is going to encrypt from %d to %d\n", rank, local_rank, rank * recvcount * recvtype_extent, rank * (recvcount * recvtype_extent + 12 + 16) );
+        if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                            &ciphertext_len, max_out_len,
+                            out, 12,
+                            in, in_size,
+                            NULL, 0))
+        {
+                printf("Error in Naive+ encryption: allgather MultiLeader\n");
+                fflush(stdout);
+        }
+
+    }
+
+    /* lookup our index in the rank list */
+    
+    //    printf("%d is %d\n", rank, comm_ptr->dev.ch.rank_list[rank_index]);
     /* compute the left and right neighbor ranks in the rank_list */
     int left_index  = (size + rank_index - p) % size;
     int right_index = (size + rank_index + p) % size;
@@ -2483,149 +2510,166 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
     int send_index = rank_index;
     int recv_index = left_index;
     
-    int i;
-    for (i=1; i < n; ++i){
 
+    for (i=1; i < n; ++i){
+	
         int send_rank = comm_ptr->dev.ch.rank_list[send_index];
         int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
         /* compute position within buffer to send from and receive into */
+        //if(recvcount==16)
+        //  	    printf("%d is going to send from %d to %d and receive from %d at %d\n", rank, send_rank, right, left, recv_rank);
+
+        if(security_approach == 2){
+
+            void* sbuf = (void*)((char*) ciphertext_recvbuf + send_rank * (recvcount * recvtype_extent + 16 + 12));
+            void* rbuf = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 16 + 12));
+        
+            /* exchange data with our neighbors in the ring */
+            MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, (recvcount * recvtype_extent + 16 + 12), MPI_CHAR); 
+            MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, (recvcount * recvtype_extent + 16 + 12), MPI_CHAR); 
+            mpi_errno = MPIC_Sendrecv_Plus(
+            sbuf, (recvcount * recvtype_extent + 16 + 12), MPI_CHAR, right, MPIR_ALLGATHER_TAG,
+            rbuf, (recvcount * recvtype_extent + 16 + 12), MPI_CHAR, left,  MPIR_ALLGATHER_TAG,
+            comm_ptr, MPI_STATUS_IGNORE, errflag
+            );
+
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+
+            // Decrypt recently received data
+            unsigned long count=0;
+            
+            if(!EVP_AEAD_CTX_open(ctx, (recvbuf+recv_rank*recvcount*recvtype_extent),
+                        &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))), 12,
+                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                        NULL, 0)){
+                printf("Error in Naive+ decryption: allgather MultiLeader\n");
+                fflush(stdout);        
+            }
+
+
+
+        }else{
+            void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
+            void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
+        
+            /* exchange data with our neighbors in the ring */
+            MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, recvcount, recvtype); 
+            MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, recvcount, recvtype); 
+            mpi_errno = MPIC_Sendrecv_Plus(
+            sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
+            rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
+            comm_ptr, MPI_STATUS_IGNORE, errflag
+            );
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+        }
+	    
+    
+    
+        
+
+        /* update index values to account for data we just received */
+        send_index = recv_index;
+        recv_index = (size + recv_index - p) % size;
+    }//End for
+    
+    //printf("%d finished inter-node\n", rank);
+    /* Intra-node Ring */
+    
+    /* Find the local node id*/
+    MPID_Node_id_t node_id, left_node_id, right_node_id;    
+    MPID_Get_node_id(comm_ptr, rank, &node_id);
+
+
+
+    right_index = (rank_index + 1);
+    if(right_index >= size){
+	    right_index -= p;
+    }else{
+        MPID_Get_node_id(comm_ptr, comm_ptr->dev.ch.rank_list[right_index], &right_node_id);
+        if(right_node_id != node_id){
+            right_index -= p;
+        }
+    }
+    right = comm_ptr->dev.ch.rank_list[right_index];
+    
+    left_index = (rank_index - 1);
+    if(left_index<0){
+	    left_index += p;
+    }else{
+        MPID_Get_node_id(comm_ptr, comm_ptr->dev.ch.rank_list[left_index], &left_node_id);
+        if(left_node_id != node_id){
+            (left_index += p);
+        }
+    }
+    left = comm_ptr->dev.ch.rank_list[left_index];
+
+    send_index = rank_index;
+    recv_index = left_index;
+
+    for (i=1; i < p; ++i){
+        
+        for(j=0; j<n; ++j){
+            
+	    //        send_index = (size + rank_index - j*p) % size;
+            //recv_index = (size + left_index - j*p) % size;
+
+            int send_rank = comm_ptr->dev.ch.rank_list[(size + send_index - j*p) % size];
+            int recv_rank = comm_ptr->dev.ch.rank_list[(size + recv_index - j*p) % size];
+
+	    //if(recvcount==16)
+	    //	    printf("%d is going to send from %d to %d and receive from %d at %d\n", rank, send_rank, right, left, recv_rank);
         void* sbuf = (void*)((char*) recvbuf + send_rank * recvcount * recvtype_extent);
         void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
     
         /* exchange data with our neighbors in the ring */
         MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, recvcount, recvtype); 
         MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, recvcount, recvtype); 
-        mpi_errno = MPIC_Sendrecv(
+
+        mpi_errno = MPIC_Sendrecv_Plus(
         sbuf, recvcount, recvtype, right, MPIR_ALLGATHER_TAG,
         rbuf, recvcount, recvtype, left,  MPIR_ALLGATHER_TAG,
         comm_ptr, MPI_STATUS_IGNORE, errflag
         );
-    
-    
-    
-        if (mpi_errno) {
-            /* for communication errors, just record the error but continue */
-            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-        }
 
-        /* update index values to account for data we just received */
-        send_index = recv_index;
-        recv_index = (size + recv_index - p) % size;
-    }//End for
-
-    /* Intra-node Ring */
-
-    
-    
-    /** #TODO:
-     * allocate a big temp recv buffer
-     * compress local data to the tmp recv buffer
-     **/
-    void* tmpbuf = MPIU_Malloc(size * recvcnt * recvtype_extent);
-    if (!tmpbuf) {
-        mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE,
-                                            FCNAME, __LINE__, MPI_ERR_OTHER,
-                                            "**nomem", 0);
-        return mpi_errno;
-    }
-    /**
-    * We gather local data and all the data received
-    * in the inter-node allgather step, to continigous 
-    * positions on the tmpbuf
-    **/
-   /* lookup our index in the shmem_comm */
-    int rank_index = shmem_commptr->rank;
-
-
-   for(i=0; i<n; ++i){
-       void* src = (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[(left_index-(i*p)+size)%size] * (recvcount));
-       void* dst = (void*)((char*)tmpbuf + ((rank_index * n) + i) * (recvcount));
-       mpi_errno = MPIR_Localcopy(
-            src, sendcount, sendtype,
-            dst, recvcount, recvtype);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
-       
-   }
-
-    
-
-    /* compute the left and right neighbor ranks in the shmem_comm */
-    int left_index  = (p + rank_index - 1) % p;
-    int right_index = (p + rank_index + 1) % p;
-    
-
-    /* execute ring exchange, start by sending our own data to the right
-     * and receiving the data from the rank to our left */
-    int send_index = rank_index;
-    int recv_index = left_index;
-
-
-
-    /** #TODO:
-     * 
-     * Define Sendrequests
-     * 
-     **/
-    
-    int i;
-    for (i=1; i < n; ++i){
-
-        int send_rank = comm_ptr->dev.ch.rank_list[send_index];
-        int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
+            
         
-        /* compute position within buffer to send from and receive into */
-        
-        void* sbuf = (void*)((char*) tmpbuf + send_rank * recvcount * recvtype_extent);
-        void* rbuf = (void*)((char*) tmpbuf + recv_rank * recvcount * recvtype_extent);
-    
-        /* exchange data with our neighbors in the ring */
-        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, send, recvcount, recvtype); 
-        MPIR_PVAR_INC(allgather, 2lvl_multileader_ring, recv, recvcount, recvtype); 
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+        }//end for j
+	    send_index = recv_index;
+	    recv_index = recv_index - 1;
+	    if(recv_index<0){
+		    recv_index += p;
+	    }else{
+            MPID_Get_node_id(comm_ptr, comm_ptr->dev.ch.rank_list[recv_index], &left_node_id);
+            if(left_node_id != node_id){
+                (recv_index += p);
+            }
+	    }
+    }//End for i
 
-        /** #TODO:
-         * 
-         * Add SendrecvPlus
-         * 
-         **/
+    //printf("%d finished Intra-Node\n", rank);
 
-        mpi_errno = MPIC_Sendrecv_Plus(
-        sbuf, recvcount, recvtype, right_index, MPIR_ALLGATHER_TAG,
-        rbuf, recvcount, recvtype, left_index,  MPIR_ALLGATHER_TAG,
-        comm_ptr, MPI_STATUS_IGNORE, errflag
-        );
-
-        /** #TODO:
-         * 
-         * Scatter copy from tmpbuf to the appropriate location in the recvbuf
-         * 
-         **/
-    
-        if (mpi_errno) {
-            /* for communication errors, just record the error but continue */
-            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-        }
-
-        /* update index values to account for data we just received */
-        send_index = recv_index;
-        recv_index = (p + recv_index - 1) % p;
-    }//End for
-
-
-    /** #TODO:
-     * 
-     * Wait for sends
-     * 
-     **/
 
     fn_fail:
         MPIR_TIMER_END(coll,allgather,2lvl_multileader_ring);
-        return (mpi_errno);
+
+	    return (mpi_errno);
 }
 /*****************************************************/
 

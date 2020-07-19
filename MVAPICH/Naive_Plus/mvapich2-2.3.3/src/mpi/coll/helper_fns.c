@@ -509,6 +509,96 @@ int MPIC_Ssend(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest,
     /* --END ERROR HANDLING-- */
 }
 
+
+/**************************** Added by Mehran ***************************/
+/**
+ * This function is almost the same as the MPIC_Sendrecv.
+ * The only difference is that we do not wait for the send in this function
+ * 
+/************************************************************************/
+
+#undef FUNCNAME
+#define FUNCNAME MPIC_Sendrecv_Plus
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
+                     int dest, int sendtag, void *recvbuf, MPI_Aint recvcount, 
+                     MPI_Datatype recvtype, int source, int recvtag,
+                     MPID_Comm *comm_ptr, MPI_Status *status, MPIR_Errflag_t *errflag)
+{
+    int mpi_errno = MPI_SUCCESS;
+    int context_id;
+    MPI_Status mystatus;
+    MPID_Request *recv_req_ptr = NULL, *send_req_ptr = NULL;
+    MPIDI_STATE_DECL(MPID_STATE_MPIC_SENDRECV_PLUS);
+
+    MPIDI_FUNC_ENTER(MPID_STATE_MPIC_SENDRECV_PLUS);
+
+    MPIU_DBG_MSG_S(PT2PT, TYPICAL, "IN: errflag = %s", *errflag?"TRUE":"FALSE");
+
+    MPIR_ERR_CHKANDJUMP1((sendcount < 0), mpi_errno, MPI_ERR_COUNT,
+                         "**countneg", "**countneg %d", sendcount);
+    MPIR_ERR_CHKANDJUMP1((recvcount < 0), mpi_errno, MPI_ERR_COUNT,
+                         "**countneg", "**countneg %d", recvcount);
+
+    context_id = (comm_ptr->comm_kind == MPID_INTRACOMM) ?
+        MPID_CONTEXT_INTRA_COLL : MPID_CONTEXT_INTER_COLL;
+
+    if (status == MPI_STATUS_IGNORE) status = &mystatus;
+    switch(*errflag) {
+        case MPIR_ERR_NONE:
+            break;
+        case MPIR_ERR_PROC_FAILED:
+            MPIR_TAG_SET_PROC_FAILURE_BIT(sendtag);
+        default:
+            MPIR_TAG_SET_ERROR_BIT(sendtag);
+    }
+
+    mpi_errno = MPID_Irecv(recvbuf, recvcount, recvtype, source, recvtag,
+                           comm_ptr, context_id, &recv_req_ptr);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    mpi_errno = MPID_Isend(sendbuf, sendcount, sendtype, dest, sendtag,
+                           comm_ptr, context_id, &send_req_ptr);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    // mpi_errno = MPIC_Wait(send_req_ptr, errflag);
+    // if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    mpi_errno = MPIC_Wait(recv_req_ptr, errflag);
+    if (mpi_errno) MPIR_ERR_POPFATAL(mpi_errno);
+
+    *status = recv_req_ptr->status;
+
+    if (mpi_errno == MPI_SUCCESS) {
+        mpi_errno = recv_req_ptr->status.MPI_ERROR;
+
+        /*if (mpi_errno == MPI_SUCCESS) {
+            mpi_errno = send_req_ptr->status.MPI_ERROR;
+            }*/
+    }
+
+    //MPID_Request_release(send_req_ptr);
+    MPID_Request_release(recv_req_ptr);
+
+ fn_exit:
+    MPIU_DBG_MSG_D(PT2PT, TYPICAL, "OUT: errflag = %d", *errflag);
+
+    MPIDI_FUNC_EXIT(MPID_STATE_MPIC_SENDRECV_PLUS);
+    return mpi_errno;
+ fn_fail:
+    // if (send_req_ptr)
+    //     MPID_Request_release(send_req_ptr);
+    if (recv_req_ptr)
+        MPID_Request_release(recv_req_ptr);
+    goto fn_exit;
+}
+
+
+
+
+
+
+
+
 #undef FUNCNAME
 #define FUNCNAME MPIC_Sendrecv
 #undef FCNAME
