@@ -516,7 +516,6 @@ int MPIC_Ssend(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest,
  * The only difference is that we do not wait for the send in this function
  * 
 /************************************************************************/
-
 #undef FUNCNAME
 #define FUNCNAME MPIC_Sendrecv_Plus
 #undef FCNAME
@@ -524,12 +523,12 @@ int MPIC_Ssend(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest,
 int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
                      int dest, int sendtag, void *recvbuf, MPI_Aint recvcount, 
                      MPI_Datatype recvtype, int source, int recvtag,
-                     MPID_Comm *comm_ptr, MPI_Status *status, MPIR_Errflag_t *errflag)
+                     MPID_Comm *comm_ptr, MPI_Status *status, MPID_Request **send_req_ptr, MPIR_Errflag_t *errflag)
 {
     int mpi_errno = MPI_SUCCESS;
     int context_id;
     MPI_Status mystatus;
-    MPID_Request *recv_req_ptr = NULL, *send_req_ptr = NULL;
+    MPID_Request *recv_req_ptr = NULL;
     MPIDI_STATE_DECL(MPID_STATE_MPIC_SENDRECV_PLUS);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIC_SENDRECV_PLUS);
@@ -558,7 +557,7 @@ int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sen
                            comm_ptr, context_id, &recv_req_ptr);
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     mpi_errno = MPID_Isend(sendbuf, sendcount, sendtype, dest, sendtag,
-                           comm_ptr, context_id, &send_req_ptr);
+                           comm_ptr, context_id, send_req_ptr);
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
 
     // mpi_errno = MPIC_Wait(send_req_ptr, errflag);
@@ -591,8 +590,6 @@ int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sen
         MPID_Request_release(recv_req_ptr);
     goto fn_exit;
 }
-
-
 
 
 
