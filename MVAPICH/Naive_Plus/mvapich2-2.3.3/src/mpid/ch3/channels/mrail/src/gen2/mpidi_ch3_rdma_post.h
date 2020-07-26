@@ -87,7 +87,7 @@ struct MPIDI_CH3I_RDMA_put_get_list_t{
         MPIDI_CH3I_MRAIL_FREE_RNDV_BUFFER(rreq);                    \
     }                                                               \
     rreq->mrail.d_entry = NULL;                                     \
-    rreq->mrail.protocol = MV2_RNDV_PROTOCOL_RENDEZVOUS_UNSPECIFIED;    \
+    rreq->mrail.protocol = MV2_RNDV_PROTOCOL_S_UNSPECIFIED;    \
 }                                                                   \
 
 #define PUSH_FLOWLIST(c) {                                      \
@@ -120,7 +120,7 @@ struct MPIDI_CH3I_RDMA_put_get_list_t{
 }
 /*
  * Attached to each connection is a list of send handles that
- * represent rendezvous sends that have been started and acked but not
+ * represent s sends that have been started and acked but not
  * finished. When the ack is received, the send is placed on the list;
  * when the send is complete, it is removed from the list.  The list
  * is an "in progress sends" queue for this connection.  We need it to
@@ -139,7 +139,7 @@ struct MPIDI_CH3I_RDMA_put_get_list_t{
  *
  */
 
-#define RENDEZVOUS_IN_PROGRESS(c, s) {                          \
+#define S_IN_PROGRESS(c, s) {                          \
     MPIR_Request_add_ref(s);                                    \
     if (NULL == (c)->mrail.sreq_tail) {                         \
         (c)->mrail.sreq_head = (void *)(s);                     \
@@ -152,7 +152,7 @@ struct MPIDI_CH3I_RDMA_put_get_list_t{
     ((MPID_Request *)(s))->mrail.next_inflow = NULL;            \
 }
 
-#define RENDEZVOUS_DONE(c) {                                    \
+#define S_DONE(c) {                                    \
     MPID_Request *req = (c)->mrail.sreq_head;                   \
     (c)->mrail.sreq_head =                                      \
     ((MPID_Request *)                                           \
@@ -302,13 +302,13 @@ int MRAILI_Send_noop_if_needed(struct MPIDI_VC* vc, int rail);
 int MRAILI_Send_rdma_credit_if_needed(struct MPIDI_VC* vc);
 
 /* Following interface for rndv msgs */
-void MPIDI_CH3I_MRAILI_Rendezvous_rput_push(struct MPIDI_VC* vc, MPID_Request * sreq);
+void MPIDI_CH3I_MRAILI_s_rput_push(struct MPIDI_VC* vc, MPID_Request * sreq);
 
-void MPIDI_CH3I_MRAILI_Rendezvous_rget_push(struct MPIDI_VC* vc, MPID_Request * sreq);
+void MPIDI_CH3I_MRAILI_s_rget_push(struct MPIDI_VC* vc, MPID_Request * sreq);
 
 #ifdef _ENABLE_UD_
 /* UD ZCOPY RNDV interface */
-void MPIDI_CH3I_MRAILI_Rendezvous_zcopy_push(struct MPIDI_VC * vc,
+void MPIDI_CH3I_MRAILI_s_zcopy_push(struct MPIDI_VC * vc,
                                              MPID_Request * sreq,
                                              mv2_ud_zcopy_info_t *zcopy_info);
 #endif

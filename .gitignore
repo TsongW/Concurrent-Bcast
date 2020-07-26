@@ -1,1 +1,15 @@
 clean_*
+Benchmarks/
+Debug/
+Hierarchical/
+Tests/
+MVAPICH/*.gz
+MVAPICH/SMVAPI/
+MVAPICH/Naive/
+MVAPICH/Unencrypted/
+MVAPICH/Results/OLD
+MVAPICH/Results/Figs
+MVAPICH/Results/Innovation
+MVAPICH/Results/NoleLand
+MVAPICH/Results/*.zip
+MVAPICH/Results/*.xlsx
