@@ -1,0 +1,88 @@
+Output for ibstat:
+
+
+
+CA 'mlx5_0'
+	CA type: MT4123
+	Number of ports: 1
+	Firmware version: 20.25.2010
+	Hardware version: 0
+	Node GUID: 0x98039b0300cc14cc
+	System image GUID: 0x98039b0300cc14cc
+	Port 1:
+		State: Active
+		Physical state: LinkUp
+		Rate: 100
+		Base lid: 7
+		LMC: 0
+		SM lid: 13
+		Capability mask: 0x2651e848
+		Port GUID: 0x98039b0300cc14cc
+		Link layer: InfiniBand
+CA 'mlx5_1'
+	CA type: MT4123
+	Number of ports: 1
+	Firmware version: 20.25.2010
+	Hardware version: 0
+	Node GUID: 0x98039b0300cc14cd
+	System image GUID: 0x98039b0300cc14cc
+	Port 1:
+		State: Down
+		Physical state: Disabled
+		Rate: 10
+		Base lid: 65535
+		LMC: 0
+		SM lid: 0
+		Capability mask: 0x2651e848
+		Port GUID: 0x98039b0300cc14cd
+		Link layer: InfiniBand
+
+====================================================================
+
+
+
+====================================================================
+Output for ibv_devinfo:
+
+
+
+hca_id:	mlx5_1
+	transport:			InfiniBand (0)
+	fw_ver:				20.25.2010
+	node_guid:			9803:9b03:00cc:14cd
+	sys_image_guid:			9803:9b03:00cc:14cc
+	vendor_id:			0x02c9
+	vendor_part_id:			4123
+	hw_ver:				0x0
+	board_id:			MT_0000000224
+	phys_port_cnt:			1
+	Device ports:
+		port:	1
+			state:			PORT_DOWN (1)
+			max_mtu:		4096 (5)
+			active_mtu:		4096 (5)
+			sm_lid:			0
+			port_lid:		65535
+			port_lmc:		0x00
+			link_layer:		InfiniBand
+
+hca_id:	mlx5_0
+	transport:			InfiniBand (0)
+	fw_ver:				20.25.2010
+	node_guid:			9803:9b03:00cc:14cc
+	sys_image_guid:			9803:9b03:00cc:14cc
+	vendor_id:			0x02c9
+	vendor_part_id:			4123
+	hw_ver:				0x0
+	board_id:			MT_0000000224
+	phys_port_cnt:			1
+	Device ports:
+		port:	1
+			state:			PORT_ACTIVE (4)
+			max_mtu:		4096 (5)
+			active_mtu:		4096 (5)
+			sm_lid:			13
+			port_lid:		7
+			port_lmc:		0x00
+			link_layer:		InfiniBand
+
