@@ -393,6 +393,73 @@ int MPIC_Send(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, 
     /* --END ERROR HANDLING-- */
 }
 
+
+/****************** Added by Mehran ********************/
+
+#undef FUNCNAME
+#define FUNCNAME MPIC_Send_Plus
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIC_Send_Plus(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, int tag,
+                 MPID_Comm *comm_ptr, MPID_Request **send_req_ptr, MPIR_Errflag_t *errflag)
+{
+    int mpi_errno = MPI_SUCCESS;
+    int context_id;
+    
+    MPIDI_STATE_DECL(MPID_STATE_MPIC_SEND_PLUS);
+
+    MPIDI_FUNC_ENTER(MPID_STATE_MPIC_SEND_PLUS);
+
+    MPIU_DBG_MSG_D(PT2PT, TYPICAL, "IN: errflag = %d", *errflag);
+
+    MPIR_ERR_CHKANDJUMP1((count < 0), mpi_errno, MPI_ERR_COUNT,
+                         "**countneg", "**countneg %d", count);
+
+    switch(*errflag) {
+        case MPIR_ERR_NONE:
+            break;
+        case MPIR_ERR_PROC_FAILED:
+            MPIR_TAG_SET_PROC_FAILURE_BIT(tag);
+        default:
+            MPIR_TAG_SET_ERROR_BIT(tag);
+    }
+
+    context_id = (comm_ptr->comm_kind == MPID_INTRACOMM) ?
+        MPID_CONTEXT_INTRA_COLL : MPID_CONTEXT_INTER_COLL;
+
+    mpi_errno = MPID_Send(buf, count, datatype, dest, tag, comm_ptr,
+                          context_id, send_req_ptr);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    // if (request_ptr) {
+    //     mpi_errno = MPIC_Wait(request_ptr, errflag);
+    //     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    //     MPID_Request_release(request_ptr);
+    // }
+
+ fn_exit:
+    MPIU_DBG_MSG_D(PT2PT, TYPICAL, "OUT: errflag = %d", *errflag);
+    MPIDI_FUNC_EXIT(MPID_STATE_MPIC_SEND_PLUS);
+    return mpi_errno;
+ fn_fail:
+    /* --BEGIN ERROR HANDLING-- */
+    // if (request_ptr) MPID_Request_release(request_ptr);
+    if (mpi_errno && !*errflag) {
+        if (MPIX_ERR_PROC_FAILED == MPIR_ERR_GET_CLASS(mpi_errno)) {
+            *errflag = MPIR_ERR_PROC_FAILED;
+        } else {
+            *errflag = MPIR_ERR_OTHER;
+        }
+    }
+    goto fn_exit;
+    /* --END ERROR HANDLING-- */
+}
+
+
+/*******************************************************/
+
+
+
+
 #undef FUNCNAME
 #define FUNCNAME MPIC_Recv
 #undef FCNAME

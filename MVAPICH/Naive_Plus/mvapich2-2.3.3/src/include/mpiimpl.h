@@ -4035,6 +4035,16 @@ int MPIC_Probe(int source, int tag, MPI_Comm comm, MPI_Status *status);
 /* FT versions of te MPIC_ functions */
 int MPIC_Send(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, int tag,
                  MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag);
+
+/************* Added by Mehran **************/
+
+int MPIC_Send_Plus(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, int tag,
+                 MPID_Comm *comm_ptr, MPID_Request **send_req_ptr, MPIR_Errflag_t *errflag);
+
+
+/********************************************/
+
+
 int MPIC_Recv(void *buf, MPI_Aint count, MPI_Datatype datatype, int source, int tag,
                  MPID_Comm *comm_ptr, MPI_Status *status, MPIR_Errflag_t *errflag);
 int MPIC_Ssend(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, int tag,
