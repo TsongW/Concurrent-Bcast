@@ -40,6 +40,11 @@ MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_nonblock
 MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_ring_nonblocked);
 MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_direct);
 MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_ring);
+MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_multileader_rd_nonblocked);
+MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_multileader_rd);
+MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_allgather_2lvl_multileader_ring);
+
+
 
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_rd_allgather_comm);
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_rd);
@@ -52,6 +57,9 @@ MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_nonblocked);
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_ring_nonblocked);
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_direct);
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_ring);
+MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_multileader_rd_nonblocked);
+MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_multileader_rd);
+MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_2lvl_multileader_ring);
 
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_rd_bytes_send);
 MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_bruck_bytes_send);
@@ -2588,6 +2596,728 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
 
 
 
+/**************** Added by Mehran *****************/
+/**
+ * 
+ * In this function, first, we perform an inter-node 
+ * RD allgather where all the ranks exchange 
+ * their data with their peers on other nodes. 
+ * Then, we perform inter-node allgather where all
+ * the ranks at each node, exchange all the data
+ * that they have using RD algorithm. This version is 
+ * used when ranks are not block-ordered. So, we use a 
+ * tmp buffer for allgather and at the end of the algorithm
+ * we perform ordering.
+ * 
+ **/
+#undef FUNCNAME
+#define FUNCNAME MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
+    const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+          void *recvbuf, int recvcount, MPI_Datatype recvtype,
+    MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
+{
+    MPIR_TIMER_START(coll,allgather,2lvl_multileader_rd_nonblocked);
+    printf("MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2\n");
+    int mpi_errno = MPI_SUCCESS;
+    int mpi_errno_ret = MPI_SUCCESS;
+    int i, j, k, f;
+    char *in, *out, *sbuf, *rbuf, *tmp_buf;
+    MPI_Status status;
+    /* get info about communicator for ranks on the same node */
+    MPID_Comm* shmem_commptr;
+    MPI_Comm shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    
+    /* get our rank and the size of this communicator */
+    int rank = comm_ptr->rank;
+    int comm_size = comm_ptr->local_size;
+    
+    int p = shmem_commptr->local_size; // number of ranks per node
+    int n = (int) (comm_size / p); // number of nodes
+    
+    int mask, dst_tree_root, my_tree_root, send_offset, recv_offset, send_req_idx = 0,
+        last_recv_cnt = 0, nprocs_completed, offset, tmp_mask, out_index, dst,
+         dst_node, my_node, tree_root, rank_index, dst_index, curr_cnt=1, recently_received;
+
+    /************* For MPIC_Sendrecv_Plus ************/
+    MPID_Request *send_req_ptr[2*(comm_size-1)];
+    int s;
+    for(s=0; s<comm_size-1; ++s){
+        (send_req_ptr[s])=NULL;
+    }
+    /*************************************************/
+
+    /* get extent of receive type */
+    MPI_Aint recvtype_extent, sendtype_extent, recvtype_true_extent, recvbuf_extent, recvtype_true_lb;
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
+    MPIR_Type_get_true_extent_impl(recvtype, &recvtype_true_lb, &recvtype_true_extent);
+
+    recvbuf_extent =
+        recvcount * comm_size * (MPIR_MAX(recvtype_true_extent, recvtype_extent));
+    /* allocate a temporary buffer of the same size as recvbuf. */
+    tmp_buf = MPIU_Malloc(recvbuf_extent);
+    /* --BEGIN ERROR HANDLING-- */
+    if (!tmp_buf) {
+        mpi_errno =
+            MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME,
+                                 __LINE__, MPI_ERR_OTHER, "**nomem", 0);
+        return mpi_errno;
+    }
+    /* --END ERROR HANDLING-- */
+
+    /* adjust for potential negative lower bound in datatype */
+    tmp_buf = (void *) ((char *) tmp_buf - recvtype_true_lb);
+
+    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_multileader_rd_nonblocked, 1);
+
+    int shared_mem_rank, shared_mem_dst; 
+    shared_mem_rank = shmem_commptr->rank;
+
+    /* Find the local node id*/
+    MPID_Node_id_t node_id;    
+    MPID_Get_node_id(comm_ptr, rank, &node_id);
+    my_node = node_id;
+
+
+
+    /* First, load the "local" version in the recvbuf. */
+    if (sendbuf != MPI_IN_PLACE) {
+        /* compute location in receive buffer for our data */
+        void* rbuf = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
+
+        /* copy data from send buffer to receive buffer */
+        mpi_errno = MPIR_Localcopy(
+            sendbuf, sendcount, sendtype,
+            rbuf,    recvcount, recvtype
+        );
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
+
+
+    
+
+    rank_index = comm_ptr->dev.ch.rank_list_index;
+    
+    if(security_approach==2){
+        unsigned long  ciphertext_len = 0;
+        //encrypt local data to ciphertext rcvbuffer
+        void* in = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
+        void* out = (void*)((char*) ciphertext_recvbuf + my_node * (recvcount * recvtype_extent + 12 + 16));
+
+        RAND_bytes(out, 12); // 12 bytes of nonce
+        unsigned long in_size=0;
+        in_size = (unsigned long)(sendcount * sendtype_extent);
+        unsigned long max_out_len = (unsigned long) (16 + in_size);
+        //printf("%d (%d) is going to encrypt from %d to %d\n", rank, local_rank, rank * recvcount * recvtype_extent, rank * (recvcount * recvtype_extent + 12 + 16) );
+        if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                            &ciphertext_len, max_out_len,
+                            out, 12,
+                            in, in_size,
+                            NULL, 0))
+        {
+                printf("Error in Naive+ encryption: allgather MultiLeader-RD\n");
+                fflush(stdout);
+        }
+    }else{
+        /** 
+         * Only for the Unencrypted version
+         * Copy from recv_buf to ciphertext_recvbuf
+         **/
+        void* rbuf = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
+        void* crbuf = (void*)((char*) ciphertext_recvbuf + my_node * recvcount * recvtype_extent);
+        mpi_errno = MPIR_Localcopy(
+            rbuf, sendcount, sendtype,
+            crbuf, recvcount, recvtype);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
+    
+    /* Inter-Node RD*/
+    
+    mask = 0x1;
+    i = 0;
+    
+    while (mask < comm_size) {
+        dst_node = my_node ^ mask;
+        dst_index = rank_index + (dst_node - my_node) * p;
+        
+        /* find offset into send and recv buffers. zero out
+            * the least significant "i" bits of rank and dst to
+            * find root of src and dst subtrees. Use ranks of
+            * roots as index to send from and recv into buffer */
+    
+        dst_tree_root = dst_node >> i;
+        dst_tree_root <<= i;
+
+        my_tree_root = my_node >> i;
+        my_tree_root <<= i;
+
+        if (dst_index < comm_size) { 
+            dst = comm_ptr->dev.ch.rank_list[dst_index];
+            /** #TODO: Check curr_cnt is not more than available space **/
+
+            if(security_approach==2){
+                send_offset = my_tree_root * (recvcount * recvtype_extent +16 +12);
+                recv_offset = dst_tree_root * (recvcount * recvtype_extent +16 +12);
+
+                //printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - dst_tree_root) * (recvcount * recvtype_extent +16 +12), MPI_CHAR); 
+                mpi_errno =
+                    MPIC_Sendrecv_Plus(((char *) ciphertext_recvbuf + send_offset),
+                                    curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR, dst,
+                                    MPIR_ALLGATHER_TAG,
+                                    ((char *) ciphertext_recvbuf + recv_offset),
+                                    (n -dst_tree_root) * (recvcount * recvtype_extent +16 +12), MPI_CHAR,
+                                    dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, &(send_req_ptr[send_req_idx++]), errflag);
+
+                    
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but
+                    continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                    last_recv_cnt = 0;
+                }
+
+                MPIR_Get_count_impl(&status, MPI_CHAR, &last_recv_cnt);
+                recently_received = (int)(last_recv_cnt/(recvcount*recvtype_extent+16+12));
+                curr_cnt += recently_received;
+
+                //printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
+
+                for(f=0; f<recently_received; ++f){
+                    unsigned long count=0;
+                    
+                    in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)));
+                    out_index = (my_node * p + shared_mem_rank) + (dst_tree_root+f-my_node) * p;
+                    out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+
+                    //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+
+                    if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                                    in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
+                                    NULL, 0)){
+
+                        printf("Error in Naive+ decryption: allgather ML_RD (I) while %d tried to decrypt from %d to %d\n", rank, recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                        fflush(stdout);        
+                    }
+                }// End for
+
+
+
+
+
+            }else{//if not Naive+
+                /* FIXME: saving an MPI_Aint into an int */
+                send_offset = my_tree_root * recvcount * recvtype_extent;
+                recv_offset = dst_tree_root * recvcount * recvtype_extent;
+
+                if(recvcount==16)
+                    printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
+
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - dst_tree_root) * recvcount, recvtype); 
+                mpi_errno =
+                    MPIC_Sendrecv_Plus(((char *) ciphertext_recvbuf + send_offset),
+                                    curr_cnt*recvcount, recvtype, dst,
+                                    MPIR_ALLGATHER_TAG,
+                                    ((char *) ciphertext_recvbuf + recv_offset),
+                                    (n -dst_tree_root) * recvcount, recvtype,
+                                    dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, &(send_req_ptr[send_req_idx++]), errflag);
+
+                    
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but
+                    continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                    last_recv_cnt = 0;
+                }
+
+                MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+                recently_received = (int)(last_recv_cnt/(recvcount));
+                curr_cnt += recently_received;
+
+                if(recvcount==16)
+                    printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
+
+
+                for(f=0; f<recently_received; ++f){
+                    
+                    in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * recvcount * recvtype_extent));
+                    out_index = (my_node * p + shared_mem_rank) + (dst_tree_root+f-my_node) * p;
+                    out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+
+                    //if(recvcount==16)
+                      //  printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+
+                    mpi_errno = MPIR_Localcopy(
+                        in, recvcount, recvtype,
+                        out, recvcount, recvtype);
+                    if (mpi_errno) {
+                        MPIR_ERR_POP(mpi_errno);
+                    }
+                }// End for
+            }//end else
+            
+
+        }//end if dst_index < comm_size
+
+        /* if some processes in this process's subtree in this step
+            * did not have any destination process to communicate with
+            * because of non-power-of-two, we need to send them the
+            * data that they would normally have received from those
+            * processes. That is, the haves in this subtree must send to
+            * the havenots. We use a logarithmic recursive-halfing algorithm
+            * for this. */
+
+    
+        /* --BEGIN EXPERIMENTAL-- */
+        if (dst_tree_root + mask > n) {
+            
+            nprocs_completed = n - my_tree_root - mask;
+            /* nprocs_completed is the number of processes in this
+                * subtree that have all the data. Send data to others
+                * in a tree fashion. First find root of current tree
+                * that is being divided into two. k is the number of
+                * least-significant bits in this process's rank that
+                * must be zeroed out to find the rank of the root */
+            j = mask;
+            k = 0;
+            while (j) {
+                j >>= 1;
+                k++;
+            }
+            k--;
+
+            /* FIXME: saving an MPI_Aint into an int */
+            offset = recvcount * (my_tree_root + mask) * recvtype_extent;
+            tmp_mask = mask >> 1;
+            unsigned long  ciphertext_len = 0, count=0, in_size=0;
+            in_size = (unsigned long)(recvcount * recvtype_extent);
+            unsigned long max_out_len = (unsigned long) (16 + in_size);
+
+            while (tmp_mask) {
+                dst_node = my_node ^ tmp_mask;
+                dst_index = rank + (dst_node - my_node) * p;
+
+                tree_root = my_node >> k;
+                tree_root <<= k;
+
+                /* send only if this proc has data and destination
+                    * doesn't have data. at any step, multiple processes
+                    * can send if they have the data */
+                dst = comm_ptr->dev.ch.rank_list[dst_index];
+                
+                if ((dst_node > my_node) && (my_node < tree_root + nprocs_completed)
+                    && (dst_node >= tree_root + nprocs_completed)) {
+                        if(security_approach==2){
+                            //Naive+
+                            // if(comm_size - (my_tree_root+mask) < recently_received)
+                            //     recently_received = comm_size - (my_tree_root+mask);
+                            
+
+                            sbuf = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask) * (recvcount * recvtype_extent + 16+12));
+                            
+                            //send
+                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, recently_received * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
+                            //printf("%d is going to send (II) %d from %d to %d\n", rank, recently_received, (my_tree_root + mask), dst);
+                            mpi_errno =
+                                MPIC_Send_Plus(sbuf,
+                                        recently_received * (recvcount * recvtype_extent + 16+12), MPI_CHAR, dst,
+                                        MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+                            if (mpi_errno) {
+                                /* for communication errors, just record the error but
+                                continue */
+                                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                                
+                            }
+                            
+                            //printf("%d sent (II) %d to %d\n", rank, recently_received, dst);
+                            
+                        }//End Naive +
+                        else{
+                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, last_recv_cnt, recvtype); 
+                            mpi_errno =
+                                MPIC_Send_Plus(((char *) ciphertext_recvbuf + offset),
+                                            recently_received*recvcount, recvtype, dst,
+                                            MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+                            /* last_recv_cnt was set in the previous
+                            * receive. that's the amount of data to be
+                            * sent now. */
+                            if (mpi_errno) {
+                                /* for communication errors, just record the error
+                                but continue */
+                                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            }
+                        }
+                    
+                }//End send condition
+                /* recv only if this proc. doesn't have data and sender
+                    * has data */
+                else if ((dst_node < my_node) &&
+                            (dst_node < tree_root + nprocs_completed) &&
+                            (my_node >= tree_root + nprocs_completed)) {
+                    if(security_approach==2){
+                        
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (comm_size - (my_tree_root + mask)) * (recvcount*recvtype_extent + 16+12), MPI_CHAR);
+                        mpi_errno =
+                            MPIC_Recv(((char *) ciphertext_recvbuf + (my_tree_root + mask)*(recvcount*recvtype_extent + 16+12)),
+                                        (n -
+                                        (my_tree_root +
+                                        mask)) * (recvcount*recvtype_extent + 16+12), MPI_CHAR,
+                                        dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
+                        /* nprocs_completed is also equal to the
+                        * no. of processes whose data we don't have */
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error
+                            but continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            last_recv_cnt = 0;
+                        }
+                        MPIR_Get_count_impl(&status, MPI_CHAR, &last_recv_cnt);
+                        recently_received = (int)(last_recv_cnt/(recvcount*recvtype_extent + 16+12));
+                        curr_cnt += recently_received;
+                        //printf("%d received (II) %d (or %d) from %d and curr_cnt is now %d\n", rank, recently_received, last_recv_cnt, dst, curr_cnt);
+
+                        //decrypt the received messages
+
+                        for(f=0; f<recently_received; ++f){
+                            unsigned long count=0;
+                            
+                            in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12));
+                            out_index = (my_node * p + shared_mem_rank) + (my_tree_root + mask + f - my_node) * p;
+                            out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+
+                            //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+
+                            if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                                            in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
+                                            NULL, 0)){
+
+                                printf("Error in Naive+ decryption: allgather ML_RD (II) while %d tried to decrypt from %d to %d\n", rank, (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                                fflush(stdout);        
+                            }
+                        }// End for
+
+                    }else{ // Not Naive+
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - (my_tree_root + mask)) * recvcount, recvtype);
+                        mpi_errno =
+                            MPIC_Recv(((char *) ciphertext_recvbuf + offset),
+                                        (n -
+                                        (my_tree_root +
+                                        mask)) * recvcount, recvtype,
+                                        dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
+                        /* nprocs_completed is also equal to the
+                        * no. of processes whose data we don't have */
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error
+                            but continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            last_recv_cnt = 0;
+                        }
+                        MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+                        recently_received = (int)(last_recv_cnt/(recvcount)); 
+                        curr_cnt += recently_received;
+
+
+                        for(f=0; f<recently_received; ++f){
+                            unsigned long count=0;
+                            
+                            in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent));
+                            out_index = (my_node * p + shared_mem_rank) + (my_tree_root + mask + f - my_node) * p;
+                            out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+
+                            mpi_errno = MPIR_Localcopy(
+                                in, recvcount, recvtype,
+                                out, recvcount, recvtype);
+                            if (mpi_errno) {
+                                MPIR_ERR_POP(mpi_errno);
+                            }
+                        }// End for
+
+
+                    }
+                    
+                }
+                tmp_mask >>= 1;
+                k--;
+            }//end while tmp_mask
+        }
+        /* --END EXPERIMENTAL-- */
+
+        mask <<= 1;
+        i++;
+    }
+
+    //printf("%d finished Inter-Node (ML-RD)\n", rank);
+
+    /* Intra-Node RD*/
+    
+
+    mask = 0x1;
+    i = 0;
+    curr_cnt = 1;
+    
+
+    
+    rank_index = comm_ptr->dev.ch.rank_list_index;
+    
+
+    while (mask <  p) {
+        shared_mem_dst = shared_mem_rank ^ mask;
+        dst_index = my_node * p + shared_mem_dst;
+
+        
+        /* find offset into send and recv buffers. zero out
+            * the least significant "i" bits of rank and dst to
+            * find root of src and dst subtrees. Use ranks of
+            * roots as index to send from and recv into buffer */
+    
+        dst_tree_root = shared_mem_dst >> i;
+        dst_tree_root <<= i;
+
+        my_tree_root = shared_mem_rank >> i;
+        my_tree_root <<= i;
+
+        if ( dst_index < (my_node + 1) * p && dst_index>= (my_node * p) ) {
+            dst = comm_ptr->dev.ch.rank_list[dst_index];
+            /** #TODO: Check curr_cnt is not more than available space **/
+
+
+            /** #TODO: for loop to send all the msgs received in the inter-node step**/
+            for(f=0; f< n; ++f){
+                /* FIXME: saving an MPI_Aint into an int */
+                send_offset = ((my_tree_root + f * p) % comm_size) * recvcount * recvtype_extent;
+                recv_offset = ((dst_tree_root + f * p) % comm_size) * recvcount * recvtype_extent;
+
+                if(recvcount==16)
+                    printf("%d is going to send (Intra-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, (my_tree_root + f * p) % comm_size, dst, (p - dst_tree_root), (dst_tree_root + f * p) % comm_size);
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (p - dst_tree_root) * recvcount, recvtype); 
+                mpi_errno =
+                    MPIC_Sendrecv_Plus(((char *) tmp_buf + send_offset),
+                                    curr_cnt*recvcount, recvtype, dst,
+                                    MPIR_ALLGATHER_TAG,
+                                    ((char *) tmp_buf + recv_offset),
+                                    (p -dst_tree_root) * recvcount, recvtype,
+                                    dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, &(send_req_ptr[send_req_idx++]), errflag);
+
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but
+                    continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                    last_recv_cnt = 0;
+                }
+            }//end for f
+
+            MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+            recently_received = (int)(last_recv_cnt/(recvcount));
+            curr_cnt += recently_received;
+	    
+            if(recvcount==16)
+                printf("%d received (Intra-I) %d and curr_cnt is now %d\n",rank, recently_received, curr_cnt);
+        }
+
+        /* if some processes in this process's subtree in this step
+            * did not have any destination process to communicate with
+            * because of non-power-of-two, we need to send them the
+            * data that they would normally have received from those
+            * processes. That is, the haves in this subtree must send to
+            * the havenots. We use a logarithmic recursive-halfing algorithm
+            * for this. */
+    
+        /* --BEGIN EXPERIMENTAL-- */
+        
+
+
+        if (dst_tree_root + mask > p) {
+            nprocs_completed = p - my_tree_root - mask;
+            /* nprocs_completed is the number of processes in this
+                * subtree that have all the data. Send data to others
+                * in a tree fashion. First find root of current tree
+                * that is being divided into two. k is the number of
+                * least-significant bits in this process's rank that
+                * must be zeroed out to find the rank of the root */
+            j = mask;
+            k = 0;
+            while (j) {
+                j >>= 1;
+                k++;
+            }
+            k--;
+
+            /* FIXME: saving an MPI_Aint into an int */
+            offset = recvcount * (my_tree_root + mask) * recvtype_extent;
+            tmp_mask = mask >> 1;
+            unsigned long  ciphertext_len = 0, count=0, in_size=0;
+            in_size = (unsigned long)(recvcount * recvtype_extent);
+            unsigned long max_out_len = (unsigned long) (16 + in_size);
+
+            while (tmp_mask) {
+                shared_mem_dst = shared_mem_rank ^ tmp_mask;
+                dst_index = my_node * p + shared_mem_dst;
+
+                tree_root = shared_mem_rank >> k;
+                tree_root <<= k;
+
+                /* send only if this proc has data and destination
+                    * doesn't have data. at any step, multiple processes
+                    * can send if they have the data */
+                dst = comm_ptr->dev.ch.rank_list[dst_index];
+                
+                if ((shared_mem_dst > shared_mem_rank) && (shared_mem_rank < tree_root + nprocs_completed)
+                    && (shared_mem_dst >= tree_root + nprocs_completed)) {
+
+                    for(f=0; f<n; ++f){
+                        sbuf = (char*)((char*) tmp_buf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
+                    
+                        //send
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, recently_received * recvcount, recvtype); 
+                        printf("%d  -   %d is going to send %d from %d to %d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst);
+                        mpi_errno =
+                            MPIC_Send_Plus(sbuf,
+                                    recently_received * recvcount, recvtype, dst,
+                                    MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error but
+                            continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            
+                        }
+                    }//end for f
+                            
+
+                }//End send condition
+                /* recv only if this proc. doesn't have data and sender
+                    * has data */
+                else if ((shared_mem_dst < shared_mem_rank) &&
+                            (shared_mem_dst < tree_root + nprocs_completed) &&
+                            (shared_mem_rank >= tree_root + nprocs_completed)) {
+
+                    for(f=0; f<n; ++f){
+                        rbuf = (char*)((char*) tmp_buf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (p - (my_tree_root + mask)) * recvcount, recvtype);
+                        printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
+                        mpi_errno =
+                            MPIC_Recv(rbuf,
+                                        (p - (my_tree_root + mask)) * recvcount, recvtype,
+                                        dst, MPIR_ALLGATHER_TAG, comm_ptr, &status, errflag);
+                        /* nprocs_completed is also equal to the
+                        * no. of processes whose data we don't have */
+                        if (mpi_errno) {
+                            /* for communication errors, just record the error
+                            but continue */
+                            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                            last_recv_cnt = 0;
+                        }
+                        MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+                        recently_received = (int)(last_recv_cnt/(recvcount));
+                        curr_cnt += recently_received;
+                        printf("%d  -   %d received (II) %d and curr_cnt is now %d\n", recvcount, rank, recently_received, curr_cnt);
+                    
+                    }//end for f
+
+  
+                }
+                tmp_mask >>= 1;
+                k--;
+
+            }//end while tmp_mask
+
+        }
+
+        // /* --END EXPERIMENTAL-- */
+
+        mask <<= 1;
+        i++;
+    }
+
+    //printf("%d finished Intra-Node (ML-RD)\n", rank);
+
+    sbuf = (char*)tmp_buf;
+
+    /* copy data for each rank from temp buffer to receive buffer */
+    for (i = 0; i < comm_size; i++) {
+        /* get next rank in list */
+        int dstrank = comm_ptr->dev.ch.rank_list[i];
+
+        /* compute position in receive buffer for this rank */
+        void* rbuf = (void*)((char*)recvbuf + dstrank * recvcount * recvtype_extent);
+
+        /* copy data to its correct place */
+        mpi_errno = MPIR_Localcopy(sbuf, recvcount, recvtype,
+                                    rbuf, recvcount, recvtype);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+
+        /* update pointer to next spot in temp buffer */
+        sbuf += recvcount * recvtype_extent;
+    }
+
+    /* free the temporary buffer if we allocated one */
+    tmp_buf = (void*)((char*)tmp_buf + recvtype_true_lb);
+    MPIU_Free(tmp_buf);
+
+
+
+
+    for(i=0; i<send_req_idx; ++i){
+        mpi_errno = MPIC_Wait((send_req_ptr[i]), errflag);
+        if (mpi_errno)
+            MPIR_ERR_POP(mpi_errno);
+        
+
+        if (mpi_errno == MPI_SUCCESS) {
+            mpi_errno = send_req_ptr[i]->status.MPI_ERROR;
+        }
+	 MPID_Request_release(send_req_ptr[i]);
+    }
+
+    fn_fail:
+        MPIR_TIMER_END(coll,allgather,2lvl_multileader_rd_nonblocked);
+
+	    return (mpi_errno);
+}
+/*****************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**************** Added by Mehran *****************/
@@ -2634,7 +3364,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
          dst_node, my_node, tree_root, rank_index, dst_index, curr_cnt=1, recently_received;
 
     /************* For MPIC_Sendrecv_Plus ************/
-    MPID_Request *send_req_ptr[comm_size-1];
+    MPID_Request *send_req_ptr[20*(comm_size-1)];
     int s;
     for(s=0; s<comm_size-1; ++s){
         (send_req_ptr[s])=NULL;
@@ -2646,7 +3376,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
 
-    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_ring_nonblocked, 1);
+    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_multileader_rd, 1);
 
     /* First, load the "local" version in the recvbuf. */
     if (sendbuf != MPI_IN_PLACE) {
@@ -2735,8 +3465,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                 recv_offset = dst_tree_root * (recvcount * recvtype_extent +16 +12);
 
                 //printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
-                MPIR_PVAR_INC(allgather, rd, send, curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR); 
-                MPIR_PVAR_INC(allgather, rd, recv, (n - dst_tree_root) * (recvcount * recvtype_extent +16 +12), MPI_CHAR); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (n - dst_tree_root) * (recvcount * recvtype_extent +16 +12), MPI_CHAR); 
                 mpi_errno =
                     MPIC_Sendrecv_Plus(((char *) ciphertext_recvbuf + send_offset),
                                     curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR, dst,
@@ -2791,8 +3521,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                 if(recvcount==16)
                     printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
 
-                MPIR_PVAR_INC(allgather, rd, send, curr_cnt*recvcount, recvtype); 
-                MPIR_PVAR_INC(allgather, rd, recv, (n - dst_tree_root) * recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, curr_cnt*recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (n - dst_tree_root) * recvcount, recvtype); 
                 mpi_errno =
                     MPIC_Sendrecv_Plus(((char *) ciphertext_recvbuf + send_offset),
                                     curr_cnt*recvcount, recvtype, dst,
@@ -2897,12 +3627,20 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                             sbuf = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask) * (recvcount * recvtype_extent + 16+12));
                             
                             //send
-                            MPIR_PVAR_INC(allgather, rd, send, recently_received * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
+                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, recently_received * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
                             //printf("%d is going to send (II) %d from %d to %d\n", rank, recently_received, (my_tree_root + mask), dst);
                             mpi_errno =
                                 MPIC_Send_Plus(sbuf,
                                         recently_received * (recvcount * recvtype_extent + 16+12), MPI_CHAR, dst,
                                         MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+
+                            /*mpi_errno =
+                                MPIC_Send(sbuf,
+                                        recently_received * (recvcount * recvtype_extent + 16+12), MPI_CHAR, dst,
+                                        MPIR_ALLGATHER_TAG, comm_ptr, errflag);*/
+
+
+
                             if (mpi_errno) {
                                 /* for communication errors, just record the error but
                                 continue */
@@ -2916,11 +3654,17 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                             
                         }//End Naive +
                         else{
-                            MPIR_PVAR_INC(allgather, rd, send, last_recv_cnt, recvtype); 
+                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, last_recv_cnt, recvtype); 
                             mpi_errno =
                                 MPIC_Send_Plus(((char *) ciphertext_recvbuf + offset),
                                             recently_received*recvcount, recvtype, dst,
                                             MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+
+                            /*mpi_errno =
+                                MPIC_Send(((char *) ciphertext_recvbuf + offset),
+                                            recently_received*recvcount, recvtype, dst,
+                                            MPIR_ALLGATHER_TAG, comm_ptr, errflag);*/
+                            
                             /* last_recv_cnt was set in the previous
                             * receive. that's the amount of data to be
                             * sent now. */
@@ -2941,7 +3685,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                             (my_node >= tree_root + nprocs_completed)) {
                     if(security_approach==2){
                         
-                        MPIR_PVAR_INC(allgather, rd, recv, (comm_size - (my_tree_root + mask)) * (recvcount*recvtype_extent + 16+12), MPI_CHAR);
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (comm_size - (my_tree_root + mask)) * (recvcount*recvtype_extent + 16+12), MPI_CHAR);
                         mpi_errno =
                             MPIC_Recv(((char *) ciphertext_recvbuf + (my_tree_root + mask)*(recvcount*recvtype_extent + 16+12)),
                                         (n -
@@ -2984,7 +3728,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                         }// End for
 
                     }else{ // Not Naive+
-                        MPIR_PVAR_INC(allgather, rd, recv, (n - (my_tree_root + mask)) * recvcount, recvtype);
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (n - (my_tree_root + mask)) * recvcount, recvtype);
                         mpi_errno =
                             MPIC_Recv(((char *) ciphertext_recvbuf + offset),
                                         (n -
@@ -3079,8 +3823,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
 
                 if(recvcount==16)
                     printf("%d is going to send (Intra-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, comm_ptr->dev.ch.rank_list[(my_tree_root + f * p) % comm_size], dst, (p - dst_tree_root), comm_ptr->dev.ch.rank_list[(dst_tree_root + f * p) % comm_size]);
-                MPIR_PVAR_INC(allgather, rd, send, curr_cnt*recvcount, recvtype); 
-                MPIR_PVAR_INC(allgather, rd, recv, (p - dst_tree_root) * recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, curr_cnt*recvcount, recvtype); 
+                MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (p - dst_tree_root) * recvcount, recvtype); 
                 mpi_errno =
                     MPIC_Sendrecv_Plus(((char *) recvbuf + send_offset),
                                     curr_cnt*recvcount, recvtype, dst,
@@ -3161,12 +3905,19 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                         sbuf = (char*)((char*) recvbuf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
                     
                         //send
-                        MPIR_PVAR_INC(allgather, rd, send, recently_received * recvcount, recvtype); 
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, recently_received * recvcount, recvtype); 
                         printf("%d  -   %d is going to send %d from %d to %d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst);
                         mpi_errno =
                             MPIC_Send_Plus(sbuf,
                                     recently_received * recvcount, recvtype, dst,
                                     MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+
+                        /*mpi_errno =
+                            MPIC_Send(sbuf,
+                                    recently_received * recvcount, recvtype, dst,
+                                    MPIR_ALLGATHER_TAG, comm_ptr, errflag);*/
+
+                        
                         if (mpi_errno) {
                             /* for communication errors, just record the error but
                             continue */
@@ -3187,7 +3938,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
 
                     for(f=0; f<n; ++f){
                         rbuf = (char*)((char*) recvbuf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
-                        MPIR_PVAR_INC(allgather, rd, recv, (p - (my_tree_root + mask)) * recvcount, recvtype);
+                        MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (p - (my_tree_root + mask)) * recvcount, recvtype);
                         printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
                         mpi_errno =
                             MPIC_Recv(rbuf,
@@ -3249,17 +4000,6 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 /**************** Added by Mehran *****************/
 /**
  * 
@@ -3311,7 +4051,7 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
 
-    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_ring_nonblocked, 1);
+    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_multileader_ring, 1);
 
     /* First, load the "local" version in the recvbuf. */
     if (sendbuf != MPI_IN_PLACE) {
@@ -4698,6 +5438,11 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_MV2)) {
+            /***** Added by Mehran *****/
+            if(MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2 && comm_ptr->dev.ch.is_blocked!=1){
+                MV2_Allgather_function = &MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2;
+            }
+            /***************************/
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);

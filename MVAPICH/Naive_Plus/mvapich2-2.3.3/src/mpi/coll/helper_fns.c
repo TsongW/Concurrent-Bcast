@@ -427,8 +427,9 @@ int MPIC_Send_Plus(const void *buf, MPI_Aint count, MPI_Datatype datatype, int d
     context_id = (comm_ptr->comm_kind == MPID_INTRACOMM) ?
         MPID_CONTEXT_INTRA_COLL : MPID_CONTEXT_INTER_COLL;
 
-    mpi_errno = MPID_Send(buf, count, datatype, dest, tag, comm_ptr,
+    mpi_errno = MPID_Isend(buf, count, datatype, dest, tag, comm_ptr,
                           context_id, send_req_ptr);
+
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     // if (request_ptr) {
     //     mpi_errno = MPIC_Wait(request_ptr, errflag);
