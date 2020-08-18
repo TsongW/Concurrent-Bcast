@@ -2620,7 +2620,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
     MPIR_TIMER_START(coll,allgather,2lvl_multileader_rd_nonblocked);
-    printf("MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2\n");
+    //    printf("MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2\n");
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int i, j, k, f;
@@ -2649,7 +2649,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
         (send_req_ptr[s])=NULL;
     }
     /*************************************************/
-
+    //printf("%d  - %d started\n", recvcount, rank);
     /* get extent of receive type */
     MPI_Aint recvtype_extent, sendtype_extent, recvtype_true_extent, recvbuf_extent, recvtype_true_lb;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -2681,47 +2681,53 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
     MPID_Node_id_t node_id;    
     MPID_Get_node_id(comm_ptr, rank, &node_id);
     my_node = node_id;
+    rank_index = comm_ptr->dev.ch.rank_list_index;
 
-
-
-    /* First, load the "local" version in the recvbuf. */
-    if (sendbuf != MPI_IN_PLACE) {
-        /* compute location in receive buffer for our data */
-        void* rbuf = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
-
-        /* copy data from send buffer to receive buffer */
-        mpi_errno = MPIR_Localcopy(
-            sendbuf, sendcount, sendtype,
-            rbuf,    recvcount, recvtype
-        );
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
-    }
-
-
+    printf("%d [%d] is in node %d and blocked = %d\n", rank, rank_index, my_node, comm_ptr->dev.ch.is_blocked);
+    /* First, load the "local" version in the tmp_buf. */
+    rbuf = ((char*) tmp_buf + rank_index * recvcount * recvtype_extent);
     
 
-    rank_index = comm_ptr->dev.ch.rank_list_index;
+    if (sendbuf != MPI_IN_PLACE) {
+        sbuf = ((char*) sendbuf);
+	//if(recvcount==16)
+	//printf("%d - %d copies from send buffer to %d at tmp_buffer\n", recvcount, rank, rank_index);
+    }else{
+        sbuf = ((char*) recvbuf + rank * recvcount * recvtype_extent);
+	//	if(recvcount==16)
+	//printf("%d - %d copies from %d at recv_buffer to %d at tmp_buffer\n", recvcount, rank, rank, rank_index);
+    }
+
+    /* copy data from send buffer to receive buffer */
+    
+    mpi_errno = MPIR_Localcopy(
+        sendbuf, sendcount, sendtype,
+        rbuf,    recvcount, recvtype
+    );
+    if (mpi_errno) {
+        MPIR_ERR_POP(mpi_errno);
+    }
+    
     
     if(security_approach==2){
         unsigned long  ciphertext_len = 0;
         //encrypt local data to ciphertext rcvbuffer
-        void* in = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
+        void* in = (void*)((char*) tmp_buf + rank_index * recvcount * recvtype_extent);
         void* out = (void*)((char*) ciphertext_recvbuf + my_node * (recvcount * recvtype_extent + 12 + 16));
 
         RAND_bytes(out, 12); // 12 bytes of nonce
         unsigned long in_size=0;
         in_size = (unsigned long)(sendcount * sendtype_extent);
         unsigned long max_out_len = (unsigned long) (16 + in_size);
-        //printf("%d (%d) is going to encrypt from %d to %d\n", rank, local_rank, rank * recvcount * recvtype_extent, rank * (recvcount * recvtype_extent + 12 + 16) );
+        //if(recvcount==16)
+	//printf("%d - %d is going to encrypt from %d to %d\n", recvcount, rank, rank_index, my_node );
         if(!EVP_AEAD_CTX_seal(ctx, out+12,
                             &ciphertext_len, max_out_len,
                             out, 12,
                             in, in_size,
                             NULL, 0))
         {
-                printf("Error in Naive+ encryption: allgather MultiLeader-RD\n");
+                printf("Error in Naive+ encryption: allgather MultiLeader-RD-NB\n");
                 fflush(stdout);
         }
     }else{
@@ -2729,8 +2735,10 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
          * Only for the Unencrypted version
          * Copy from recv_buf to ciphertext_recvbuf
          **/
-        void* rbuf = (void*)((char*) tmp_buf + (my_node * p + shared_mem_rank) * recvcount * recvtype_extent);
+        void* rbuf = (void*)((char*) tmp_buf + rank_index * recvcount * recvtype_extent);
         void* crbuf = (void*)((char*) ciphertext_recvbuf + my_node * recvcount * recvtype_extent);
+        //if(recvcount==16)
+	//printf("%d - %d is going to copy from %d to %d\n", recvcount, rank, rank_index, my_node );
         mpi_errno = MPIR_Localcopy(
             rbuf, sendcount, sendtype,
             crbuf, recvcount, recvtype);
@@ -2766,8 +2774,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
             if(security_approach==2){
                 send_offset = my_tree_root * (recvcount * recvtype_extent +16 +12);
                 recv_offset = dst_tree_root * (recvcount * recvtype_extent +16 +12);
-
-                //printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
+                //if(recvcount==16)
+		//printf("%d - %d is going to send (Inter-I) %d from %d to %d and receive %d at %d ,send_req_idx=%d\n", recvcount, rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root, send_req_idx);
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*(recvcount * recvtype_extent +16 +12), MPI_CHAR); 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - dst_tree_root) * (recvcount * recvtype_extent +16 +12), MPI_CHAR); 
                 mpi_errno =
@@ -2791,14 +2799,14 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                 MPIR_Get_count_impl(&status, MPI_CHAR, &last_recv_cnt);
                 recently_received = (int)(last_recv_cnt/(recvcount*recvtype_extent+16+12));
                 curr_cnt += recently_received;
-
-                //printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
+                //if(recvcount==16)
+		//printf("%d - %d received %d (%d) and curr_cunt = %d\n", recvcount, rank, last_recv_cnt, recently_received, curr_cnt);
 
                 for(f=0; f<recently_received; ++f){
                     unsigned long count=0;
                     
                     in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)));
-                    out_index = (my_node * p + shared_mem_rank) + (dst_tree_root+f-my_node) * p;
+                    out_index = rank_index + (dst_tree_root+f-my_node) * p;
                     out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
                     //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
@@ -2821,8 +2829,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                 send_offset = my_tree_root * recvcount * recvtype_extent;
                 recv_offset = dst_tree_root * recvcount * recvtype_extent;
 
-                if(recvcount==16)
-                    printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
+                //if(recvcount==16)
+		//printf("%d - %d is going to send (Inter-I) %d from %d to %d and receive %d at %d, send_req_idx=%d\n", recvcount, rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root, send_req_idx);
 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*recvcount, recvtype); 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - dst_tree_root) * recvcount, recvtype); 
@@ -2848,14 +2856,14 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                 recently_received = (int)(last_recv_cnt/(recvcount));
                 curr_cnt += recently_received;
 
-                if(recvcount==16)
-                    printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
+                //if(recvcount==16)
+                //    printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
 
 
                 for(f=0; f<recently_received; ++f){
                     
                     in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * recvcount * recvtype_extent));
-                    out_index = (my_node * p + shared_mem_rank) + (dst_tree_root+f-my_node) * p;
+                    out_index = rank_index + (dst_tree_root+f-my_node) * p;
                     out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
                     //if(recvcount==16)
@@ -2909,7 +2917,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
 
             while (tmp_mask) {
                 dst_node = my_node ^ tmp_mask;
-                dst_index = rank + (dst_node - my_node) * p;
+                dst_index = rank_index + (dst_node - my_node) * p;
 
                 tree_root = my_node >> k;
                 tree_root <<= k;
@@ -2931,7 +2939,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                             
                             //send
                             MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, recently_received * (recvcount*recvtype_extent + 16+12), MPI_CHAR); 
-                            //printf("%d is going to send (II) %d from %d to %d\n", rank, recently_received, (my_tree_root + mask), dst);
+                            //printf("%d  - %d is going to send (II) %d from %d to %d, send_req_idx=%d\n", recvcount, rank, recently_received, (my_tree_root + mask), dst, send_req_idx);
                             mpi_errno =
                                 MPIC_Send_Plus(sbuf,
                                         recently_received * (recvcount * recvtype_extent + 16+12), MPI_CHAR, dst,
@@ -2949,7 +2957,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                             
                         }//End Naive +
                         else{
-                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, last_recv_cnt, recvtype); 
+                            MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, last_recv_cnt, recvtype);
+			    //printf("%d  - %d is going to send (II) %d from %d to %d, send_req_idx=%d\n", recvcount, rank, recently_received, (my_tree_root + mask), dst, send_req_idx);
                             mpi_errno =
                                 MPIC_Send_Plus(((char *) ciphertext_recvbuf + offset),
                                             recently_received*recvcount, recvtype, dst,
@@ -3002,7 +3011,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                             unsigned long count=0;
                             
                             in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12));
-                            out_index = (my_node * p + shared_mem_rank) + (my_tree_root + mask + f - my_node) * p;
+                            out_index = rank_index + (my_tree_root + mask + f - my_node) * p;
                             out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
                             //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
@@ -3037,13 +3046,13 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                         MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
                         recently_received = (int)(last_recv_cnt/(recvcount)); 
                         curr_cnt += recently_received;
-
+			//printf("%d  - %d recved (II) %d from %d at %d, curr_cnt=%d\n", recvcount, rank, recently_received, dst, offset, curr_cnt);
 
                         for(f=0; f<recently_received; ++f){
                             unsigned long count=0;
                             
                             in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent));
-                            out_index = (my_node * p + shared_mem_rank) + (my_tree_root + mask + f - my_node) * p;
+                            out_index = rank_index + (my_tree_root + mask + f - my_node) * p;
                             out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
                             mpi_errno = MPIR_Localcopy(
@@ -3104,13 +3113,14 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
 
 
             /** #TODO: for loop to send all the msgs received in the inter-node step**/
+            int previous_recv_count = 0;
             for(f=0; f< n; ++f){
                 /* FIXME: saving an MPI_Aint into an int */
                 send_offset = ((my_tree_root + f * p) % comm_size) * recvcount * recvtype_extent;
                 recv_offset = ((dst_tree_root + f * p) % comm_size) * recvcount * recvtype_extent;
 
-                if(recvcount==16)
-                    printf("%d is going to send (Intra-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, (my_tree_root + f * p) % comm_size, dst, (p - dst_tree_root), (dst_tree_root + f * p) % comm_size);
+                //if(recvcount==16)
+		//printf("%d  - %d is going to send (Intra-I) %d from %d to %d and receive %d at %d, send_req_idx=%d\n", recvcount, rank, curr_cnt, (my_tree_root + f * p) % comm_size, dst, (p - dst_tree_root), (dst_tree_root + f * p) % comm_size, send_req_idx);
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, curr_cnt*recvcount, recvtype); 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (p - dst_tree_root) * recvcount, recvtype); 
                 mpi_errno =
@@ -3129,14 +3139,19 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                     MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
                     last_recv_cnt = 0;
                 }
+                MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
+                recently_received = (int)(last_recv_cnt/(recvcount));
+                if(previous_recv_count==0){
+                    previous_recv_count = recently_received;
+                }else{
+                    if(previous_recv_count != recently_received){
+                        printf("ERROR in Multileader-RD-NB!\nReceived sizes are not equal!\n");
+                    }
+                }
+                //printf("%d  - %d received (Intra-I) %d from %d and curr_cnt is now %d\n", recvcount, rank, recently_received, dst, curr_cnt);
             }//end for f
-
-            MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
-            recently_received = (int)(last_recv_cnt/(recvcount));
             curr_cnt += recently_received;
-	    
-            if(recvcount==16)
-                printf("%d received (Intra-I) %d and curr_cnt is now %d\n",rank, recently_received, curr_cnt);
+            
         }
 
         /* if some processes in this process's subtree in this step
@@ -3194,11 +3209,16 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                     
                         //send
                         MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, send, recently_received * recvcount, recvtype); 
-                        printf("%d  -   %d is going to send %d from %d to %d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst);
-                        mpi_errno =
+			//printf("%d  -   %d is going to send %d from %d to %d, send_req_idx=%d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst, send_req_idx);
+                        /*mpi_errno =
+                            MPIC_Send_Plus(sbuf,
+                                    recently_received * recvcount, recvtype, dst,
+                                    MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);*/
+			mpi_errno =
                             MPIC_Send_Plus(sbuf,
                                     recently_received * recvcount, recvtype, dst,
                                     MPIR_ALLGATHER_TAG, comm_ptr, &(send_req_ptr[send_req_idx++]), errflag);
+			
                         if (mpi_errno) {
                             /* for communication errors, just record the error but
                             continue */
@@ -3216,11 +3236,11 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                 else if ((shared_mem_dst < shared_mem_rank) &&
                             (shared_mem_dst < tree_root + nprocs_completed) &&
                             (shared_mem_rank >= tree_root + nprocs_completed)) {
-
+                    int previous_recv_count = 0;
                     for(f=0; f<n; ++f){
                         rbuf = (char*)((char*) tmp_buf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
                         MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (p - (my_tree_root + mask)) * recvcount, recvtype);
-                        printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
+                        //printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
                         mpi_errno =
                             MPIC_Recv(rbuf,
                                         (p - (my_tree_root + mask)) * recvcount, recvtype,
@@ -3237,10 +3257,16 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                         }
                         MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
                         recently_received = (int)(last_recv_cnt/(recvcount));
-                        curr_cnt += recently_received;
-                        printf("%d  -   %d received (II) %d and curr_cnt is now %d\n", recvcount, rank, recently_received, curr_cnt);
-                    
+                        if(previous_recv_count==0){
+                            previous_recv_count = recently_received;
+                        }else{
+                            if(previous_recv_count != recently_received){
+                                printf("ERROR in Multileader-RD-NB!\nReceived sizes are not equal!\n");
+                            }
+                        }
+                        //printf("%d  - %d received (Intra-II) %d from %d and curr_cnt is now %d\n", recvcount, rank, recently_received, dst, curr_cnt);
                     }//end for f
+                    curr_cnt += recently_received;
 
   
                 }
@@ -3257,6 +3283,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
         i++;
     }
 
+    //printf("%d - %d Done!\n", recvcount, rank);
     //printf("%d finished Intra-Node (ML-RD)\n", rank);
 
     sbuf = (char*)tmp_buf;
@@ -3285,9 +3312,10 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
     MPIU_Free(tmp_buf);
 
 
-
+    //printf("%d - %d Rotation | send_req_idx=%d\n", recvcount, rank, send_req_idx);
 
     for(i=0; i<send_req_idx; ++i){
+	//printf("%d - %d gonna wait for %d\n", recvcount, rank, i);
         mpi_errno = MPIC_Wait((send_req_ptr[i]), errflag);
         if (mpi_errno)
             MPIR_ERR_POP(mpi_errno);
@@ -3298,6 +3326,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
         }
 	 MPID_Request_release(send_req_ptr[i]);
     }
+    //printf("%d - %d finished\n", recvcount, rank);
 
     fn_fail:
         MPIR_TIMER_END(coll,allgather,2lvl_multileader_rd_nonblocked);
@@ -3400,6 +3429,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
     my_node = node_id;
 
     rank_index = comm_ptr->dev.ch.rank_list_index;
+    printf("%d [%d] is in node %d and blocked = %d\n", rank, rank_index, my_node, comm_ptr->dev.ch.is_blocked);
     
     if(security_approach==2){
         unsigned long  ciphertext_len = 0;
@@ -3518,8 +3548,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                 send_offset = my_tree_root * recvcount * recvtype_extent;
                 recv_offset = dst_tree_root * recvcount * recvtype_extent;
 
-                if(recvcount==16)
-                    printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
+                // if(recvcount==16)
+                //     printf("%d is going to send (Inter-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, my_tree_root, dst, (n - dst_tree_root), dst_tree_root);
 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, curr_cnt*recvcount, recvtype); 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (n - dst_tree_root) * recvcount, recvtype); 
@@ -3545,8 +3575,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                 recently_received = (int)(last_recv_cnt/(recvcount));
                 curr_cnt += recently_received;
 
-                if(recvcount==16)
-                    printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
+                // if(recvcount==16)
+                //     printf("%d received %d (%d) and curr_cunt = %d\n", rank, last_recv_cnt, recently_received, curr_cnt);
 
 
                 for(f=0; f<recently_received; ++f){
@@ -3555,8 +3585,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                     out_index = rank_index + (dst_tree_root+f-my_node) * p;
                     out = (char*)((char*) recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
 
-                    if(recvcount==16)
-                        printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                    // if(recvcount==16)
+                    //     printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
 
                     mpi_errno = MPIR_Localcopy(
                         in, recvcount, recvtype,
@@ -3821,8 +3851,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                 send_offset = comm_ptr->dev.ch.rank_list[((my_tree_root + f * p) % comm_size)] * recvcount * recvtype_extent;
                 recv_offset = comm_ptr->dev.ch.rank_list[((dst_tree_root + f * p) % comm_size)] * recvcount * recvtype_extent;
 
-                if(recvcount==16)
-                    printf("%d is going to send (Intra-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, comm_ptr->dev.ch.rank_list[(my_tree_root + f * p) % comm_size], dst, (p - dst_tree_root), comm_ptr->dev.ch.rank_list[(dst_tree_root + f * p) % comm_size]);
+                // if(recvcount==16)
+                //     printf("%d is going to send (Intra-I) %d from %d to %d and receive %d at %d\n", rank, curr_cnt, comm_ptr->dev.ch.rank_list[(my_tree_root + f * p) % comm_size], dst, (p - dst_tree_root), comm_ptr->dev.ch.rank_list[(dst_tree_root + f * p) % comm_size]);
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, curr_cnt*recvcount, recvtype); 
                 MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (p - dst_tree_root) * recvcount, recvtype); 
                 mpi_errno =
@@ -3847,8 +3877,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
             recently_received = (int)(last_recv_cnt/(recvcount));
             curr_cnt += recently_received;
 	    
-            if(recvcount==16)
-                printf("%d received (Intra-I) %d and curr_cnt is now %d\n",rank, recently_received, curr_cnt);
+            // if(recvcount==16)
+            //     printf("%d received (Intra-I) %d and curr_cnt is now %d\n",rank, recently_received, curr_cnt);
         }
 
         /* if some processes in this process's subtree in this step
@@ -3906,7 +3936,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                     
                         //send
                         MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, send, recently_received * recvcount, recvtype); 
-                        printf("%d  -   %d is going to send %d from %d to %d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst);
+                        // printf("%d  -   %d is going to send %d from %d to %d\n", recvcount, rank, recently_received, (my_tree_root + mask+ f*p)%comm_size, dst);
                         mpi_errno =
                             MPIC_Send_Plus(sbuf,
                                     recently_received * recvcount, recvtype, dst,
@@ -3939,7 +3969,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                     for(f=0; f<n; ++f){
                         rbuf = (char*)((char*) recvbuf + ((my_tree_root + mask+ f*p)%comm_size) * (recvcount * recvtype_extent));
                         MPIR_PVAR_INC(allgather, 2lvl_multileader_rd, recv, (p - (my_tree_root + mask)) * recvcount, recvtype);
-                        printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
+                        // printf("%d  -   %d is going to recv %d at %d from %d\n", recvcount, rank, p - (my_tree_root + mask), (my_tree_root + mask+ f*p)%comm_size, dst);
                         mpi_errno =
                             MPIC_Recv(rbuf,
                                         (p - (my_tree_root + mask)) * recvcount, recvtype,
@@ -3957,7 +3987,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
                         MPIR_Get_count_impl(&status, recvtype, &last_recv_cnt);
                         recently_received = (int)(last_recv_cnt/(recvcount));
                         curr_cnt += recently_received;
-                        printf("%d  -   %d received (II) %d and curr_cnt is now %d\n", recvcount, rank, recently_received, curr_cnt);
+                        // printf("%d  -   %d received (II) %d and curr_cnt is now %d\n", recvcount, rank, recently_received, curr_cnt);
                     
                     }//end for f
 
@@ -5438,8 +5468,8 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Ring_MV2)) {
-            /***** Added by Mehran *****/
-            if(MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2 && comm_ptr->dev.ch.is_blocked!=1){
+	/***** Added by Mehran *****/
+	if(MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2 && comm_ptr->dev.ch.is_blocked!=1){
                 MV2_Allgather_function = &MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2;
             }
             /***************************/
