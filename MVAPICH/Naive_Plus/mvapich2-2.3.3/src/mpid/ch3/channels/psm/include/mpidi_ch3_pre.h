@@ -50,6 +50,9 @@ typedef struct {
     int     rank_list_index; /* index of this process in the rank_list array */
     int     is_uniform;
     int     is_blocked;
+    /************ Added by Mehran ************/
+    int     equal_local_sizes;
+    /*****************************************/
     int     shmem_comm_rank;
     int     shmem_coll_ok;
     int     allgather_comm_ok;

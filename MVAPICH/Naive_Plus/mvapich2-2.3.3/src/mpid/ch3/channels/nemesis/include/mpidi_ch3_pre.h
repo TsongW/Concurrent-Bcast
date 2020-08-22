@@ -88,6 +88,9 @@ typedef struct {
     int*    leader_rank;
     int*    node_sizes;
     int*    allgather_new_ranks;
+    /************ Added by Mehran ************/
+    int     equal_local_sizes;
+    /*****************************************/
     int     is_uniform;
     int     is_blocked;
     int     shmem_comm_rank;
