@@ -1681,7 +1681,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 
     /******************** Added by Mehran  ********************/
     MPID_Node_id_t node_id, send_node_id, recv_node_id;
-    int node_gateway=0;
+    int node_gateway=0, send_idx=0;
     if(security_approach==2){
         
         MPID_Get_node_id(comm_ptr, rank, &node_id);
@@ -1694,6 +1694,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
         }else if(node_id != recv_node_id){
             node_gateway=2;
         }
+        
     }
     /**********************************************************/
 
@@ -1713,7 +1714,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 		    //printf("Case 1 in naive+ ring (default)\n");
                     //Encrypt before sending
                     in = (char*)((char*) recvbuf + j * recvcount * recvtype_extent);
-                    out = (char*)((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
+                    out = (char*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
                     RAND_bytes(out, 12); // 12 bytes of nonce
 
                     if(!EVP_AEAD_CTX_seal(ctx, out+12,
@@ -1743,12 +1744,13 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
                                     MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
                     /**************************************************/
+                    send_idx = (send_idx+1)%2;
                     break;
                 case 2:
                     //Decrypt after receiving
                     //printf("Case 2 in naive+ ring (default)\n");
                     sbuf = (char*)((char*) recvbuf + j * recvcount * recvtype_extent);
-                    rbuf = (char*)((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
+                    rbuf = (char*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
 
 
                     MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
@@ -1772,19 +1774,19 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
                         rbuf, 12, rbuf+12, (unsigned long )((recvcount*recvtype_extent)+16),
                         NULL, 0)){
-                            printf("Error in Naive+ decryption: allgather ring (default)\n");
+                            printf("Error in Naive+ decryption: allgather ring (default) I \n");
                             fflush(stdout);        
                         }
-
+                    send_idx = (send_idx+1)%2;
                     break;
 		case 3:
                     //Encrypt before sending and Decrypt after receiving
                     
                     //printf("Case 3 in naive+ ring (default)\n");
 		    in = (char*)((char*) recvbuf + j * recvcount * recvtype_extent);
-		    out = (char*)((char*) ciphertext_recvbuf + j * (recvcount * recvtype_extent + 12 + 16));
+		    out = (char*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
 		    
-		    rbuf = (char*)((char*) ciphertext_recvbuf + jnext * (recvcount * recvtype_extent + 12 + 16));
+		    rbuf = (char*)((char*) ciphertext_recvbuf + (send_idx+1)%2 * (recvcount * recvtype_extent + 12 + 16));
 		    
 		    RAND_bytes(out, 12); // 12 bytes of nonce
                     
@@ -1819,11 +1821,11 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
                         rbuf, 12, rbuf+12, (unsigned long )((recvcount*recvtype_extent)+16),
                         NULL, 0)){
-                            printf("Error in Naive+ decryption: allgather ring (default)\n");
+                            printf("Error in Naive+ decryption: allgather ring (default) II \n");
                             fflush(stdout);        
                         }
 
-
+                        send_idx = (send_idx+1)%2;
 
 
                     break;
