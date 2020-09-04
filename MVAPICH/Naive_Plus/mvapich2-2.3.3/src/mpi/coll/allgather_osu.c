@@ -1650,13 +1650,13 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
     
-    /************* For MPIC_Sendrecv_Plus ***************/
+    /************* For MPIC_Sendrecv_Plus ***************
     MPID_Request *send_req_ptr[comm_size-1];
     int p;
     for(p=0; p<comm_size-1; ++p){
         (send_req_ptr[p])=NULL;
     }
-    /****************************************************/
+    ****************************************************/
 
 
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -1728,22 +1728,22 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                     }
                     MPIR_PVAR_INC(allgather, ring, send, recvcount*recvtype_extent+16+12, MPI_CHAR); 
                     MPIR_PVAR_INC(allgather, ring, recv, recvcount, recvtype); 
-                    /*mpi_errno = MPIC_Sendrecv(out, recvcount*recvtype_extent+16+12, 
+                    mpi_errno = MPIC_Sendrecv(out, recvcount*recvtype_extent+16+12, 
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     recvbuf + jnext * recvcount * recvtype_extent,
                                     recvcount, recvtype, left,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
-                                    MPI_STATUS_IGNORE, errflag);*/
+                                    MPI_STATUS_IGNORE, errflag);
                     
 
-                    /************* For MPIC_Sendrecv_Plus ************/
+                    /************* For MPIC_Sendrecv_Plus ************
                     mpi_errno = MPIC_Sendrecv_Plus(out, recvcount*recvtype_extent+16+12, 
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     recvbuf + jnext * recvcount * recvtype_extent,
                                     recvcount, recvtype, left,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
                                     MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
-                    /**************************************************/
+                    **************************************************/
                     send_idx = (send_idx+1)%2;
                     break;
                 case 2:
@@ -1755,26 +1755,26 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 
                     MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
                     MPIR_PVAR_INC(allgather, ring, recv, recvcount*recvtype_extent+16+12, MPI_CHAR); 
-                    /*mpi_errno = MPIC_Sendrecv(sbuf, recvcount,
+                    mpi_errno = MPIC_Sendrecv(sbuf, recvcount,
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     rbuf, recvcount * recvtype_extent + 16+12,
                                     MPI_CHAR, left, MPIR_ALLGATHER_TAG,
-                                    comm_ptr, MPI_STATUS_IGNORE, errflag);*/
+                                    comm_ptr, MPI_STATUS_IGNORE, errflag);
 
-                    /************* For MPIC_Sendrecv_Plus ************/
+                    /************* For MPIC_Sendrecv_Plus ************
                     mpi_errno = MPIC_Sendrecv_Plus(sbuf, recvcount,
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     rbuf, recvcount * recvtype_extent + 16+12,
                                     MPI_CHAR, left, MPIR_ALLGATHER_TAG,
                                     comm_ptr, MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
-                    /**************************************************/
+                    **************************************************/
 
 
                     if(!EVP_AEAD_CTX_open(ctx, (recvbuf+jnext*recvcount*recvtype_extent),
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
                         rbuf, 12, rbuf+12, (unsigned long )((recvcount*recvtype_extent)+16),
                         NULL, 0)){
-                            printf("Error in Naive+ decryption: allgather ring (default) I \n");
+			printf("Error in Naive+ decryption: allgather ring (default) I\n");
                             fflush(stdout);        
                         }
                     send_idx = (send_idx+1)%2;
@@ -1802,19 +1802,19 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                     MPIR_PVAR_INC(allgather, ring, send, recvcount*recvtype_extent+16+12, MPI_CHAR); 
                     MPIR_PVAR_INC(allgather, ring, recv, recvcount*recvtype_extent+16+12, MPI_CHAR);
 		    
-                    /*mpi_errno = MPIC_Sendrecv((char *) out, recvcount*recvtype_extent+16+12, 
+                    mpi_errno = MPIC_Sendrecv((char *) out, recvcount*recvtype_extent+16+12, 
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     rbuf, recvcount*recvtype_extent+16+12, MPI_CHAR, left,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
-                                    MPI_STATUS_IGNORE, errflag);*/
+                                    MPI_STATUS_IGNORE, errflag);
 
-                    /************* For MPIC_Sendrecv_Plus ************/
+                    /************* For MPIC_Sendrecv_Plus ************
                     mpi_errno = MPIC_Sendrecv_Plus((char *) out, recvcount*recvtype_extent+16+12, 
                                     MPI_CHAR, right, MPIR_ALLGATHER_TAG,
                                     rbuf, recvcount*recvtype_extent+16+12, MPI_CHAR, left,
                                     MPIR_ALLGATHER_TAG, comm_ptr,
                                     MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
-                    /**************************************************/
+                    **************************************************/
 
 		    //printf("%d is going to decrypt from %d to %d\n", rank, jnext * (recvcount * recvtype_extent + 12 + 16), jnext*recvcount*recvtype_extent);
                     if(!EVP_AEAD_CTX_open(ctx, (recvbuf+jnext*recvcount*recvtype_extent),
@@ -1834,7 +1834,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 		    //printf("Default case in naive+ ring (default)\n");
                     MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
                     MPIR_PVAR_INC(allgather, ring, recv, recvcount, recvtype); 
-                    /*mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
+                    mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
                                         j * recvcount * recvtype_extent),
                                             recvcount, recvtype, right,
                                      MPIR_ALLGATHER_TAG,
@@ -1842,8 +1842,8 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                                       jnext * recvcount * recvtype_extent),
                                      recvcount, recvtype, left,
                                      MPIR_ALLGATHER_TAG, comm_ptr,
-                                     MPI_STATUS_IGNORE, errflag);*/
-                    /************* For MPIC_Sendrecv_Plus ************/
+                                     MPI_STATUS_IGNORE, errflag);
+                    /************* For MPIC_Sendrecv_Plus ************
                     mpi_errno = MPIC_Sendrecv_Plus(((char *) recvbuf +
                                         j * recvcount * recvtype_extent),
                                             recvcount, recvtype, right,
@@ -1853,7 +1853,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                                      recvcount, recvtype, left,
                                      MPIR_ALLGATHER_TAG, comm_ptr,
                                      MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
-                    /**************************************************/
+                    **************************************************/
 
                     break;
 
@@ -1862,7 +1862,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
         }else{//Not Naive+
             MPIR_PVAR_INC(allgather, ring, send, recvcount, recvtype); 
             MPIR_PVAR_INC(allgather, ring, recv, recvcount, recvtype); 
-            /*mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
+            mpi_errno = MPIC_Sendrecv(((char *) recvbuf +
                                         j * recvcount * recvtype_extent),
                                             recvcount, recvtype, right,
                                      MPIR_ALLGATHER_TAG,
@@ -1870,9 +1870,9 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                                       jnext * recvcount * recvtype_extent),
                                      recvcount, recvtype, left,
                                      MPIR_ALLGATHER_TAG, comm_ptr,
-                                     MPI_STATUS_IGNORE, errflag);*/
+                                     MPI_STATUS_IGNORE, errflag);
 
-            /************* For MPIC_Sendrecv_Plus ************/
+            /************* For MPIC_Sendrecv_Plus ************
             mpi_errno = MPIC_Sendrecv_Plus(((char *) recvbuf +
                                         j * recvcount * recvtype_extent),
                                             recvcount, recvtype, right,
@@ -1882,7 +1882,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
                                      recvcount, recvtype, left,
                                      MPIR_ALLGATHER_TAG, comm_ptr,
                                      MPI_STATUS_IGNORE, &(send_req_ptr[i-1]), errflag);
-            /**************************************************/
+            **************************************************/
 
         }
         
@@ -1896,7 +1896,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
         jnext = (comm_size + jnext - 1) % comm_size;
     }
     
-    for(j=0; j<comm_size-1; ++j){
+    /*for(j=0; j<comm_size-1; ++j){
         mpi_errno = MPIC_Wait((send_req_ptr[j]), errflag);
         if (mpi_errno)
             MPIR_ERR_POP(mpi_errno);
@@ -1906,7 +1906,7 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
             mpi_errno = send_req_ptr[j]->status.MPI_ERROR;
         }
         MPID_Request_release(send_req_ptr[j]);
-    }
+    }*/
 
 
   fn_fail:
@@ -4419,7 +4419,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
         }
     }
     /***************** Added by Mehran *****************/
-
+    int send_idx=0;
     if(security_approach==2 && local_rank==local_size-1){
         
         unsigned long  ciphertext_len = 0;
