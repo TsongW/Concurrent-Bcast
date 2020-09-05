@@ -4,6 +4,7 @@
         "random": "c",
         "array": "c",
         "initializer_list": "c",
-        "utility": "c"
+        "utility": "c",
+        "type_traits": "c"
     }
 }

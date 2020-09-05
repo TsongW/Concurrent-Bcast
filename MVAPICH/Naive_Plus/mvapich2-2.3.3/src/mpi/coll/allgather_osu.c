@@ -4425,7 +4425,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
         unsigned long  ciphertext_len = 0;
         //encrypt local data to ciphertext rcvbuffer
         void* in = (void*)((char*) recvbuf + rank * recvcount * recvtype_extent);
-        void* out = (void*)((char*) ciphertext_recvbuf + rank * (recvcount * recvtype_extent + 12 + 16));
+        void* out = (void*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
 
         RAND_bytes(out, 12); // 12 bytes of nonce
         unsigned long in_size=0;
@@ -4471,11 +4471,12 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
             int recv_rank = comm_ptr->dev.ch.rank_list[recv_index];
             if(local_rank==0){
                 //receive at ciphertext rcvbuffer for extended size
-                void* rbuf = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 12 + 16));
+                void* rbuf = (void*)((char*) ciphertext_recvbuf + (send_idx+1)%2 * (recvcount * recvtype_extent + 12 + 16));
+                //void* rbuf = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 12 + 16));
 
                 if(local_rank==local_size-1){
                     //send from ciphertext rcvbuffer for extended size
-                    void* sbuf = (void*)((char*) ciphertext_recvbuf + send_rank * (recvcount * recvtype_extent + 12 + 16));
+                    void* sbuf = (void*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
 
                     /* exchange data with our neighbors in the ring */
                     MPIR_PVAR_INC(allgather, 2lvl_ring_nonblocked, send, (sendcount * sendtype_extent + 12 + 16), MPI_CHAR); 
@@ -4509,17 +4510,17 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
                 //printf("%d (%d) is going to decrypt from %d to %d\n", rank, local_rank, (recv_rank*(sendcount*sendtype_extent+16+12)), recv_rank*recvcount*recvtype_extent);
                 if(!EVP_AEAD_CTX_open(ctx, (recvbuf+recv_rank*recvcount*recvtype_extent),
                         &count, (unsigned long )((recvcount*recvtype_extent)+16),
-                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))), 12,
-                        (ciphertext_recvbuf+(recv_rank*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                        (ciphertext_recvbuf+(((send_idx+1)%2)*(sendcount*sendtype_extent+16+12))), 12,
+                        (ciphertext_recvbuf+(((send_idx+1)%2)*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
                         NULL, 0)){
                     printf("Error in Naive+ decryption: allgather Ring_NB\n");
                 fflush(stdout);        
                 }
-            
+                send_idx = (send_idx+1)%2;
             }
             else if(local_rank==local_size-1){
                 //send from ciphertext recvbuffer for extended size
-                void* sbuf = (void*)((char*) ciphertext_recvbuf + send_rank * (recvcount * recvtype_extent + 12 + 16));
+                void* sbuf = (void*)((char*) ciphertext_recvbuf + send_idx * (recvcount * recvtype_extent + 12 + 16));
 
                 //recv at recvbuffer for non-extended size
                 void* rbuf = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
@@ -4540,7 +4541,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
                 unsigned long  ciphertext_len = 0;
 
                 void* in = (void*)((char*) recvbuf + recv_rank * recvcount * recvtype_extent);
-                void* out = (void*)((char*) ciphertext_recvbuf + recv_rank * (recvcount * recvtype_extent + 12 + 16));
+                void* out = (void*)((char*) ciphertext_recvbuf + ((send_idx+1)%2) * (recvcount * recvtype_extent + 12 + 16));
 
                 RAND_bytes(out, 12); // 12 bytes of nonce
                 unsigned long in_size=0;
@@ -4556,6 +4557,7 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
                         printf("Error in Naive+ encryption: allgather Ring_NB\n");
                         fflush(stdout);
                 }
+                send_idx = (send_idx+1)%2;
 
             }else{
                 /* compute position within buffer to send from and receive into */
