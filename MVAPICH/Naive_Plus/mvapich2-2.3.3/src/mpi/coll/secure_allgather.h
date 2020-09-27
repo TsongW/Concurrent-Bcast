@@ -6,8 +6,8 @@
 #include <openssl/aes.h>
 #include <openssl/err.h>
 #include <openssl/aead.h>
-unsigned char ciphertext_sendbuf[1024*1024*32+284];
-unsigned char ciphertext_recvbuf[268435456*2+4000]; // 268435456 = 4MB * 64
+unsigned char ciphertext_sendbuf[(2*1024*1024+16)*16];
+unsigned char ciphertext_recvbuf[(1024*512+16)*1012];
 
 
 unsigned char ciphertext[4194304+18];
