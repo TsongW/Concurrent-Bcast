@@ -1,7 +1,7 @@
 
 set style data histograms
 set style fill solid border lt -1
-set key left top Left
+set key left top Left samplen 1 reverse
 set key font "Times-Roman,28"
 set xlabel "Message Size (B)" font "Times-Roman,30"
 set ylabel "Latency (us)" font "Times-Roman,30" 
