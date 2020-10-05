@@ -1,0 +1,64 @@
+
+./src/mpi/comm/create_2level_comm.c:    comm_ptr->dev.ch.allgather_comm_ok = 0;
+./src/mpi/comm/create_2level_comm.c:    comm_ptr->dev.ch.allgather_comm = MPI_COMM_NULL;
+./src/mpi/comm/create_2level_comm.c:    MPID_Comm *allgather_comm_ptr=NULL;
+./src/mpi/comm/create_2level_comm.c:    if(comm_ptr->dev.ch.allgather_comm_ok == 1)  { 
+./src/mpi/comm/create_2level_comm.c:       MPID_Comm_get_ptr((comm_ptr->dev.ch.allgather_comm), allgather_comm_ptr );
+./src/mpi/comm/create_2level_comm.c:    if (allgather_comm_ptr != NULL)  { 
+./src/mpi/comm/create_2level_comm.c:        mpi_errno = MPIR_Comm_release(allgather_comm_ptr);
+./src/mpi/comm/create_2level_comm.c:int create_allgather_comm(MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
+./src/mpi/comm/create_2level_comm.c:    static const char FCNAME[] = "create_allgather_comm";
+./src/mpi/comm/create_2level_comm.c:    comm_ptr->dev.ch.allgather_comm=MPI_COMM_NULL; 
+./src/mpi/comm/create_2level_comm.c:                                     &(comm_ptr->dev.ch.allgather_comm));
+./src/mpi/comm/create_2level_comm.c:        comm_ptr->dev.ch.allgather_comm_ok = 1;
+./src/mpi/comm/create_2level_comm.c:        comm_ptr->dev.ch.allgather_comm_ok = -1;
+./src/mpi/comm/create_2level_comm.c:    comm_ptr->dev.ch.allgather_comm_ok = 0;
+./src/mpi/comm/commutil.c:    comm_p->dev.ch.allgather_comm_ok = 0;
+./src/mpi/comm/commutil.c:    comm_p->dev.ch.allgather_comm=MPI_COMM_NULL;
+./src/mpi/comm/commutil.c:    localcomm_ptr->dev.ch.allgather_comm_ok = 0;
+./src/mpi/comm/commutil.c:    localcomm_ptr->dev.ch.allgather_comm = MPI_COMM_NULL;
+./src/mpi/coll/allreduce.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpi/coll/reduce.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpi/coll/ch3_shmem_coll.c:                mpi_errno = create_allgather_comm(comm_ptr, &errflag);
+./src/mpi/coll/allgatherv.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpi/coll/allreduce_osu.c:    if ((comm_ptr->dev.ch.allgather_comm_ok != 0 &&
+./src/mpi/coll/red_scat_osu.c:                ((comm_ptr->dev.ch.allgather_comm_ok != 0 &&
+./src/mpi/coll/allgather_osu.c:MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_rd_allgather_comm);
+./src/mpi/coll/allgather_osu.c:    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_rd_allgather_comm, 1);
+./src/mpi/coll/allgather_osu.c:        if ((comm_ptr->dev.ch.allgather_comm_ok != 0) &&
+./src/mpi/coll/allgather_osu.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
+./src/mpi/coll/allgather_osu.c:            MPID_Comm *allgather_comm_ptr;
+./src/mpi/coll/allgather_osu.c:            MPID_Comm_get_ptr(comm_ptr->dev.ch.allgather_comm, allgather_comm_ptr);
+./src/mpi/coll/allgather_osu.c:                                                     recvtype, allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu.c:                                                     allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
+./src/mpi/coll/allgather_osu.c:            MPID_Comm *allgather_comm_ptr;
+./src/mpi/coll/allgather_osu.c:            MPID_Comm_get_ptr(comm_ptr->dev.ch.allgather_comm, allgather_comm_ptr);
+./src/mpi/coll/allgather_osu.c:                                                     recvtype, allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu.c:                                                     allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu_plus.c:MPIR_T_PVAR_ULONG2_COUNTER_DECL_EXTERN(MV2, mv2_coll_allgather_rd_allgather_comm);
+./src/mpi/coll/allgather_osu_plus.c:    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_rd_allgather_comm, 1);
+./src/mpi/coll/allgather_osu_plus.c:        if ((comm_ptr->dev.ch.allgather_comm_ok != 0) &&
+./src/mpi/coll/allgather_osu_plus.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
+./src/mpi/coll/allgather_osu_plus.c:            MPID_Comm *allgather_comm_ptr;
+./src/mpi/coll/allgather_osu_plus.c:            MPID_Comm_get_ptr(comm_ptr->dev.ch.allgather_comm, allgather_comm_ptr);
+./src/mpi/coll/allgather_osu_plus.c:                                                     recvtype, allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu_plus.c:                                                     allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu_plus.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
+./src/mpi/coll/allgather_osu_plus.c:            MPID_Comm *allgather_comm_ptr;
+./src/mpi/coll/allgather_osu_plus.c:            MPID_Comm_get_ptr(comm_ptr->dev.ch.allgather_comm, allgather_comm_ptr);
+./src/mpi/coll/allgather_osu_plus.c:                                                     recvtype, allgather_comm_ptr, errflag);
+./src/mpi/coll/allgather_osu_plus.c:                                                     allgather_comm_ptr, errflag);
+./src/mpi/coll/gather.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpi/coll/allgather_tuning.h: * recursive doubling with allgather_comm: MV2_INTER_ALLGATHER_TUNING=1 
+./src/mpi/coll/red_scat.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpi/coll/allgather.c:        if(comm_ptr->dev.ch.allgather_comm_ok == 0) {
+./src/mpid/ch3/channels/psm/include/mpidi_ch3_pre.h:    MPI_Comm     allgather_comm;
+./src/mpid/ch3/channels/psm/include/mpidi_ch3_pre.h:    int     allgather_comm_ok;
+./src/mpid/ch3/channels/nemesis/include/mpidi_ch3_pre.h:    MPI_Comm     allgather_comm;
+./src/mpid/ch3/channels/nemesis/include/mpidi_ch3_pre.h:    int     allgather_comm_ok;
+./src/mpid/ch3/channels/mrail/include/mpidi_ch3_pre.h:    MPI_Comm     allgather_comm;
+./src/mpid/ch3/channels/mrail/include/mpidi_ch3_pre.h:    int     allgather_comm_ok; 
+./src/include/coll_shmem.h:int create_allgather_comm(MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
+./src/mpi_t/mv2_mpit.c:MPIR_T_PVAR_ULONG2_COUNTER_DECL(MV2,mv2_coll_allgather_rd_allgather_comm);
+./src/mpi_t/mv2_mpit.c:            mv2_coll_allgather_rd_allgather_comm,

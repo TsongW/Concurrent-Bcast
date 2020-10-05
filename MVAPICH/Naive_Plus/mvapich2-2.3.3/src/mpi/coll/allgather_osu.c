@@ -228,7 +228,8 @@ int MPIR_Allgather_Direct_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_Allgather_Direct_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -377,7 +378,8 @@ int MPIR_Allgather_DirectSpread_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_Allgather_DirectSpread_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -532,7 +534,8 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-
+    if(rank==0)
+        printf("MPIR_Allgather_RD_MV2\n");
     /************* For MPIC_Sendrecv_Plus ************
     MPID_Request *send_req_ptr[2*(comm_size-1)];
     int p;
@@ -1283,7 +1286,8 @@ int MPIR_Allgather_Bruck_MV2(const void *sendbuf,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-
+    if(rank==0)
+        printf("MPIR_Allgather_Bruck_MV2\n");
     /************* For MPIC_Sendrecv_Plus ************
     MPID_Request *send_req_ptr[comm_size-1];
     int p;
@@ -1650,7 +1654,8 @@ int MPIR_Allgather_Ring_MV2(const void *sendbuf,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    
+    if(rank==0)
+        printf("MPIR_Allgather_Ring_MV2\n");
     /************* For MPIC_Sendrecv_Plus ***************
     MPID_Request *send_req_ptr[comm_size-1];
     int p;
@@ -1933,7 +1938,8 @@ int MPIR_Allgather_gather_bcast_MV2(
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_gather_bcast, 1);
 
     comm_size = comm_ptr->local_size;
-
+    if(comm_ptr->rank==0)
+        printf("MPIR_Allgather_gather_bcast_MV2\n");
     MPIU_Assert(comm_ptr->dev.ch.shmem_coll_ok == 1);
 
     //Call gather (Calling mv2 version so that gather is tuned)
@@ -1981,7 +1987,8 @@ int MPIR_Allgather_intra_MV2(const void *sendbuf,
     }
 
     comm_size = comm_ptr->local_size;
-
+    if(comm_ptr->rank==0)
+        printf("MPIR_Allgather_intra_MV2\n");
     MPID_Datatype_get_size_macro(recvtype, type_size);
 
     /* check if comm_size is a power of two */
@@ -2039,7 +2046,8 @@ int MPIR_2lvl_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendty
 
     rank = comm_ptr->rank;
     size = comm_ptr->local_size; 
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_MV2\n");
     /* extract the rank,size information for the intra-node
      * communicator */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -2297,7 +2305,8 @@ int MPIR_2lvl_Allgather_nonblocked_MV2(
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
     int* node_sizes = comm_ptr->dev.ch.node_sizes;
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_nonblocked_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -2664,7 +2673,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int comm_size = comm_ptr->local_size;
-    
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2\n");
     int p = shmem_commptr->local_size; // number of ranks per node
     int n = (int) (comm_size / p); // number of nodes
     
@@ -3447,7 +3457,8 @@ int MPIR_2lvl_Allgather_Multileader_RD_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int comm_size = comm_ptr->local_size;
-    
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Multileader_RD_MV2\n");
     int p = shmem_commptr->local_size; // number of ranks per node
     int n = (int) (comm_size / p); // number of nodes
     
@@ -4145,7 +4156,8 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Multileader_Ring_MV2\n");
     int p = shmem_commptr->local_size; // number of ranks per node
     int n = (int) (size / p); // number of nodes
     
@@ -4290,10 +4302,6 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
                 MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
             }
         }
-	    
-    
-    
-        
 
         /* update index values to account for data we just received */
         send_index = recv_index;
@@ -4302,9 +4310,6 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
     
     //printf("%d finished inter-node\n", rank);
     /* Intra-node Ring */
-
-
-
 
     right_index = (rank_index + 1);
     if(right_index >= size){
@@ -4430,7 +4435,8 @@ int MPIR_2lvl_Allgather_Ring_nonblocked_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Ring_nonblocked_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent, sendtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -4693,7 +4699,8 @@ int MPIR_2lvl_Allgather_Direct_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Direct_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -4989,7 +4996,8 @@ int MPIR_2lvl_Allgather_Ring_MV2(
     /* get our rank and the size of this communicator */
     int rank = comm_ptr->rank;
     int size = comm_ptr->local_size;
-
+    if(rank==0)
+        printf("MPIR_2lvl_Allgather_Ring_MV2\n");
     /* get extent of receive type */
     MPI_Aint recvtype_extent;
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
@@ -5461,6 +5469,8 @@ conf_check_end:
 	inter_leader[inter_node_algo_index].MV2_pt_Allgather_function;
 
     if(MV2_Allgather_function == &MPIR_Allgather_RD_Allgather_Comm_MV2) {
+        if(rank==0)
+            printf("Check 0, %d, %d\n", sendcount, recvcount);
         if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
             int sendtype_iscontig = 0, recvtype_iscontig = 0;
             void *tmp_recv_buf = NULL;
@@ -5538,6 +5548,8 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_Allgather_Ring_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Direct_MV2
             || MV2_Allgather_function == &MPIR_Allgather_DirectSpread_MV2) {
+                if(rank==0)
+                    printf("Check 1, %d, %d\n", sendcount, recvcount);
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);
@@ -5569,6 +5581,8 @@ conf_check_end:
                                     recvbuf, recvcount, recvtype,
                                     comm_ptr, errflag);
     } else {
+        if(rank==0)
+            printf("Check 2, %d, %d\n", sendcount, recvcount);
         mpi_errno = MPIR_Allgather_intra(sendbuf, sendcount, sendtype,
                                          recvbuf, recvcount, recvtype, comm_ptr, errflag);
     }
@@ -5620,6 +5634,8 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
     MPID_Comm *shmem_commptr=NULL;
     
     if (mv2_use_indexed_tuning || mv2_use_indexed_allgather_tuning) {
+        if(comm_ptr->rank==0)
+            printf("Flag 0, %d, %d \n", sendcount, recvcount);
 	    return MPIR_Allgather_index_tuned_intra_MV2(sendbuf, sendcount,
                             sendtype, recvbuf, recvcount,
 				            recvtype, comm_ptr, errflag);
@@ -5707,6 +5723,8 @@ int MPIR_Allgather_MV2(const void *sendbuf, int sendcount, MPI_Datatype sendtype
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
     if (mv2_use_old_allgather == 1) {
+        if(comm_ptr->rank==0)
+            printf("Flag 1, %d, %d \n", sendcount, recvcount);
 	MPIR_Allgather_intra_MV2(sendbuf, sendcount, sendtype, recvbuf, recvcount,
 				 recvtype, comm_ptr, errflag);
 	goto fn_exit;
@@ -5761,6 +5779,8 @@ conf_check_end:
 
     /* intracommunicator */
     if(is_two_level ==1){
+        if(comm_ptr->rank==0)
+            printf("Flag 2, %d, %d \n", sendcount, recvcount);
         
         if(comm_ptr->dev.ch.shmem_coll_ok == 1){
             MPIR_T_PVAR_COUNTER_INC(MV2, mv2_num_shmem_coll_calls, 1);
@@ -5780,6 +5800,8 @@ conf_check_end:
                                                 comm_ptr, errflag);
         }
     } else if(MV2_Allgather_function == &MPIR_Allgather_RD_Allgather_Comm_MV2){
+        if(comm_ptr->rank==0)
+            printf("Flag 3, %d, %d \n", sendcount, recvcount);
         if(comm_ptr->dev.ch.allgather_comm_ok == 1) {
             int sendtype_iscontig = 0, recvtype_iscontig = 0;
             void *tmp_recv_buf = NULL;
@@ -5855,10 +5877,14 @@ conf_check_end:
     } else if(MV2_Allgather_function == &MPIR_Allgather_Bruck_MV2 
             || MV2_Allgather_function == &MPIR_Allgather_RD_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Ring_MV2) {
+                if(comm_ptr->rank==0)
+                    printf("Flag 4, %d, %d \n", sendcount, recvcount);
             mpi_errno = MV2_Allgather_function(sendbuf, sendcount, sendtype,
                                           recvbuf, recvcount, recvtype,
                                           comm_ptr, errflag);
     } else {
+        if(comm_ptr->rank==0)
+            printf("Flag 5, %d, %d \n", sendcount, recvcount);
         mpi_errno = MPIR_Allgather_intra(sendbuf, sendcount, sendtype,
                                          recvbuf, recvcount, recvtype, comm_ptr, errflag);
     }
