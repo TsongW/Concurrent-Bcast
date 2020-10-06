@@ -927,8 +927,8 @@ int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtyp
 
     if (comm_ptr->coll_fns != NULL && comm_ptr->coll_fns->Allgather != NULL)
     {
-        if(comm_ptr->rank==0)
-            printf("Begining!\n");
+        //if(comm_ptr->rank==0)
+        //  printf("Begining %d, %d\n", sendcount, recvcount);
 	/* --BEGIN USEREXTENSION-- */
 	mpi_errno = comm_ptr->coll_fns->Allgather(sendbuf, sendcount, sendtype,
                                                   recvbuf, recvcount, recvtype,
