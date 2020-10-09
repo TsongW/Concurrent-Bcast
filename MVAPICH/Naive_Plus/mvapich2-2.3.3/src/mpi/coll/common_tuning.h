@@ -182,7 +182,8 @@ enum mv2_allgather_tuning
 	ALLGATHER_2LVL_RING,
     /****** Added by Mehran *****/
     ALLGATHER_2LVL_MULTILEADER_RING,
-    ALLGATHER_2LVL_MULTILEADER_RD
+    ALLGATHER_2LVL_MULTILEADER_RD,
+    ALLGATHER_2LVL_SHMEM
 };
 
 enum mv2_alltoall_tuning 

@@ -264,7 +264,7 @@ MPID_getSharedSegment_sysv(MPID_Win * win)
 
         MPID_assert(shm_key != -1);
 
-        win->mpid.shm->shm_id = shmget(shm_key, win->mpid.shm->segment_len, shm_flag);
+        win->mpid.shm->shm_id = shm_key, win->mpid.shm->segment_len, shm_flag);
         MPIR_ERR_CHKANDJUMP((win->mpid.shm->shm_id == -1), mpi_errno, MPI_ERR_RMA_SHARED, "**rmashared");
 
         win->mpid.shm->base_addr = (void *) shmat(win->mpid.shm->shm_id,0,0);
@@ -281,7 +281,7 @@ MPID_getSharedSegment_sysv(MPID_Win * win)
         mpi_errno = MPIR_Bcast_impl((void *) &shm_key,  sizeof(int), MPI_CHAR, 0, win->comm_ptr, &errflag);
         MPIR_ERR_CHKANDJUMP(errflag, mpi_errno, MPI_ERR_OTHER, "**coll_fail");
 
-        win->mpid.shm->shm_id = shmget(shm_key, 0, 0);
+        win->mpid.shm->shm_id = shm_key, 0, 0);
         if (win->mpid.shm->shm_id != -1) { /* shm segment is available */
             win->mpid.shm->base_addr = (void *) shmat(win->mpid.shm->shm_id,0,0);
         }

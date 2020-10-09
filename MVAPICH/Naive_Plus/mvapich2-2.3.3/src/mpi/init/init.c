@@ -241,9 +241,12 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char* value;
-    if ((value = getenv("SECURITY_APPROACH")) != NULL) {
-        security_approach = (atoi(value));
+    char *s_value, *o_value;
+    if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
+        security_approach = (atoi(s_value));
+    }
+    if ((o_value = getenv("OVERLAP_DECRYPTION")) != NULL) {
+        overlap_decryption = (atoi(o_value));
     }
     /******************************************************************/
     

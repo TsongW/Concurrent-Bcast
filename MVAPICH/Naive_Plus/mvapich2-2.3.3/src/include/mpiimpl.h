@@ -3875,7 +3875,8 @@ extern int reqCounter;
 extern int waitCounter; 
 extern int nonceCounter;
 
-int security_approach;
+int security_approach, overlap_decryption=0;
+
 /**************************************************************************/
 
 
