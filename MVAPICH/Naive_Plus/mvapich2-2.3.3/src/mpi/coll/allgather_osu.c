@@ -2090,11 +2090,11 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
     }
-    printf("%d @ check1\n", rank);
-    key_t shmem_key;
-    int shmid;
-    void *shmem_buffer;
-    size_t shmem_size = n * (p * recvcnt * recvtype_extent + 16 + 12);
+    //printf("%d @ check1\n", rank);
+    // key_t shmem_key;
+    // int shmid;
+    // void *shmem_buffer;
+    
     
 
 
@@ -2163,21 +2163,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
 
         //End of NAIVE PLUS
         }else{
-            //#TODO: Allocate shared_memory and use it instead of ciphertext_recvbuf
             
-            shmem_key = 12345;
-            // create hugepage shared region 
-            shmid = shmget(shmem_key, shmem_size, 
-                                 IPC_CREAT | 0666);
-            if (shmid < 0) {
-                goto fn_fail;
-            }
-            
-            // attach shared memory 
-            shmem_buffer = (void *) shmat(shmid, NULL, 0);
-            if (shmem_buffer == (void *) -1) {
-                goto fn_fail;
-            }
             
 
             mpi_errno = MPIR_Allgather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
@@ -2224,46 +2210,19 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     if(local_rank>0 && security_approach !=2){
         // I'm here
         
-        shmem_key = 12345;
-        shmid = shmget(shmem_key, shmem_size,  SHM_R | SHM_W);
-        if (shmid < 0) {
-            goto fn_fail;
-        }
-        
-        // attach shared memory 
-        shmem_buffer = (void *) shmat(shmid, NULL, 0);
-        if (shmem_buffer == (void *) -1) {
-            goto fn_fail;
-        }
-
-        int s=0, r=0;
-        
         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
                                     (void*)((char*)recvbuf), recvcnt * size, recvtype);
-        // for(; s<n; ++s){
-        //     if(s != (int)(rank/p) /*|| sendbuf != MPI_IN_PLACE*/){
-
-        //         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * p * recvcnt * recvtype_extent), recvcnt * p, recvtype, 
-        //                             (void*)((char*)recvbuf + s * p * recvcnt * recvtype_extent), recvcnt * p, recvtype);
-        //     }else{
-        //         for(; r<p; ++r){
-        //             if(r != local_rank){
-        //                 mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + (s * p + r) * recvcnt * recvtype_extent), recvcnt, recvtype, 
-        //                                     (void*)((char*)recvbuf + (s * p + r) * recvcnt * recvtype_extent), recvcnt, recvtype);
-        //             }
-        //         }
-        //     }
-        // }
+        
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    
     }
 
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-    }
-  // Mark shmem for removal
-    if (shmctl(shmid, IPC_RMID, 0) != 0) {
-        fprintf(stderr, "Failed to mark shm for removal\n");
-    }
-    printf("%d @ check12\n", rank);
+
+    
+  
+    //printf("%d @ check12\n", rank);
   fn_fail:
     return (mpi_errno);
 }

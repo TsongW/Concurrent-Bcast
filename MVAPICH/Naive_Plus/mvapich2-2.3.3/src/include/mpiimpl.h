@@ -3866,17 +3866,22 @@ int MPID_Comm_get_lpid(MPID_Comm *comm_ptr, int idx, int * lpid_ptr, MPIU_BOOL i
 
 /****************************** Added by Mehran *****************************/
 extern unsigned char Ideciphertext[NON_BLOCKING_SEND_RECV_SIZE][NON_BLOCKING_SEND_RECV_SIZE_2];
-// extern EVP_AEAD_CTX *ctx;
-// extern unsigned char key [32];
-// extern unsigned char nonce[12];
+extern EVP_AEAD_CTX *ctx;
+extern unsigned char key [32];
+extern unsigned char nonce[12];
 //extern unsigned char Ideciphertext[3000][2100000];
 extern unsigned char * bufptr[100000];
 extern int reqCounter;
 extern int waitCounter; 
 extern int nonceCounter;
 
-int security_approach, overlap_decryption=0;
+int security_approach, overlap_decryption;
+key_t shmem_key, ciphertext_shmem_key;
+int shmid, ciphertext_shmid, allocated_shmem;
+void *shmem_buffer, *ciphertext_shmem_buffer;
 
+
+void init_shmem();
 /**************************************************************************/
 
 
@@ -4044,22 +4049,25 @@ int MPIC_Send_Plus(const void *buf, MPI_Aint count, MPI_Datatype datatype, int d
 
 
 /********************************************/
-
-
 int MPIC_Recv(void *buf, MPI_Aint count, MPI_Datatype datatype, int source, int tag,
                  MPID_Comm *comm_ptr, MPI_Status *status, MPIR_Errflag_t *errflag);
 int MPIC_Ssend(const void *buf, MPI_Aint count, MPI_Datatype datatype, int dest, int tag,
                   MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag);
-
-int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
-                     int dest, int sendtag, void *recvbuf, MPI_Aint recvcount, 
-                     MPI_Datatype recvtype, int source, int recvtag,
-                     MPID_Comm *comm_ptr, MPI_Status *status, MPID_Request **send_req_ptr, MPIR_Errflag_t *errflag);
-
 int MPIC_Sendrecv(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
                      int dest, int sendtag, void *recvbuf, MPI_Aint recvcount,
                      MPI_Datatype recvtype, int source, int recvtag,
                      MPID_Comm *comm_ptr, MPI_Status *status, MPIR_Errflag_t *errflag);
+
+/**************************** Added by Mehran ***************************/
+int MPIC_Sendrecv_Plus(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
+                     int dest, int sendtag, void *recvbuf, MPI_Aint recvcount, 
+                     MPI_Datatype recvtype, int source, int recvtag,
+                     MPID_Comm *comm_ptr, MPI_Status *status, MPID_Request **send_req_ptr, MPIR_Errflag_t *errflag);
+  
+/************************************************************************/
+
+
+
 int MPIC_Sendrecv_replace(void *buf, int count, MPI_Datatype datatype,
                              int dest, int sendtag,
                              int source, int recvtag,

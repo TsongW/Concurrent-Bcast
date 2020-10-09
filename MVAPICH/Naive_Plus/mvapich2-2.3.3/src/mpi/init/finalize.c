@@ -218,6 +218,10 @@ int MPI_Finalize( void )
 	MPIR_Process.comm_world->attributes = 0;
     }
 
+    
+
+
+
     /* 
      * Now that we're finalizing, we need to take control of the error handlers
      * At this point, we will release any user-defined error handlers on 
@@ -293,6 +297,23 @@ int MPI_Finalize( void )
 #endif /* !CHANNEL_PSM */
 #endif /* _OSU_MVAPICH_ */
 
+    /*********        Added by Mehran       **********/
+    if(allocated_shmem==1){
+        if (shmctl(shmid, IPC_RMID, 0) != 0) {
+            fprintf(stderr, "Failed to mark shm for removal\n");
+        }
+    }else if(allocated_shmem==2){
+        
+        if (shmctl(shmid, IPC_RMID, 0) != 0) {
+            fprintf(stderr, "Failed to mark shm for removal\n");
+        }
+        
+        if (shmctl(ciphertext_shmid, IPC_RMID, 0) != 0) {
+            fprintf(stderr, "Failed to mark ciphertext_shm for removal\n");
+        }
+    }
+    /**************************************************/
+    
     mpi_errno = MPID_Finalize();
     if (mpi_errno) {
 	MPIR_ERR_POP(mpi_errno);

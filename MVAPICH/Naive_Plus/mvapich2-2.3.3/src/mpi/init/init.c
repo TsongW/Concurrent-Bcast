@@ -241,15 +241,25 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char *s_value, *o_value;
+    char *s_value, *o_value, *t_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
+    overlap_decryption = 0;
     if ((o_value = getenv("OVERLAP_DECRYPTION")) != NULL) {
         overlap_decryption = (atoi(o_value));
     }
+    allocated_shmem = 0;
+    if ((t_value = getenv("MV2_INTER_ALLGATHER_TUNING")) != NULL) {
+        if((atoi(t_value))==14){
+            allocated_shmem = 1;
+            if(security_approach==2){
+                allocated_shmem = 2;
+            }
+            init_shmem();
+        }
+    }
     /******************************************************************/
-    
     /* ... end of body of routine ... */
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT);
     return mpi_errno;
@@ -266,4 +276,72 @@ int MPI_Init( int *argc, char ***argv )
     mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );
     return mpi_errno;
     /* --END ERROR HANDLING-- */
+}
+
+
+void init_shmem(){
+    static const char FCNAME[] = "init_shmem";
+    int mpi_errno = MPI_SUCCESS;
+    int security_approach, overlap_decryption;
+    //printf("Hello from init_shmem\n");
+    MPID_Comm *comm_ptr = NULL;
+    MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
+    MPID_Comm *shmem_comm_ptr = NULL;
+    MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
+    
+    //TODO: Allocate Shmem
+    size_t shmem_size = (comm_ptr->local_size) * 4 * 64 *1024;
+    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (64 * 1024 * 4 + 16 + 12);
+    shmem_key = 77777;
+    ciphertext_shmem_key = 54321;
+    
+
+    if(shmem_comm_ptr->rank == 0){
+        
+        shmid = shmget(shmem_key, shmem_size, IPC_CREAT | 0666);
+
+        if(allocated_shmem==2){
+            ciphertext_shmid = shmget(ciphertext_shmem_key, ciphertext_shmem_size, IPC_CREAT | 0666);
+
+        }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    if(shmem_comm_ptr->rank > 0){
+        shmid = shmget(shmem_key, shmem_size, 0666);
+
+        if(allocated_shmem==2){
+            ciphertext_shmid = shmget(ciphertext_shmem_key, ciphertext_shmem_size, 0666);
+
+        }
+    }
+    
+    if (shmid < 0) {
+        printf("%s",strerror(errno));
+        printf("ERROR 1\n");
+        goto fn_fail;
+    }
+    
+    // attach shared memory 
+
+    shmem_buffer = (void *) shmat(shmid, NULL, 0);
+    if (shmem_buffer == (void *) -1) {
+        printf("ERROR 2\n");
+        goto fn_fail;
+    }
+    if(allocated_shmem==2){
+        ciphertext_shmem_buffer = (void *) shmat(ciphertext_shmid, NULL, 0);
+        if (ciphertext_shmem_buffer == (void *) -1) {
+            printf("ERROR 3\n");
+            goto fn_fail;
+        }
+
+    }
+
+    return mpi_errno;
+    
+    fn_fail:
+        mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );
+    
+    return mpi_errno;
+    
 }
