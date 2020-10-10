@@ -2172,8 +2172,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             mpi_errno = MPIR_Allgather_impl(out, (max_out_len+12), MPI_CHAR,
                                             ciphertext_shmem_buffer, (max_out_len+12), MPI_CHAR,
                                             leader_commptr, errflag);
-            if(recvcnt == 32)
-                printf("%d contributed %d from %d to the allgather\n", rank, (max_out_len+12), leader_rank * (p * recvcnt * recvtype_extent + 12 + 16));
+            
             //printf("%d @ check3\n", rank);
             //Step3: Decryption
             //#TODO: Decrypt from shared_memory and only for a portion
@@ -2207,12 +2206,25 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             
             
             int s=0;
-            for(; s<n; ++s){
-                if(s != (int)(rank/p)){
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * p * recvtype_extent), recvcnt * p, recvtype, 
-                                        (void*)((char*)recvbuf + s * p * recvcnt * recvtype_extent), recvcnt * p, recvtype);
+            if(comm_ptr->dev.ch.is_global_block==1){
+                //Blocked
+                for(; s<n; ++s){
+                    if(s != (int)(rank/p)){
+                        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * p * recvtype_extent), recvcnt * p, recvtype, 
+                                            (void*)((char*)recvbuf + s * p * recvcnt * recvtype_extent), recvcnt * p, recvtype);
+                    }
                 }
+            }else{
+                //NonBlocked
+                for(; s<size; ++s){
+                    
+                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+                                            (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+                    
+                }
+
             }
+            
             
         }
 
@@ -2261,15 +2273,28 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     }
     //printf("%d @ check8\n", rank);
     
-    mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    }
+    
     //printf("%d @ check9\n", rank);
     if(security_approach == 2){
-        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
+        if(comm_ptr->dev.ch.is_global_block==1){
+            //Blocked
+            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
                                     (void*)((char*)recvbuf), recvcnt * size, recvtype);
+        }else{
+            //NonBlocked
+            int s=0;
+            for(; s<size; ++s){
+                
+                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+                                        (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+                
+            }
+        }
         
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
@@ -2280,8 +2305,24 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     else if(local_rank>0 && security_approach !=2){
         // I'm here
         
-        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+        if(comm_ptr->dev.ch.is_global_block==1){
+            //Blocked
+            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
                                     (void*)((char*)recvbuf), recvcnt * size, recvtype);
+        
+        }else{
+            //NonBlocked
+            int s=0;
+            for(; s<size; ++s){
+                
+                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+                                        (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+                
+            }
+
+        }
+    
+        
         
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
