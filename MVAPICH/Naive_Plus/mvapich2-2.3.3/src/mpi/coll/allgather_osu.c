@@ -2067,26 +2067,65 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     }
 
     //If there is just one node, after gather itself, root has all the data and it can do bcast
-    printf("%d @ check0\n", rank);
-    if(local_rank == 0) {
-        mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
-                                    (void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
-                                     recvcnt, recvtype,
-                                     0, shmem_commptr, errflag);
-    } else {
-        //Since in allgather all the processes could have its own data in place
-        if(sendbuf == MPI_IN_PLACE) {
-            mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
-                                         recvcnt , recvtype, 
-                                         recvbuf, recvcnt, recvtype,
-                                         0, shmem_commptr, errflag);
+    //printf("%d @ check0\n", rank);
+    if(security_approach == 2){
+        if(local_rank == 0) {
+            if(sendbuf == MPI_IN_PLACE) {
+                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt , recvtype,
+                                        (void*)((char*)shmem_buffer + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt, recvtype,
+                                        0, shmem_commptr, errflag);
+
+            }else{
+                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                        (void*)((char*)shmem_buffer + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt, recvtype,
+                                        0, shmem_commptr, errflag);
+            }  
         } else {
-            mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
-                                         recvbuf, recvcnt, recvtype,
-                                         0, shmem_commptr, errflag);
+            //Since in allgather all the processes could have its own data in place
+            if(sendbuf == MPI_IN_PLACE) {
+                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                            recvcnt , recvtype, 
+                                            NULL, recvcnt, recvtype,
+                                            0, shmem_commptr, errflag);
+            } else {
+                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                            NULL, recvcnt, recvtype,
+                                            0, shmem_commptr, errflag);
+            }
+        }
+    }else{
+        if(local_rank == 0) {
+            if(sendbuf == MPI_IN_PLACE) {
+                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt, recvtype, 
+                                        (void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt, recvtype,
+                                        0, shmem_commptr, errflag);
+            }else{
+                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                        (void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt, recvtype,
+                                        0, shmem_commptr, errflag);
+            }
+            
+        } else {
+            //Since in allgather all the processes could have its own data in place
+            if(sendbuf == MPI_IN_PLACE) {
+                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                            recvcnt , recvtype, 
+                                            NULL, recvcnt, recvtype,
+                                            0, shmem_commptr, errflag);
+            } else {
+                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                            NULL, recvcnt, recvtype,
+                                            0, shmem_commptr, errflag);
+            }
         }
     }
-
+    //printf("%d @ check1\n", rank);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
     }
@@ -2108,58 +2147,57 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             unsigned int i;
             //Step 1: Encryption
 
-
-            int sendtype_sz, recvtype_sz;
-            unsigned long  ciphertext_sendbuf_len = 0;
-            sendtype_sz= recvtype_sz= 0;
-            int var;
-            var=MPI_Type_size(sendtype, &sendtype_sz);
-            var=MPI_Type_size(recvtype, &recvtype_sz);
-
-            int rank;
-            rank = comm_ptr->rank;
-            void* out = (void*)((char*) ciphertext_recvbuf + leader_rank * (recvcnt * recvtype_extent + 12 + 16));
+            unsigned long  ciphertext_len = 0;
+            void* out = (void*)((char*) ciphertext_shmem_buffer + leader_rank * (p * recvcnt * recvtype_extent + 12 + 16));
             RAND_bytes(out, 12); // 12 bytes of nonce
 
             unsigned long t=0;
-            t = (unsigned long)(p*sendtype_sz*sendcnt);
-            unsigned long   max_out_len = (unsigned long) (16 + (p*sendtype_sz*sendcnt));
-
-            if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                                &out, max_out_len,
+            t = (unsigned long)(p * recvcnt * recvtype_extent);
+            unsigned long   max_out_len = (unsigned long) (16 + t);
+        
+            if(!EVP_AEAD_CTX_seal(ctx, out+12,  
+                                &ciphertext_len, max_out_len,
                                 out, 12,
-                                recvbuf + (rank * recvcnt * recvtype_extent),  t,
+                                shmem_buffer + (rank * recvcnt * recvtype_extent),  t,
                                 NULL, 0))
             {
                     printf("Error in Naive+ encryption: allgather-shmem\n");
                     fflush(stdout);
+            }else if(recvcnt == 32){
+                printf("%d encrypted %d from %d to %d and len is %d \n", rank, t, (rank * recvcnt * recvtype_extent), leader_rank * (p * recvcnt * recvtype_extent + 12 + 16), ciphertext_len);
             }
-	    
+
+            //printf("%d @ check2\n", rank);
             //Step 2: Data exchange
             
             //#TODO: Allocate shared_memory and use it instead of ciphertext_recvbuf
             
             mpi_errno = MPIR_Allgather_impl(out, (max_out_len+12), MPI_CHAR,
-                                            ciphertext_recvbuf, (max_out_len+12), MPI_CHAR,
+                                            ciphertext_shmem_buffer, (max_out_len+12), MPI_CHAR,
                                             leader_commptr, errflag);
-
-
+            if(recvcnt == 32)
+                printf("%d contributed %d from %d to the allgather\n", rank, (max_out_len+12), leader_rank * (p * recvcnt * recvtype_extent + 12 + 16));
+            //printf("%d @ check3\n", rank);
             //Step3: Decryption
             //#TODO: Decrypt from shared_memory and only for a portion
 
-            for( i = 0; i < leader_comm_size; i++){
-                next =(unsigned long )(i*(max_out_len+12));
-                dest =(unsigned long )(i*(p*sendtype_sz*sendcnt));
-                
-                if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
-                                &count, (unsigned long )((p*recvcnt*recvtype_sz)),
-                                (ciphertext_recvbuf+next), 12,
-                                (ciphertext_recvbuf+next+12), (unsigned long )((p*recvcnt*recvtype_sz)+16),
-                                NULL, 0)){
-                            printf("Decryption error in Naive+ allgather\n");fflush(stdout);        
-                    }                               
-            }
-
+            for( i = 0; i < leader_comm_size; i+=p){
+                if(i != leader_rank){
+                    next =(unsigned long )(i*(max_out_len+12));
+                    dest =(unsigned long )(i*t);
+                    
+                    if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                    &count, t,
+                                    (ciphertext_shmem_buffer+next), 12,
+                                    (ciphertext_shmem_buffer+next+12), t+16,
+                                    NULL, 0)){
+                            printf("Decryption error in Naive+ shmem_allgather I while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
+                    }else if(recvcnt == 32){
+                        printf("%d decrypted %d from %d to %d\n", rank, count, next, dest);
+                    }    
+                }                               
+            }//end for
+            //printf("%d @ check4\n", rank);
 
         //End of NAIVE PLUS
         }else{
@@ -2187,27 +2225,66 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
-
-
-
     
     } 
+    //printf("%d @ check6\n", rank);
+    mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+    if (mpi_errno) {
+        MPIR_ERR_POP(mpi_errno);
+        goto fn_fail;
+    }
+    //printf("%d @ check7\n", rank);
+    if(security_approach==2 && local_rank!=0){
+        
+        //help in decryption
+        //#TODO: Decrypt from shared_memory and only for a portion
+        int sendtype_sz, recvtype_sz;
+        unsigned long count=0;
+        sendtype_sz= recvtype_sz= 0;
+        int var;
+        var=MPI_Type_size(sendtype, &sendtype_sz);
+        var=MPI_Type_size(recvtype, &recvtype_sz);
+        unsigned long   max_out_len = (unsigned long) (16 + (p*sendtype_sz*sendcnt));
+        int i, next, dest;
+        //printf("%d- local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, local_rank, leader_comm_size, (int)(rank/p));
+        for( i = local_rank; i < n; i+=p){
+            //printf("%d- i:%d, local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, i, local_rank, leader_comm_size, (int)(rank/p));
+            if(i != (int)(rank/p)){
+                next =(unsigned long )(i*(max_out_len+12));
+                dest =(unsigned long )(i*(p*sendtype_sz*sendcnt));
+                
+                if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                &count, (unsigned long )((p*recvcnt*recvtype_sz)),
+                                (ciphertext_shmem_buffer+next), 12,
+                                (ciphertext_shmem_buffer+next+12), (unsigned long )((p*recvcnt*recvtype_sz)+16),
+                                NULL, 0)){
+                        printf("Decryption error in Naive+ shmem_allgather II while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
+                }else if(recvcnt == 32){
+                        printf("%d decrypted %d from %d to %d\n", rank, count, next, dest);
+                    }     
+            }
+                                        
+        }//end for
+    }
+    //printf("%d @ check8\n", rank);
     
     mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
         goto fn_fail;
     }
-
-    if(security_approach==2 && local_rank!=0 && leader_comm_size > 1){
-        //help in decryption
-        //#TODO: Decrypt from shared_memory and only for a portion
+    //printf("%d @ check9\n", rank);
+    if(security_approach == 2){
+        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+                                    (void*)((char*)recvbuf), recvcnt * size, recvtype);
+        
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
     }
-
-    //Bcast the entire data from node leaders to all other cores
-    //mpi_errno = MPIR_Bcast_impl (recvbuf, recvcnt * size, recvtype, 0, shmem_commptr, errflag);
+    
     //#TODO: copy from shared_memory to recv_buf
-    if(local_rank>0 && security_approach !=2){
+    else if(local_rank>0 && security_approach !=2){
         // I'm here
         
         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
@@ -2216,10 +2293,9 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
-    
     }
 
-
+    //printf("%d @ check10\n", rank);
     
   
     //printf("%d @ check12\n", rank);
@@ -2862,6 +2938,7 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
           void *recvbuf, int recvcount, MPI_Datatype recvtype,
     MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+
     MPIR_TIMER_START(coll,allgather,2lvl_multileader_rd_nonblocked);
     //    printf("MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2\n");
     int mpi_errno = MPI_SUCCESS;
