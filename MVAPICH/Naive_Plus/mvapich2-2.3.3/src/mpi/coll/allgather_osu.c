@@ -2045,8 +2045,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
 
     rank = comm_ptr->rank;
     size = comm_ptr->local_size; 
-    if(rank ==0)
-        printf("MPIR_2lvl_SharedMem_Allgather_MV2\n");
+    
     // extract the rank,size information for the intra-node communicator
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     
@@ -2163,8 +2162,6 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             {
                     printf("Error in Naive+ encryption: allgather-shmem\n");
                     fflush(stdout);
-            }else if(recvcnt == 32){
-                printf("%d encrypted %d from %d to %d and len is %d \n", rank, t, (rank * recvcnt * recvtype_extent), leader_rank * (p * recvcnt * recvtype_extent + 12 + 16), ciphertext_len);
             }
 
             //printf("%d @ check2\n", rank);
@@ -2192,9 +2189,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                                     (ciphertext_shmem_buffer+next+12), t+16,
                                     NULL, 0)){
                             printf("Decryption error in Naive+ shmem_allgather I while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
-                    }else if(recvcnt == 32){
-                        printf("%d decrypted %d from %d to %d\n", rank, count, next, dest);
-                    }    
+                    }  
                 }                               
             }//end for
             //printf("%d @ check4\n", rank);
@@ -2259,9 +2254,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                                 (ciphertext_shmem_buffer+next+12), (unsigned long )((p*recvcnt*recvtype_sz)+16),
                                 NULL, 0)){
                         printf("Decryption error in Naive+ shmem_allgather II while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
-                }else if(recvcnt == 32){
-                        printf("%d decrypted %d from %d to %d\n", rank, count, next, dest);
-                    }     
+                }  
             }
                                         
         }//end for
@@ -2295,10 +2288,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
         }
     }
 
-    //printf("%d @ check10\n", rank);
-    
-  
-    //printf("%d @ check12\n", rank);
+
   fn_fail:
     return (mpi_errno);
 }
@@ -3128,24 +3118,25 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                 curr_cnt += recently_received;
                 //if(recvcount==16)
 		//printf("%d - %d received %d (%d) and curr_cunt = %d\n", recvcount, rank, last_recv_cnt, recently_received, curr_cnt);
+                if(overlap_decryption == 1){
+                    for(f=0; f<recently_received; ++f){
+                        unsigned long count=0;
+                        
+                        in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)));
+                        out_index = rank_index + (dst_tree_root+f-my_node) * p;
+                        out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
-                for(f=0; f<recently_received; ++f){
-                    unsigned long count=0;
-                    
-                    in = (char*)((char*) ciphertext_recvbuf + recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)));
-                    out_index = rank_index + (dst_tree_root+f-my_node) * p;
-                    out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+                        //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
 
-                    //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                        if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                                        in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
+                                        NULL, 0)){
 
-                    if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
-                                    in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
-                                    NULL, 0)){
-
-                        printf("Error in Naive+ decryption: allgather ML_RD (I) while %d tried to decrypt from %d to %d\n", rank, recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
-                        fflush(stdout);        
-                    }
-                }// End for
+                            printf("Error in Naive+ decryption: allgather ML_RD (I) while %d tried to decrypt from %d to %d\n", rank, recv_offset + (f * (recvcount * recvtype_extent + 16 + 12)), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                            fflush(stdout);        
+                        }
+                    }// End for
+                }//end if
 
 
 
@@ -3351,24 +3342,25 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
                         //printf("%d received (II) %d (or %d) from %d and curr_cnt is now %d\n", rank, recently_received, last_recv_cnt, dst, curr_cnt);
 
                         //decrypt the received messages
+                        if(overlap_decryption == 1){
+                            for(f=0; f<recently_received; ++f){
+                                unsigned long count=0;
+                                
+                                in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12));
+                                out_index = rank_index + (my_tree_root + mask + f - my_node) * p;
+                                out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
 
-                        for(f=0; f<recently_received; ++f){
-                            unsigned long count=0;
-                            
-                            in = (char*)((char*) ciphertext_recvbuf + (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12));
-                            out_index = rank_index + (my_tree_root + mask + f - my_node) * p;
-                            out = (char*)((char*) tmp_buf + out_index * recvcount * recvtype_extent);
+                                //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
 
-                            //printf("%d is going to copy from %d to %d -> %d\n", rank , recv_offset + (f * recvcount * recvtype_extent), out_index, comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                                if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                                                in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
+                                                NULL, 0)){
 
-                            if(!EVP_AEAD_CTX_open(ctx, out, &count, (unsigned long )((recvcount*recvtype_extent)+16),
-                                            in, 12, in+12, (unsigned long )((recvcount*recvtype_extent)+16),
-                                            NULL, 0)){
-
-                                printf("Error in Naive+ decryption: allgather ML_RD (II) while %d tried to decrypt from %d to %d\n", rank, (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
-                                fflush(stdout);        
-                            }
-                        }// End for
+                                    printf("Error in Naive+ decryption: allgather ML_RD (II) while %d tried to decrypt from %d to %d\n", rank, (my_tree_root + mask + f) * (recvcount * recvtype_extent + 16 + 12), recvbuf + comm_ptr->dev.ch.rank_list[out_index] * recvcount * recvtype_extent);
+                                    fflush(stdout);        
+                                }
+                            }// End for
+                        }//end if
 
                     }else{ // Not Naive+
                         MPIR_PVAR_INC(allgather, 2lvl_multileader_rd_nonblocked, recv, (n - (my_tree_root + mask)) * recvcount, recvtype);
@@ -3423,7 +3415,25 @@ int MPIR_2lvl_Allgather_Multileader_RD_nonblocked_MV2(
     }
     //    if(recvcount==1048576)
 	//    printf("%d finished Inter-Node (ML-RD-NB)\n", rank);
+    if(security_approach==2 && overlap_decryption==0){
+        for (i=0; i < n; ++i){
+            if(i != my_node){
+                int recv_rank = shared_mem_rank + i * p;
 
+                unsigned long count=0;
+                
+                if(!EVP_AEAD_CTX_open(ctx, (tmp_buf+recv_rank*recvcount*recvtype_extent),
+                            &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                            (ciphertext_recvbuf+(i*(sendcount*sendtype_extent+16+12))), 12,
+                            (ciphertext_recvbuf+(i*(sendcount*sendtype_extent+16+12))+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                            NULL, 0)){
+                    printf("Error in Naive+ decryption: allgather MultiLeader\n");
+                    fflush(stdout);        
+                }
+            
+            }// end if my_node
+        }//end for
+    }
     /* Intra-Node RD*/
     
 
