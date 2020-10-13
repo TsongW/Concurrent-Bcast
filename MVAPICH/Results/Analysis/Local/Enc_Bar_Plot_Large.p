@@ -11,9 +11,7 @@ set output label.'.eps'
 set xtic font "Times-Roman,26"
 
 
-plot file using 2:xtic(1) title "Naive Default" lc rgb "#000000" fillstyle pattern 1,\
- "" using 4 title "Naive RingNB" lt rgb "#EBFAEF" fillstyle pattern 3,\
- "" using 5 title "Naive+ Default" lt rgb "#A1F1C3" fillstyle pattern 3,\
- "" using 7 title "Naive+ RingNB" lt rgb "#2DBF3F" fillstyle pattern 3,\
- "" using 8 title "Encrypted ML-Ring" lt rgb "#036144" fillstyle pattern 3,\
- "" using 9 title "Encrypted ML-RD" lt rgb "#000000" fillstyle pattern 3
+plot file using 7:xtic(1) title "Naive+ RingNB" lc rgb "#f0f9e8" fillstyle pattern 3,\
+ "" using 8 title "Enc. ML-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
+ "" using 10 title "Enc. ML-RDB" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 12 title "Enc. Shared-Memory" lt rgb "#2b8cbe" fillstyle pattern 3
