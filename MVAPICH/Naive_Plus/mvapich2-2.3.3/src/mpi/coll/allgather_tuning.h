@@ -205,6 +205,14 @@ int MPIR_2lvl_Allgather_Encrypted_RDB_MV2(const void *sendbuf,int sendcnt, MPI_D
                             void *recvbuf, int recvcnt,MPI_Datatype recvtype,
                             MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
 
+int MPIR_Allgather_NaivePlus_RDB_MV2(const void *sendbuf,
+                          int sendcount,
+                          MPI_Datatype sendtype,
+                          void *recvbuf,
+                          int recvcount,
+                          MPI_Datatype recvtype, MPID_Comm * comm_ptr,
+                          MPIR_Errflag_t *errflag);
+						  
 int MPIR_2lvl_Allgather_Direct_MV2(const void *sendbuf,
 							       int sendcnt,
 								   MPI_Datatype sendtype,
