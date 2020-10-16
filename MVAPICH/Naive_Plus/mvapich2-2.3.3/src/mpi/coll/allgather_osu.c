@@ -2067,7 +2067,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
 
     //If there is just one node, after gather itself, root has all the data and it can do bcast
     //printf("%d @ check0\n", rank);
-    if(security_approach == 2){
+    //if(security_approach == 2){
         if(local_rank == 0) {
             if(sendbuf == MPI_IN_PLACE) {
                 mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
@@ -2095,7 +2095,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                                             0, shmem_commptr, errflag);
             }
         }
-    }else{
+    /*}else{
         if(local_rank == 0) {
             if(sendbuf == MPI_IN_PLACE) {
                 mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
@@ -2123,7 +2123,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                                             0, shmem_commptr, errflag);
             }
         }
-    }
+    }*/
     //printf("%d @ check1\n", rank);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
@@ -2198,32 +2198,32 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             
             
 
-            mpi_errno = MPIR_Allgather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+            mpi_errno = MPIR_Allgather_impl((void*)((char*)shmem_buffer + (rank * recvcnt * recvtype_extent)), 
                                                 (recvcnt*p),
                                                 recvtype,
                                                 shmem_buffer, (recvcnt*p), recvtype,
                                                 leader_commptr, errflag);
             
             
-            int s=0;
-            if(comm_ptr->dev.ch.is_global_block==1){
-                //Blocked
-                for(; s<n; ++s){
-                    if(s != (int)(rank/p)){
-                        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * p * recvtype_extent), recvcnt * p, recvtype, 
-                                            (void*)((char*)recvbuf + s * p * recvcnt * recvtype_extent), recvcnt * p, recvtype);
-                    }
-                }
-            }else{
-                //NonBlocked
-                for(; s<size; ++s){
+            // int s=0;
+            // if(comm_ptr->dev.ch.is_global_block==1){
+            //     //Blocked
+            //     //for(; s<n; ++s){
+            //         //if(s != (int)(rank/p)){
+            //             mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+            //                                 (void*)((char*)recvbuf), recvcnt * size, recvtype);
+            //         //}
+            //     //}
+            // }else{
+            //     //NonBlocked
+            //     for(; s<size; ++s){
                     
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
-                                            (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+            //         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+            //                                 (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
                     
-                }
+            //     }
 
-            }
+            // }
             
             
         }
@@ -2299,10 +2299,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
-    }
-    
-    //#TODO: copy from shared_memory to recv_buf
-    else if(local_rank>0 && security_approach !=2){
+    }else{
         // I'm here
         
         if(comm_ptr->dev.ch.is_global_block==1){

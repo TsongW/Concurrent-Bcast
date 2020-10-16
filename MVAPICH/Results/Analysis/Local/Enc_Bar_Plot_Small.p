@@ -11,9 +11,9 @@ set grid ytics lw 0.7 lt 0
 set term postscript eps font "Times-Roman, 30" enhanced color
 set output label.'.eps'
 
-plot file using 5:xtic(1) title "Naive+ Default (RDB)" lc rgb "#e0f3db" fillstyle pattern 3,\
- "" using 10 title "Enc. ML-RDB" lt rgb "#a8ddb5" fillstyle pattern 3,\
- "" using 12 title "Enc. Shared-Memory" lt rgb "#43a2ca" fillstyle pattern 3
+plot file using 5:xtic(1) title "Naive+ RDB" lc rgb "#e0f3db" fillstyle pattern 3,\
+ "" using 10 title "C-RDB" lt rgb "#a8ddb5" fillstyle pattern 3,\
+ "" using 12 title "ShMem-NB" lt rgb "#43a2ca" fillstyle pattern 3
 
 
 

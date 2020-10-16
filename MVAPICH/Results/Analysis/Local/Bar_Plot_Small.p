@@ -10,6 +10,6 @@ set term postscript eps font "Times-Roman, 32" enhanced color
 set output label.'.eps'
 set xtic font "Times-Roman,26"
 
-plot file using 2:xtic(1) title "Default (RDB)" lc rgb "#e0f3db",\
- "" using 6 title "ML-RDB" lt rgb "#a8ddb5",\
- "" using 7 title "Shared-Memory" lt rgb "#43a2ca"
+plot file using 2:xtic(1) title "RDB" lc rgb "#e0f3db",\
+ "" using 6 title "C-RDB" lt rgb "#a8ddb5",\
+ "" using 7 title "ShMem-NB" lt rgb "#43a2ca"

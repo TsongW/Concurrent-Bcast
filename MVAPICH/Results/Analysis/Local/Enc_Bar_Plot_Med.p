@@ -12,9 +12,9 @@ set output label.'.eps'
 #set yrange [:400]
 
 
-plot file using 5:xtic(1) title "Naive+ Default" lc rgb "#f0f9e8" fillstyle pattern 3,\
+plot file using 5:xtic(1) title "Naive+ RDB" lc rgb "#f0f9e8" fillstyle pattern 3,\
  "" using 7 title "Naive+ RingNB" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 8 title "Enc. ML-Ring" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 10 title "Enc. ML-RDB" lt rgb "#43a2ca" fillstyle pattern 3,\
- "" using 12 title "Enc. Shared-Memory" lt rgb "#0868ac" fillstyle pattern 3
+ "" using 8 title "C-Ring" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 10 title "C-RDB" lt rgb "#43a2ca" fillstyle pattern 3,\
+ "" using 12 title "ShMem-NB" lt rgb "#0868ac" fillstyle pattern 3
 

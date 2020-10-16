@@ -10,8 +10,8 @@ set output label.'.eps'
 set xtic font "Times-Roman,26"
 
 
-plot file using 2:xtic(1) title "Default" lc rgb "#f0f9e8",\
+plot file using 2:xtic(1) title "Ring" lc rgb "#f0f9e8",\
  "" using 4 title "RingNB" lt rgb "#bae4bc",\
- "" using 5 title "ML-Ring" lt rgb "#7bccc4",\
- "" using 6 title "ML-RDB" lt rgb "#43a2ca",\
- "" using 7 title "Shared-Memory" lt rgb "#0868ac"
+ "" using 5 title "C-Ring" lt rgb "#7bccc4",\
+ "" using 6 title "C-RDB" lt rgb "#43a2ca",\
+ "" using 7 title "ShMem-NB" lt rgb "#0868ac"
