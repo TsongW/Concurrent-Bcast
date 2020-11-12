@@ -1,0 +1,8 @@
+Use these commands for compiling and running the code:
+ 
+$mpicc -o ./moore4_chck ./moore4_chck.c -lm
+$mpirun_rsh -n #number-of-processes -hostfile ./hosts ./moore4_chck #dimension #radius
+
+Moore gets two input parameters. the first number is dimension and the second number is radius. You can run moore with these dimensions and radius: (d=2,r=1), (d=2,r=2), (d=2,r=3), (d=2,r=4),(d=3,r=1),(d=3,r=2)
+ 
+The output gives the communication time for different message sizes. 
