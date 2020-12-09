@@ -5,7 +5,7 @@
  */
 
 #include "mpiimpl.h"
-
+#include "secure_allgather.h"
 /* -- Begin Profiling Symbol Block for routine MPI_Neighbor_allgather */
 #if defined(HAVE_PRAGMA_WEAK)
 #pragma weak MPI_Neighbor_allgather = PMPI_Neighbor_allgather
@@ -48,6 +48,270 @@ fn_exit:
 fn_fail:
     goto fn_exit;
 }
+
+
+/************* Added by Mehran ***************/
+#undef FUNCNAME
+#define FUNCNAME MPIR_Naive_Neighbor_allgather
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_Naive_Neighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPID_Comm *comm_ptr)
+{
+
+    MPI_Request req;
+    int mpi_errno = MPI_SUCCESS;
+    int tag = -1;
+    
+    MPID_Request *reqp = NULL;
+    MPID_Sched_t s = MPID_SCHED_NULL;
+
+    req = MPI_REQUEST_NULL;
+
+    mpi_errno = MPID_Sched_next_tag(comm_ptr, &tag);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    mpi_errno = MPID_Sched_create(&s);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+
+    int indegree, outdegree, weighted;
+    int k,l;
+    int *srcs, *dsts;
+    MPI_Aint recvtype_extent;
+    MPIU_CHKLMEM_DECL(2);
+
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+
+    /* This is the largest offset we add to recvbuf */
+    MPIU_Ensure_Aint_fits_in_pointer(MPIU_VOID_PTR_CAST_TO_MPI_AINT recvbuf +
+                                     (comm_ptr->local_size * recvcount * recvtype_extent));
+
+    
+    mpi_errno = MPIR_Topo_canon_nhb_count(comm_ptr, &indegree, &outdegree, &weighted);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    MPIU_CHKLMEM_MALLOC(srcs, int *, indegree*sizeof(int), mpi_errno, "srcs");
+    MPIU_CHKLMEM_MALLOC(dsts, int *, outdegree*sizeof(int), mpi_errno, "dsts");
+    mpi_errno = MPIR_Topo_canon_nhb(comm_ptr,
+                                    indegree, srcs, MPI_UNWEIGHTED,
+                                    outdegree, dsts, MPI_UNWEIGHTED);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    //encrypt
+
+    unsigned long  ciphertext_sendbuf_len = 0;
+    RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce
+
+    unsigned long t=0;
+    t = (unsigned long)(recvtype_extent*sendcount);
+    unsigned long   max_out_len = (unsigned long) (16 + (recvtype_extent*sendcount));
+
+    if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
+                        &ciphertext_sendbuf_len, max_out_len,
+                        ciphertext_sendbuf, 12,
+                        sendbuf,  t,
+                        NULL, 0))
+    {
+            printf("Error in encryption: Naive Ineighbor_allgather\n");
+            fflush(stdout);
+    }
+
+
+    //send
+
+    for (k = 0; k < outdegree; ++k) {
+        mpi_errno = MPID_Sched_send(ciphertext_sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR, dsts[k], comm_ptr, s);
+        if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    }
+    
+    //recv
+
+    for (l = 0; l < indegree; ++l) {
+        char *rb = ((char *)ciphertext_recvbuf) + l * (recvcount * recvtype_extent + 16 + 12);
+        mpi_errno = MPID_Sched_recv(rb, ((recvcount*recvtype_extent) + 16+12), MPI_CHAR, srcs[l], comm_ptr, s);
+        if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    }
+
+    MPID_SCHED_BARRIER(s);
+
+    
+
+    mpi_errno = MPID_Sched_start(&s, comm_ptr, tag, &reqp);
+    if (reqp)
+        req = reqp->handle;
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    mpi_errno = MPIR_Wait_impl(&req, MPI_STATUS_IGNORE);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    //decrypt
+
+    unsigned long count=0;
+    unsigned long next, dest;
+    unsigned int i;
+    for (i = 0; i < indegree; ++i) {
+        next =(unsigned long )(i*((recvcount*recvtype_extent) + 16+12));
+        dest =(unsigned long )(i*(recvcount*recvtype_extent));
+        if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                    &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                        (ciphertext_recvbuf+next), 12,
+                    (ciphertext_recvbuf+next+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                    NULL, 0)){
+                printf("Decryption error: Naive Ineighbor_allgather while %d tried to decrypt from %d to %d\n", comm_ptr->rank, next, dest);fflush(stdout);        
+        }  
+    }
+
+
+  fn_exit:
+    MPIU_CHKLMEM_FREEALL();
+    return mpi_errno;
+  fn_fail:
+    goto fn_exit;
+}
+
+
+
+
+#undef FUNCNAME
+#define FUNCNAME MPIR_NaivePlus_Neighbor_allgather
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_NaivePlus_Neighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPID_Comm *comm_ptr)
+{
+
+    MPI_Request req;
+    int mpi_errno = MPI_SUCCESS;
+    int tag = -1;
+    bool encrypt = true;
+    MPID_Request *reqp = NULL;
+    MPID_Sched_t s = MPID_SCHED_NULL;
+
+    req = MPI_REQUEST_NULL;
+
+    mpi_errno = MPID_Sched_next_tag(comm_ptr, &tag);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    mpi_errno = MPID_Sched_create(&s);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+
+    int indegree, outdegree, weighted;
+    int k,l;
+    int *srcs, *dsts;
+    MPI_Aint recvtype_extent;
+    MPIU_CHKLMEM_DECL(2);
+
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+
+    /* This is the largest offset we add to recvbuf */
+    MPIU_Ensure_Aint_fits_in_pointer(MPIU_VOID_PTR_CAST_TO_MPI_AINT recvbuf +
+                                     (comm_ptr->local_size * recvcount * recvtype_extent));
+
+    
+    mpi_errno = MPIR_Topo_canon_nhb_count(comm_ptr, &indegree, &outdegree, &weighted);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    MPIU_CHKLMEM_MALLOC(srcs, int *, indegree*sizeof(int), mpi_errno, "srcs");
+    MPIU_CHKLMEM_MALLOC(dsts, int *, outdegree*sizeof(int), mpi_errno, "dsts");
+    mpi_errno = MPIR_Topo_canon_nhb(comm_ptr,
+                                    indegree, srcs, MPI_UNWEIGHTED,
+                                    outdegree, dsts, MPI_UNWEIGHTED);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    unsigned long  ciphertext_sendbuf_len = 0;
+    RAND_bytes(ciphertext_sendbuf, 12); // 12 bytes of nonce
+
+    unsigned long t=0;
+    t = (unsigned long)(recvtype_extent*sendcount);
+    unsigned long   max_out_len = (unsigned long) (16 + (recvtype_extent*sendcount));
+
+
+    //send
+    //    printf("%d @ Check 0\n", comm_ptr->rank);
+    int my_node = comm_ptr->dev.ch.leader_map[comm_ptr->rank];
+    for (k = 0; k < outdegree; ++k) {
+
+        if(my_node != comm_ptr->dev.ch.leader_map[dsts[k]]){//Inter Node
+            //printf("%d @ Check 01-%d, node=%d , dst=%d, dst_node=%d\n", comm_ptr->rank, k, my_node, dsts[k], comm_ptr->dev.ch.leader_map[dsts[k]]);
+            if(encrypt){
+                //encrypt
+                //printf("%d @ Check 02-%d\n", comm_ptr->rank, k);
+                if(!EVP_AEAD_CTX_seal(ctx, ciphertext_sendbuf+12,
+                                    &ciphertext_sendbuf_len, max_out_len,
+                                    ciphertext_sendbuf, 12,
+                                    sendbuf,  t,
+                                    NULL, 0))
+                {
+                        printf("Error in encryption: Naive Ineighbor_allgather\n");
+                        fflush(stdout);
+                }
+                encrypt = false;
+            }
+            //printf("%d @ Check 03-%d\n", comm_ptr->rank, k);
+            mpi_errno = MPID_Sched_send(ciphertext_sendbuf, ciphertext_sendbuf_len+12, MPI_CHAR, dsts[k], comm_ptr, s);
+            //printf("%d @ Check 04-%d\n", comm_ptr->rank, k);
+        }
+        else{ //Intra Node
+            mpi_errno = MPID_Sched_send(sendbuf, sendcount, sendtype, dsts[k], comm_ptr, s);
+            //printf("%d @ Check 05-%d\n", comm_ptr->rank, k);
+        }
+        if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    }
+    //    printf("%d @ Check 1\n", comm_ptr->rank);
+    //recv
+
+    for (l = 0; l < indegree; ++l) {
+        if(comm_ptr->dev.ch.leader_map[comm_ptr->rank] != comm_ptr->dev.ch.leader_map[srcs[l]]){//Inter Node
+            char *rb = ((char *)ciphertext_recvbuf) + l * (recvcount * recvtype_extent + 16 + 12);
+            mpi_errno = MPID_Sched_recv(rb, ((recvcount*recvtype_extent) + 16+12), MPI_CHAR, srcs[l], comm_ptr, s);
+        }else{
+            char *rb = ((char *)recvbuf) + l * recvcount * recvtype_extent;
+            mpi_errno = MPID_Sched_recv(rb, recvcount, recvtype, srcs[l], comm_ptr, s);
+        }
+        
+        if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    }
+    //    printf("%d @ Check 2\n", comm_ptr->rank);
+    MPID_SCHED_BARRIER(s);
+
+    
+
+    mpi_errno = MPID_Sched_start(&s, comm_ptr, tag, &reqp);
+    if (reqp)
+        req = reqp->handle;
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    mpi_errno = MPIR_Wait_impl(&req, MPI_STATUS_IGNORE);
+    if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+
+    //decrypt
+    //    printf("%d @ Check 3\n", comm_ptr->rank);
+    unsigned long count=0;
+    unsigned long next, dest;
+    unsigned int i;
+    for (i = 0; i < indegree; ++i) {
+        if(comm_ptr->dev.ch.leader_map[comm_ptr->rank] != comm_ptr->dev.ch.leader_map[srcs[i]]){//Inter Node
+            next =(unsigned long )(i*((recvcount*recvtype_extent) + 16+12));
+            dest =(unsigned long )(i*(recvcount*recvtype_extent));
+            if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                        &count, (unsigned long )((recvcount*recvtype_extent)+16),
+                            (ciphertext_recvbuf+next), 12,
+                        (ciphertext_recvbuf+next+12), (unsigned long )((recvcount*recvtype_extent)+16),
+                        NULL, 0)){
+                    printf("Decryption error: Naive Ineighbor_allgather while %d tried to decrypt from %d to %d\n", comm_ptr->rank, next, dest);fflush(stdout);        
+            }  
+        }//end if
+    }//end for
+    //    printf("%d @ Check 4\n", comm_ptr->rank);
+
+  fn_exit:
+    MPIU_CHKLMEM_FREEALL();
+    return mpi_errno;
+  fn_fail:
+    goto fn_exit;
+}
+
+
+    /*******************************************************************************/
+
+
+
 
 #undef FUNCNAME
 #define FUNCNAME MPIR_Neighbor_allgather_impl
@@ -155,8 +419,13 @@ int MPI_Neighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype send
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
-
-    mpi_errno = MPIR_Neighbor_allgather_impl(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr);
+     if(security_approach == 1){ //Naive
+        mpi_errno = MPIR_Naive_Neighbor_allgather(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr);
+    }else if(security_approach == 2){ // NaivePlus
+        mpi_errno = MPIR_NaivePlus_Neighbor_allgather(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr);
+    }else{
+        mpi_errno = MPIR_Neighbor_allgather_impl(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr);
+    }
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
 
     /* ... end of body of routine ... */

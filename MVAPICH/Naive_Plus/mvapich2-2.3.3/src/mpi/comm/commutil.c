@@ -900,6 +900,12 @@ int MPIR_Comm_copy(MPID_Comm * comm_ptr, int size, MPID_Comm ** outcomm_ptr)
 
     /* FIXME do we want to copy coll_fns here? */
 
+
+    /********* Added by Mehran *******/
+
+    newcomm_ptr->dev.ch.leader_map = comm_ptr->dev.ch.leader_map;
+
+    /********************************/
     mpi_errno = MPIR_Comm_commit(newcomm_ptr);
     if (mpi_errno)
         MPIR_ERR_POP(mpi_errno);

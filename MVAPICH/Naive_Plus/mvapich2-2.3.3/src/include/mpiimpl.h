@@ -3881,7 +3881,7 @@ int shmid, ciphertext_shmid, allocated_shmem;
 void *shmem_buffer, *ciphertext_shmem_buffer;
 
 
-void init_shmem();
+int init_shmem();
 /**************************************************************************/
 
 
@@ -4476,6 +4476,15 @@ int MPIR_Ineighbor_allgatherv_default(const void *sendbuf, int sendcount, MPI_Da
 int MPIR_Ineighbor_alltoall_default(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPID_Comm *comm_ptr, MPID_Sched_t s);
 int MPIR_Ineighbor_alltoallv_default(const void *sendbuf, const int sendcounts[], const int sdispls[], MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int rdispls[], MPI_Datatype recvtype, MPID_Comm *comm_ptr, MPID_Sched_t s);
 int MPIR_Ineighbor_alltoallw_default(const void *sendbuf, const int sendcounts[], const MPI_Aint sdispls[], const MPI_Datatype sendtypes[], void *recvbuf, const int recvcounts[], const MPI_Aint rdispls[], const MPI_Datatype recvtypes[], MPID_Comm *comm_ptr, MPID_Sched_t s);
+
+
+/***************** Added by Mehran *******************/
+
+/* encrypted neighborhood collective algorithms */
+int MPIR_Naive_Neighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPID_Comm *comm_ptr);
+int MPIR_NaivePlus_Neighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPID_Comm *comm_ptr);
+
+/****************************************************/
 
 /* nonblocking collective default algorithms */
 int MPIR_Ibcast_intra(void *buffer, int count, MPI_Datatype datatype, int root, MPID_Comm *comm_ptr, MPID_Sched_t s);

@@ -7,6 +7,7 @@
 #include "mpiimpl.h"
 #include "topo.h"
 
+
 /* -- Begin Profiling Symbol Block for routine MPI_Ineighbor_allgather */
 #if defined(HAVE_PRAGMA_WEAK)
 #pragma weak MPI_Ineighbor_allgather = PMPI_Ineighbor_allgather
@@ -49,6 +50,7 @@ int MPIR_Ineighbor_allgather_default(const void *sendbuf, int sendcount, MPI_Dat
     MPIU_Ensure_Aint_fits_in_pointer(MPIU_VOID_PTR_CAST_TO_MPI_AINT recvbuf +
                                      (comm_ptr->local_size * recvcount * recvtype_extent));
 
+    
     mpi_errno = MPIR_Topo_canon_nhb_count(comm_ptr, &indegree, &outdegree, &weighted);
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     MPIU_CHKLMEM_MALLOC(srcs, int *, indegree*sizeof(int), mpi_errno, "srcs");
@@ -58,6 +60,7 @@ int MPIR_Ineighbor_allgather_default(const void *sendbuf, int sendcount, MPI_Dat
                                     outdegree, dsts, MPI_UNWEIGHTED);
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
 
+    
     for (k = 0; k < outdegree; ++k) {
         mpi_errno = MPID_Sched_send(sendbuf, sendcount, sendtype, dsts[k], comm_ptr, s);
         if (mpi_errno) MPIR_ERR_POP(mpi_errno);
@@ -70,6 +73,9 @@ int MPIR_Ineighbor_allgather_default(const void *sendbuf, int sendcount, MPI_Dat
     }
 
     MPID_SCHED_BARRIER(s);
+
+    
+
 
 fn_exit:
     MPIU_CHKLMEM_FREEALL();
@@ -97,9 +103,13 @@ int MPIR_Ineighbor_allgather_impl(const void *sendbuf, int sendcount, MPI_Dataty
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     MPIU_Assert(comm_ptr->coll_fns != NULL);
     MPIU_Assert(comm_ptr->coll_fns->Ineighbor_allgather != NULL);
+
+    
     mpi_errno = comm_ptr->coll_fns->Ineighbor_allgather(sendbuf, sendcount, sendtype,
                                                         recvbuf, recvcount, recvtype,
                                                         comm_ptr, s);
+    
+    
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
 
     mpi_errno = MPID_Sched_start(&s, comm_ptr, tag, &reqp);
@@ -114,6 +124,11 @@ fn_fail:
 }
 
 #endif /* MPICH_MPI_FROM_PMPI */
+
+
+
+
+
 
 #undef FUNCNAME
 #define FUNCNAME MPI_Ineighbor_allgather
@@ -200,9 +215,11 @@ int MPI_Ineighbor_allgather(const void *sendbuf, int sendcount, MPI_Datatype sen
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
-
+   
     mpi_errno = MPIR_Ineighbor_allgather_impl(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm_ptr, request);
+    
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+    
 
     /* ... end of body of routine ... */
 
