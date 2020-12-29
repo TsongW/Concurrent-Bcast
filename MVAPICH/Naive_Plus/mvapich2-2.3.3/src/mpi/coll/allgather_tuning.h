@@ -193,6 +193,10 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                             void *recvbuf, int recvcnt,MPI_Datatype recvtype,
                             MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
 
+int MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendtype,
+                            void *recvbuf, int recvcnt,MPI_Datatype recvtype,
+                            MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
+
 int MPIR_Allgather_Encrypted_RDB_MV2(const void *sendbuf,
                           int sendcount,
                           MPI_Datatype sendtype,
