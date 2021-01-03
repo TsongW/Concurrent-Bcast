@@ -510,8 +510,6 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                           MPI_Datatype recvtype, MPID_Comm * comm_ptr,
                           MPIR_Errflag_t *errflag)
 {
-
-
     MPIR_TIMER_START(coll,allgather,rd);
     int comm_size, rank;
     int mpi_errno = MPI_SUCCESS;
@@ -581,7 +579,6 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
         //printf("recvcount=%d & recvtype_extent=%d\n", recvcount, recvtype_extent);
         mask = 0x1;
         i = 0;
-        
         while (mask < comm_size) {
             dst = rank ^ mask;
 
@@ -1253,6 +1250,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 
 
   fn_fail:
+    MPIU_Free(enc_map);
     MPIR_TIMER_END(coll,allgather,rd);
     return (mpi_errno);
 }
