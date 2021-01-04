@@ -577,6 +577,24 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 	    }
 
         //printf("recvcount=%d & recvtype_extent=%d\n", recvcount, recvtype_extent);
+        //I'm Working Here
+	
+        /* allocate a map that shows which messages are encrypted */
+        char* enc_map;
+        enc_map = MPIU_Malloc(comm_size);
+        /* --BEGIN ERROR HANDLING-- */
+        if (!enc_map) {
+            mpi_errno =
+                MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME,
+                                    __LINE__, MPI_ERR_OTHER, "**nomem", 0);
+            return mpi_errno;
+        }
+        int cc;
+        for(cc=0; cc< comm_size; ++cc){
+            enc_map[cc] = 'U';
+        }
+        /* --END ERROR HANDLING-- */
+
         mask = 0x1;
         i = 0;
         while (mask < comm_size) {
@@ -626,7 +644,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 			            //printf("%d is going to encrypt [%d, %d] - [%d, %d]\n", rank, first_to_send, last_to_send, first_encrypted_index, last_encrypted_index);
                         for(enc_idx = first_to_send; enc_idx<last_to_send; ++enc_idx){
                             bool already_encrypted = first_encrypted_index!= -1 && enc_idx >= first_encrypted_index && last_encrypted_index!= -1 && enc_idx <= last_encrypted_index;
-                            if(!already_encrypted){
+                            if(!already_encrypted && enc_map[enc_idx] == 'U'){
                                 in = (char*)((char*) recvbuf + enc_idx * recvcount * recvtype_extent);
                                 out = (char*)((char*) ciphertext_recvbuf + enc_idx * (recvcount * recvtype_extent + 16+12));
                                 //printf("%d is going to encrypt %d\n", rank, enc_idx);
@@ -639,6 +657,11 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                                     printf("Error in Naive+ encryption: allgather RD (Default)\n");
                                     fflush(stdout);
                                 }
+				/*if (rank == 0){
+				    printf("Encrypted %d\n", enc_idx);
+				}*/
+				
+                                enc_map[enc_idx] = 'E';
                             }//end if
                         }//end for
                         if(last_encrypted_index == -1 || last_to_send > last_encrypted_index){
@@ -649,7 +672,13 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                         }
                         //--last_encrypted_index;
                         //printf("now first and last encrypted indices for %d are %d and %d\n", rank , first_encrypted_index, last_encrypted_index);
-
+			/*	if(rank==0){
+			    int jjj;
+			    for (jjj=0; jjj<comm_size; ++jjj){
+				printf("%c, ", enc_map[jjj]);
+			    }
+			    printf("\n\n");
+			    }*/
                         //set the send and recv buffers
                         
                         sbuf = (char*)((char*) ciphertext_recvbuf + my_tree_root * (recvcount * recvtype_extent + 16+12));
@@ -690,6 +719,10 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 			            int last_to_decrypt = dst_tree_root + recently_received;
                         //printf("%d is going to decrypt %d - %d\n", rank, decryption_index, last_to_decrypt);
                         for(; decryption_index<last_to_decrypt; ++decryption_index){
+			    /*if(rank == 0){
+				printf("set Flag for %d\n", decryption_index);
+				}*/
+			    enc_map[decryption_index] = 'E';
                             in = (char*)((char*) ciphertext_recvbuf + decryption_index * (recvcount * recvtype_extent + 16+12));
                             out = (char*)((char*) recvbuf + decryption_index * recvcount * recvtype_extent);
                             //printf("%d is going to decrypt %d from %d to %d\n", rank, decryption_index, decryption_index * (recvcount * recvtype_extent +16 +12), decryption_index * recvcount * recvtype_extent);
@@ -701,6 +734,14 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                                 fflush(stdout);        
                             }
                         }
+			/*if(rank==0){
+                            int jjj;
+                            for (jjj=0; jjj<comm_size; ++jjj){
+                                printf("%c| ", enc_map[jjj]);
+                            }
+                            printf("\n\n");
+			    }*/
+
 
 
                     }else{
@@ -708,7 +749,15 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 			            //printf("curr_cnt for %d is %d (intra-node)\n", rank, curr_cnt);
                         MPIR_PVAR_INC(allgather, rd, send, curr_cnt*recvcount, recvtype); 
                         MPIR_PVAR_INC(allgather, rd, recv, (comm_size - dst_tree_root)*recvcount, recvtype); 
-                        mpi_errno =
+			/*if(rank==0){
+                            int jjj;
+                            for (jjj=0; jjj<comm_size; ++jjj){
+                                printf("%c, ", enc_map[jjj]);
+                            }
+                            printf("\n\n");
+			    }*/
+
+			mpi_errno =
                             MPIC_Sendrecv(((char *) recvbuf + send_offset),
                                             curr_cnt*recvcount, recvtype, dst,
                                             MPIR_ALLGATHER_TAG,
@@ -844,7 +893,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                                     //printf("%d is going to encrypt %d - %d\n", rank, last_encrypted_index, last_to_send);
                                     for(enc_idx = first_to_send; enc_idx<last_to_send; ++enc_idx){
                                         bool already_encrypted = first_encrypted_index!= -1 && enc_idx >= first_encrypted_index && last_encrypted_index!= -1 && enc_idx <= last_encrypted_index;
-                                        if(! already_encrypted){
+                                        if(!already_encrypted && enc_map[enc_idx]=='U'){
                                             in = (char*)((char*) recvbuf + enc_idx * recvcount * recvtype_extent);
                                             out = (char*)((char*) ciphertext_recvbuf + enc_idx * (recvcount * recvtype_extent + 16+12));
                                             // printf("%d is going to encrypt %d\n", rank, last_encrypted_index);
@@ -857,6 +906,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                                                 printf("Error in Naive+ encryption: allgather RD (Default)\n");
                                                 fflush(stdout);
                                             }
+                                            enc_map[enc_idx] = 'E';
                                         }//end if
                                     }//end for
                                     if(last_encrypted_index == -1 || last_to_send > last_encrypted_index){
@@ -990,6 +1040,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
                                 int last_to_decrypt = (my_tree_root + mask) + recently_received;
                                 //printf("%d is going to decrypt %d - %d\n", rank, decryption_index, last_to_decrypt);
                                 for(; decryption_index<last_to_decrypt; ++decryption_index){
+                                    enc_map[decryption_index] = 'E';
                                     in = (char*)((char*) ciphertext_recvbuf + decryption_index * (recvcount * recvtype_extent + 16+12));
                                     out = (char*)((char*) recvbuf + decryption_index * recvcount * recvtype_extent);
                                     //printf("%d is going to decrypt %d from %d to %d\n", rank, decryption_index, decryption_index * (recvcount * recvtype_extent +16 +12), decryption_index * recvcount * recvtype_extent);
@@ -1057,6 +1108,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
             mask <<= 1;
             i++;
         }
+        MPIU_Free(enc_map);
     }
 #ifdef MPID_HAS_HETERO
     else {
@@ -1250,7 +1302,6 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 
 
   fn_fail:
-    MPIU_Free(enc_map);
     MPIR_TIMER_END(coll,allgather,rd);
     return (mpi_errno);
 }
