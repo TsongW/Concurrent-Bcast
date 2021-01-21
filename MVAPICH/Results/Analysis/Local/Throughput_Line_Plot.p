@@ -3,7 +3,7 @@ set key left top Left samplen 1 reverse
 set key font "Times-Roman,28"
 set xlabel "Message Size" font "Times-Roman,30"
 set ylabel "Throughput (MB/s)" font "Times-Roman,30" 
-set grid ytics lw 0.7 lt rgb "#D4D4D4"
+set grid ytics lw 0.7 lt rgb "#939393"
 set term postscript eps font "Times-Roman, 30" enhanced color
 set output 'throughputs.eps'
 set xtic font "Times-Roman,26"
