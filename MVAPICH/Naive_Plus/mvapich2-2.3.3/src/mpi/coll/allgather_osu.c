@@ -2952,10 +2952,10 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                 printf("Error in Naive+ encryption: allgather-shmem while %d tried to encrypt %d from %d to %d, count*size = %d\n", rank, max_out_len, (my_node * p + local_rank * workload)* recvcnt * recvtype_extent, my_node * (workload * recvcnt * recvtype_extent + 12 + 16), recvcnt * recvtype_extent);
                 fflush(stdout);
         }
-        if(recvcnt * recvtype_extent == 524288)
-            printf("%d encrypted %d from %d to %d\n", rank, ciphertext_len, ((my_node * p + local_rank * workload)* recvcnt * recvtype_extent), (my_node * p + local_rank * workload)* recvcnt * recvtype_extent + (my_node * shmem_leaders + local_rank) * (16 + 12));
+        //if(recvcnt * recvtype_extent == 524288)
+	//  printf("%d encrypted %d from %d to %d\n", rank, ciphertext_len, ((my_node * p + local_rank * workload)* recvcnt * recvtype_extent), (my_node * p + local_rank * workload)* recvcnt * recvtype_extent + (my_node * shmem_leaders + local_rank) * (16 + 12));
     }
-    if(security_approach == 2){
+    if(security_approach == 2 && shmem_leaders>1){
         mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
@@ -2999,8 +2999,8 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                             int idx = i*p + l_idx * workload;
                             next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
                             dest =(unsigned long )(idx* recvcnt * recvtype_extent);
-                            if(recvcnt * recvtype_extent == 524288)
-                                printf("%d is going to decrypt %d from %d to %d\n", rank, t, next, dest);
+                            //if(recvcnt * recvtype_extent == 524288)
+			    //  printf("%d is going to decrypt %d from %d to %d\n", rank, t, next, dest);
                             if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
                                             &count, t,
                                             (ciphertext_shmem_buffer+next), 12,
@@ -3070,8 +3070,8 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                         int idx = i*p + l_idx * workload;
                         next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
                         dest =(unsigned long )(idx* recvcnt * recvtype_extent);
-                        if(recvcnt * recvtype_extent == 524288)
-                                printf("%d is going to decrypt (II) %d from %d to %d\n", rank, t, next, dest);
+                        //if(recvcnt * recvtype_extent == 524288)
+			//      printf("%d is going to decrypt (II) %d from %d to %d\n", rank, t, next, dest);
                         if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
                                         &count, t,
                                         (ciphertext_shmem_buffer+next), 12,
