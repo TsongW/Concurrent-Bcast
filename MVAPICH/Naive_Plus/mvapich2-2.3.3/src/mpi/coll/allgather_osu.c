@@ -2923,9 +2923,17 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
     }
+    
+    if(security_approach == 2 && shmem_leaders>1){
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
+    }
 
 
-    if(local_rank < shmem_leaders && security_approach==2){
+    if(local_rank<shmem_leaders && security_approach==2){
         unsigned long count=0;
         unsigned long next, dest;
         unsigned int i;
@@ -2989,7 +2997,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                 if(i != my_node){
                     int l_idx;
                     for(l_idx=0 ; l_idx<shmem_leaders ; ++l_idx){
-                        if((i*l_idx)%p == local_rank){
+                        if(((i+1)*(l_idx+1))%p == local_rank){
                             unsigned long t=0;
                             t = (unsigned long)(workload * recvcnt * recvtype_extent);
                             if(l_idx == shmem_leaders-1){
@@ -3000,7 +3008,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                             next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
                             dest =(unsigned long )(idx* recvcnt * recvtype_extent);
                             //if(recvcnt * recvtype_extent == 524288)
-			    //  printf("%d is going to decrypt %d from %d to %d\n", rank, t, next, dest);
+			    //                printf("%d is going to decrypt %d from %d to %d\n", rank, t, next, dest);
                             if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
                                             &count, t,
                                             (ciphertext_shmem_buffer+next), 12,
@@ -3060,7 +3068,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             if(i != my_node){
                 int l_idx;
                 for(l_idx=0 ; l_idx<shmem_leaders ; ++l_idx){
-                    if((i*l_idx)%p == local_rank){
+                    if(((i+1)*(l_idx+1))%p == local_rank){
                         unsigned long t=0;
                         t = (unsigned long)(workload * recvcnt * recvtype_extent);
                         if(l_idx == shmem_leaders-1){
@@ -3071,7 +3079,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
                         next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
                         dest =(unsigned long )(idx* recvcnt * recvtype_extent);
                         //if(recvcnt * recvtype_extent == 524288)
-			//      printf("%d is going to decrypt (II) %d from %d to %d\n", rank, t, next, dest);
+			//              printf("%d is going to decrypt (II) %d from %d to %d\n", rank, t, next, dest);
                         if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
                                         &count, t,
                                         (ciphertext_shmem_buffer+next), 12,

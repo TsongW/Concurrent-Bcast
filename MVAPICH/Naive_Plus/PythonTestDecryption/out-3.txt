@@ -1,0 +1,192 @@
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      59.95
+2                      16.45
+4                      13.34
+8                      13.84
+16                    203.51
+32                     34.50
+64                     52.05
+128                    66.34
+256                   227.89
+512                   228.36
+1024                  569.19
+2048                  800.94
+4096                 1562.35
+8192                 6694.04
+16384                5252.82
+32768                8411.11
+65536               14520.83
+131072              24004.15
+262144              46088.84
+524288              89845.12
+113 is going to decrypt (II) 5242880 from 0 to 0
+114 is going to decrypt (II) 5242880 from 5242908 to 5242880
+115 is going to decrypt (II) 6291456 from 10485816 to 10485760
+116 is going to decrypt (II) 5242880 from 22020208 to 22020096
+117 is going to decrypt (II) 5242880 from 67109200 to 67108864
+118 is going to decrypt (II) 6291456 from 27263116 to 27262976
+119 is going to decrypt (II) 5242880 from 100663800 to 100663296
+120 is going to decrypt (II) 5242880 from 55574808 to 55574528
+121 is going to decrypt (II) 6291456 from 44040416 to 44040192
+122 is going to decrypt (II) 5242880 from 72352108 to 72351744
+124 is going to decrypt (II) 6291456 from 60817716 to 60817408
+126 is going to decrypt (II) 5242880 from 105906708 to 105906176
+127 is going to decrypt (II) 6291456 from 77595016 to 77594624
+114 is going to decrypt (II) 5242880 from 16777300 to 16777216
+116 is going to decrypt (II) 5242880 from 50331900 to 50331648
+115 is going to decrypt (II) 5242880 from 33554600 to 33554432
+118 is going to decrypt (II) 5242880 from 38797508 to 38797312
+124 is going to decrypt (II) 5242880 from 89129408 to 89128960
+114 is going to decrypt (II) 6291456 from 94372316 to 94371840
+118 is going to decrypt (II) 5242880 from 83886500 to 83886080
+117 is going to decrypt (II) 6291456 from 111149616 to 111149056
+0 is going to decrypt 5242880 from 122684008 to 122683392
+16 is going to decrypt 5242880 from 122684008 to 122683392
+96 is going to decrypt 5242880 from 122684008 to 122683392
+2 is going to decrypt (II) 5242880 from 16777300 to 16777216
+3 is going to decrypt (II) 5242880 from 33554600 to 33554432
+4 is going to decrypt (II) 5242880 from 22020208 to 22020096
+5 is going to decrypt (II) 5242880 from 67109200 to 67108864
+6 is going to decrypt (II) 6291456 from 27263116 to 27262976
+7 is going to decrypt (II) 5242880 from 100663800 to 100663296
+8 is going to decrypt (II) 5242880 from 55574808 to 55574528
+9 is going to decrypt (II) 6291456 from 44040416 to 44040192
+10 is going to decrypt (II) 5242880 from 72352108 to 72351744
+12 is going to decrypt (II) 6291456 from 60817716 to 60817408
+14 is going to decrypt (II) 5242880 from 105906708 to 105906176
+15 is going to decrypt (II) 6291456 from 77595016 to 77594624
+17 is going to decrypt (II) 5242880 from 0 to 0
+18 is going to decrypt (II) 5242880 from 5242908 to 5242880
+19 is going to decrypt (II) 6291456 from 10485816 to 10485760
+20 is going to decrypt (II) 5242880 from 50331900 to 50331648
+21 is going to decrypt (II) 5242880 from 67109200 to 67108864
+22 is going to decrypt (II) 5242880 from 38797508 to 38797312
+23 is going to decrypt (II) 5242880 from 100663800 to 100663296
+24 is going to decrypt (II) 5242880 from 55574808 to 55574528
+25 is going to decrypt (II) 6291456 from 44040416 to 44040192
+26 is going to decrypt (II) 5242880 from 72352108 to 72351744
+28 is going to decrypt (II) 6291456 from 60817716 to 60817408
+30 is going to decrypt (II) 5242880 from 105906708 to 105906176
+31 is going to decrypt (II) 6291456 from 77595016 to 77594624
+4 is going to decrypt (II) 5242880 from 50331900 to 50331648
+8 is going to decrypt (II) 5242880 from 117441100 to 117440512
+2 is going to decrypt (II) 6291456 from 94372316 to 94371840
+80 is going to decrypt 5242880 from 122684008 to 122683392
+12 is going to decrypt (II) 5242880 from 89129408 to 89128960
+6 is going to decrypt (II) 5242880 from 38797508 to 38797312
+32 is going to decrypt 5242880 from 122684008 to 122683392
+22 is going to decrypt (II) 5242880 from 83886500 to 83886080
+48 is going to decrypt 5242880 from 122684008 to 122683392
+64 is going to decrypt 5242880 from 122684008 to 122683392
+97 is going to decrypt (II) 5242880 from 0 to 0
+24 is going to decrypt (II) 5242880 from 117441100 to 117440512
+98 is going to decrypt (II) 5242880 from 5242908 to 5242880
+99 is going to decrypt (II) 6291456 from 10485816 to 10485760
+100 is going to decrypt (II) 5242880 from 22020208 to 22020096
+101 is going to decrypt (II) 5242880 from 67109200 to 67108864
+102 is going to decrypt (II) 6291456 from 27263116 to 27262976
+18 is going to decrypt (II) 6291456 from 94372316 to 94371840
+104 is going to decrypt (II) 5242880 from 55574808 to 55574528
+105 is going to decrypt (II) 6291456 from 44040416 to 44040192
+106 is going to decrypt (II) 5242880 from 72352108 to 72351744
+108 is going to decrypt (II) 6291456 from 60817716 to 60817408
+111 is going to decrypt (II) 6291456 from 77595016 to 77594624
+5 is going to decrypt (II) 6291456 from 111149616 to 111149056
+19 is going to decrypt (II) 5242880 from 33554600 to 33554432
+28 is going to decrypt (II) 5242880 from 89129408 to 89128960
+6 is going to decrypt (II) 5242880 from 83886500 to 83886080
+98 is going to decrypt (II) 5242880 from 16777300 to 16777216
+100 is going to decrypt (II) 5242880 from 50331900 to 50331648
+104 is going to decrypt (II) 5242880 from 117441100 to 117440512
+8 is going to decrypt (II) 6291456 from 127926916 to 127926272
+81 is going to decrypt (II) 5242880 from 0 to 0
+82 is going to decrypt (II) 5242880 from 5242908 to 5242880
+83 is going to decrypt (II) 6291456 from 10485816 to 10485760
+84 is going to decrypt (II) 5242880 from 22020208 to 22020096
+85 is going to decrypt (II) 5242880 from 67109200 to 67108864
+86 is going to decrypt (II) 6291456 from 27263116 to 27262976
+87 is going to decrypt (II) 5242880 from 100663800 to 100663296
+88 is going to decrypt (II) 5242880 from 55574808 to 55574528
+89 is going to decrypt (II) 6291456 from 44040416 to 44040192
+90 is going to decrypt (II) 5242880 from 72352108 to 72351744
+92 is going to decrypt (II) 6291456 from 60817716 to 60817408
+94 is going to decrypt (II) 5242880 from 105906708 to 105906176
+95 is going to decrypt (II) 6291456 from 77595016 to 77594624
+99 is going to decrypt (II) 5242880 from 33554600 to 33554432
+108 is going to decrypt (II) 5242880 from 89129408 to 89128960
+102 is going to decrypt (II) 5242880 from 38797508 to 38797312
+21 is going to decrypt (II) 6291456 from 111149616 to 111149056
+33 is going to decrypt (II) 5242880 from 0 to 0
+34 is going to decrypt (II) 5242880 from 5242908 to 5242880
+35 is going to decrypt (II) 6291456 from 10485816 to 10485760
+36 is going to decrypt (II) 5242880 from 22020208 to 22020096
+37 is going to decrypt (II) 5242880 from 67109200 to 67108864
+38 is going to decrypt (II) 6291456 from 27263116 to 27262976
+39 is going to decrypt (II) 5242880 from 100663800 to 100663296
+49 is going to decrypt (II) 5242880 from 0 to 0
+65 is going to decrypt (II) 5242880 from 0 to 0
+40 is going to decrypt (II) 5242880 from 55574808 to 55574528
+50 is going to decrypt (II) 5242880 from 5242908 to 5242880
+66 is going to decrypt (II) 5242880 from 5242908 to 5242880
+42 is going to decrypt (II) 5242880 from 72352108 to 72351744
+51 is going to decrypt (II) 6291456 from 10485816 to 10485760
+67 is going to decrypt (II) 6291456 from 10485816 to 10485760
+44 is going to decrypt (II) 6291456 from 60817716 to 60817408
+52 is going to decrypt (II) 5242880 from 22020208 to 22020096
+68 is going to decrypt (II) 5242880 from 22020208 to 22020096
+46 is going to decrypt (II) 5242880 from 105906708 to 105906176
+53 is going to decrypt (II) 5242880 from 67109200 to 67108864
+69 is going to decrypt (II) 6291456 from 111149616 to 111149056
+47 is going to decrypt (II) 6291456 from 77595016 to 77594624
+54 is going to decrypt (II) 6291456 from 27263116 to 27262976
+70 is going to decrypt (II) 6291456 from 27263116 to 27262976
+55 is going to decrypt (II) 5242880 from 100663800 to 100663296
+71 is going to decrypt (II) 5242880 from 100663800 to 100663296
+56 is going to decrypt (II) 5242880 from 117441100 to 117440512
+72 is going to decrypt (II) 5242880 from 55574808 to 55574528
+57 is going to decrypt (II) 6291456 from 44040416 to 44040192
+73 is going to decrypt (II) 6291456 from 44040416 to 44040192
+58 is going to decrypt (II) 5242880 from 72352108 to 72351744
+76 is going to decrypt (II) 6291456 from 60817716 to 60817408
+60 is going to decrypt (II) 5242880 from 89129408 to 89128960
+78 is going to decrypt (II) 5242880 from 105906708 to 105906176
+62 is going to decrypt (II) 5242880 from 105906708 to 105906176
+63 is going to decrypt (II) 6291456 from 77595016 to 77594624
+98 is going to decrypt (II) 6291456 from 94372316 to 94371840
+82 is going to decrypt (II) 5242880 from 16777300 to 16777216
+84 is going to decrypt (II) 5242880 from 50331900 to 50331648
+88 is going to decrypt (II) 5242880 from 117441100 to 117440512
+102 is going to decrypt (II) 5242880 from 83886500 to 83886080
+24 is going to decrypt (II) 6291456 from 127926916 to 127926272
+34 is going to decrypt (II) 5242880 from 16777300 to 16777216
+50 is going to decrypt (II) 5242880 from 16777300 to 16777216
+66 is going to decrypt (II) 5242880 from 16777300 to 16777216
+40 is going to decrypt (II) 5242880 from 117441100 to 117440512
+36 is going to decrypt (II) 5242880 from 50331900 to 50331648
+72 is going to decrypt (II) 5242880 from 117441100 to 117440512
+68 is going to decrypt (II) 5242880 from 50331900 to 50331648
+86 is going to decrypt (II) 5242880 from 38797508 to 38797312
+83 is going to decrypt (II) 5242880 from 33554600 to 33554432
+44 is going to decrypt (II) 5242880 from 89129408 to 89128960
+54 is going to decrypt (II) 5242880 from 38797508 to 38797312
+76 is going to decrypt (II) 5242880 from 89129408 to 89128960
+38 is going to decrypt (II) 5242880 from 83886500 to 83886080
+70 is going to decrypt (II) 5242880 from 38797508 to 38797312
+51 is going to decrypt (II) 5242880 from 33554600 to 33554432
+67 is going to decrypt (II) 5242880 from 33554600 to 33554432
+104 is going to decrypt (II) 6291456 from 127926916 to 127926272
+66 is going to decrypt (II) 6291456 from 94372316 to 94371840
+34 is going to decrypt (II) 6291456 from 94372316 to 94371840
+50 is going to decrypt (II) 6291456 from 94372316 to 94371840
+85 is going to decrypt (II) 6291456 from 111149616 to 111149056
+54 is going to decrypt (II) 5242880 from 83886500 to 83886080
+70 is going to decrypt (II) 5242880 from 83886500 to 83886080
+37 is going to decrypt (II) 6291456 from 111149616 to 111149056
+56 is going to decrypt (II) 6291456 from 127926916 to 127926272
+53 is going to decrypt (II) 6291456 from 111149616 to 111149056
+88 is going to decrypt (II) 6291456 from 127926916 to 127926272
+40 is going to decrypt (II) 6291456 from 127926916 to 127926272
+72 is going to decrypt (II) 6291456 from 127926916 to 127926272
+1048576            180213.60

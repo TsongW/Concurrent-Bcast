@@ -295,10 +295,10 @@ int init_shmem(){
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
     
     //TODO: Allocate Shmem
-    size_t shmem_size = (comm_ptr->local_size) * 4 * 64 *1024;
-    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (64 * 1024 * 4 + 16 + 12);
-    shmem_key = 77777;
-    ciphertext_shmem_key = 54321;
+    size_t shmem_size = (comm_ptr->local_size) * 4 * 1024 *1024;
+    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (1024 * 1024 * 4 + 16 + 12);
+    shmem_key = 77877;
+    ciphertext_shmem_key = 54821;
     
 
     if(shmem_comm_ptr->rank == 0){
