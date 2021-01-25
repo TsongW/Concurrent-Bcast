@@ -1723,10 +1723,11 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
         }
     }
 
-    /*********** Added by Mehran *************/
+    /************************** Added by Mehran *********************************/
     /** We are going to determine if:
      * 1- local sizes are equal? i. e. each node has p ranks
      **/
+    if(my_local_id == 0){
     int* local_sizes = MPIU_Malloc(sizeof(int) * leader_comm_size);
     if (NULL == local_sizes){
        mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPI_ERR_OTHER,
@@ -1734,12 +1735,8 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
                    "memory allocation failed", strerror(errno));
                    MPIR_ERR_POP(mpi_errno);
     }
-    if(my_local_id==0){
         mpi_errno = MPIR_Allgather_impl(&my_local_size, 1, MPI_INT,
                     local_sizes, 1, MPI_INT, leader_ptr, &errflag);
-
-                    
-                     
         if(mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
@@ -1756,7 +1753,8 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
                                shmem_ptr, &errflag); 
         if(mpi_errno) {
            MPIR_ERR_POP(mpi_errno);
-        } 
+        }
+	MPIU_Free(local_sizes);
     }else{
         mpi_errno = MPIR_Bcast_impl(&(comm_ptr->dev.ch.equal_local_sizes),1, MPI_INT, 0,
                                shmem_ptr, &errflag); 
@@ -1764,11 +1762,11 @@ int create_2level_comm (MPI_Comm comm, int size, int my_rank)
            MPIR_ERR_POP(mpi_errno);
         } 
     }
-    /*****************************************/
+    /*****************************************************************************/
 
     fn_exit:
        MPIU_Free(shmem_group);
-       MPIU_Free(leader_comm_size);
+
        return (mpi_errno);
     fn_fail: 
        MPIDU_ERR_CHECK_MULTIPLE_THREADS_EXIT( comm_ptr );

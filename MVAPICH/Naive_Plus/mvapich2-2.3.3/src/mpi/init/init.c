@@ -241,7 +241,7 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char *s_value, *o_value, *t_value;
+    char *s_value, *o_value, *t_value, *sml_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
@@ -259,6 +259,10 @@ int MPI_Init( int *argc, char ***argv )
             }
             init_shmem();
         }
+    }
+    shmem_leaders = 1;
+    if ((sml_value = getenv("SHMEM_LEADERS")) != NULL) {
+        shmem_leaders = (atoi(sml_value));
     }
     /******************************************************************/
     /* ... end of body of routine ... */
@@ -280,7 +284,7 @@ int MPI_Init( int *argc, char ***argv )
 }
 
 
-void init_shmem(){
+int init_shmem(){
     static const char FCNAME[] = "init_shmem";
     int mpi_errno = MPI_SUCCESS;
     int security_approach, overlap_decryption;
@@ -291,10 +295,10 @@ void init_shmem(){
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
     
     //TODO: Allocate Shmem
-    size_t shmem_size = (comm_ptr->local_size) * 4 * 64 *1024;
-    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (64 * 1024 * 4 + 16 + 12);
-    shmem_key = 77777;
-    ciphertext_shmem_key = 54321;
+    size_t shmem_size = (comm_ptr->local_size) * 4 * 1024 *1024;
+    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (1024 * 1024 * 4 + 16 + 12);
+    shmem_key = 77877;
+    ciphertext_shmem_key = 54821;
     
 
     if(shmem_comm_ptr->rank == 0){

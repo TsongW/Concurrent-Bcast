@@ -3875,13 +3875,13 @@ extern int reqCounter;
 extern int waitCounter; 
 extern int nonceCounter;
 
-int security_approach, overlap_decryption;
+int security_approach, overlap_decryption, shmem_leaders;
 key_t shmem_key, ciphertext_shmem_key;
 int shmid, ciphertext_shmid, allocated_shmem;
 void *shmem_buffer, *ciphertext_shmem_buffer;
 
 
-void init_shmem();
+int init_shmem();
 /**************************************************************************/
 
 

@@ -577,7 +577,7 @@ int MPIR_Allgather_RD_MV2(const void *sendbuf,
 	    }
 
         //printf("recvcount=%d & recvtype_extent=%d\n", recvcount, recvtype_extent);
-        //I'm Working Here
+        
 	
         /* allocate a map that shows which messages are encrypted */
         char* enc_map;
@@ -2873,8 +2873,14 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     local_size = shmem_commptr->local_size;
     int p = shmem_commptr->local_size; // number of ranks per node
     int n = (int) (size / p); // number of nodes
+    int workload = (int) (p / shmem_leaders); //number of encryptions each leader has to perform 
+    MPID_Node_id_t node_id;
+
+    MPID_Get_node_id(comm_ptr, rank, &node_id);
+    int my_node = node_id;
 
 
+    
     if (local_rank == 0) {
         // Node leader. Extract the rank, size information for the leader communicator
         leader_comm = comm_ptr->dev.ch.leader_comm;
@@ -2886,93 +2892,135 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
     //If there is just one node, after gather itself, root has all the data and it can do bcast
     //printf("%d @ check0\n", rank);
     //if(security_approach == 2){
-        if(local_rank == 0) {
-            if(sendbuf == MPI_IN_PLACE) {
-                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
-                                        recvcnt , recvtype,
-                                        (void*)((char*)shmem_buffer + (rank * recvcnt * recvtype_extent)), 
-                                        recvcnt, recvtype,
-                                        0, shmem_commptr, errflag);
+    if(local_rank == 0) {
+        if(sendbuf == MPI_IN_PLACE) {
+            mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                    recvcnt , recvtype,
+                                    (void*)((char*)shmem_buffer + ((my_node * p + local_rank) * recvcnt * recvtype_extent)), 
+                                    recvcnt, recvtype,
+                                    0, shmem_commptr, errflag);
 
-            }else{
-                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
-                                        (void*)((char*)shmem_buffer + (rank * recvcnt * recvtype_extent)), 
-                                        recvcnt, recvtype,
+        }else{
+            mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                    (void*)((char*)shmem_buffer + ((my_node * p + local_rank) * recvcnt * recvtype_extent)), 
+                                    recvcnt, recvtype,
+                                    0, shmem_commptr, errflag);
+        }  
+    } else {
+        //Since in allgather all the processes could have its own data in place
+        if(sendbuf == MPI_IN_PLACE) {
+            mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
+                                        recvcnt , recvtype, 
+                                        NULL, recvcnt, recvtype,
                                         0, shmem_commptr, errflag);
-            }  
         } else {
-            //Since in allgather all the processes could have its own data in place
-            if(sendbuf == MPI_IN_PLACE) {
-                mpi_errno = MPIR_Gather_impl((void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent)), 
-                                            recvcnt , recvtype, 
-                                            NULL, recvcnt, recvtype,
-                                            0, shmem_commptr, errflag);
-            } else {
-                mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
-                                            NULL, recvcnt, recvtype,
-                                            0, shmem_commptr, errflag);
-            }
+            mpi_errno = MPIR_Gather_impl(sendbuf, sendcnt,sendtype, 
+                                        NULL, recvcnt, recvtype,
+                                        0, shmem_commptr, errflag);
         }
+    }
     //printf("%d @ check1\n", rank);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
     }
+    
+    if(security_approach == 2 && shmem_leaders>1){
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
+    }
+
+
+    if(local_rank<shmem_leaders && security_approach==2){
+        unsigned long count=0;
+        unsigned long next, dest;
+        unsigned int i;
+        //Step 1: Encryption
+
+        unsigned long  ciphertext_len = 0;
+        //void* out = (void*)((char*) ciphertext_shmem_buffer + local_rank * (workload * recvcnt * recvtype_extent + 12 + 16));
+        void* out = (void*)((char*) ciphertext_shmem_buffer + (my_node * p + local_rank * workload)* recvcnt * recvtype_extent + (my_node * shmem_leaders + local_rank) * (16 + 12));
+        RAND_bytes(out, 12); // 12 bytes of nonce
+
+        unsigned long t=0;
+        t = (unsigned long)(workload * recvcnt * recvtype_extent);
+        if(local_rank == shmem_leaders-1){
+            t += (p - (shmem_leaders * workload)) * recvcnt * recvtype_extent;
+        }
+        unsigned long   max_out_len = (unsigned long) (16 + t  + 12);
+        
+        if(!EVP_AEAD_CTX_seal(ctx, out+12,  
+                            &ciphertext_len, max_out_len,
+                            out, 12,
+                            shmem_buffer + ((my_node * p + local_rank * workload)* recvcnt * recvtype_extent),  t,
+                            NULL, 0))
+        {
+                printf("Error in Naive+ encryption: allgather-shmem while %d tried to encrypt %d from %d to %d, count*size = %d\n", rank, max_out_len, (my_node * p + local_rank * workload)* recvcnt * recvtype_extent, my_node * (workload * recvcnt * recvtype_extent + 12 + 16), recvcnt * recvtype_extent);
+                fflush(stdout);
+        }
+        //if(recvcnt * recvtype_extent == 524288)
+	//  printf("%d encrypted %d from %d to %d\n", rank, ciphertext_len, ((my_node * p + local_rank * workload)* recvcnt * recvtype_extent), (my_node * p + local_rank * workload)* recvcnt * recvtype_extent + (my_node * shmem_leaders + local_rank) * (16 + 12));
+    }
+    if(security_approach == 2 && shmem_leaders>1){
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
+    }
+    
 
     // Exchange the data between the node leaders
     if (local_rank == 0 && (leader_comm_size > 1)) {
         if(security_approach == 2){
             //NAIVE PLUS
 	    //printf("Naive+\n");
-            unsigned long count=0;
-            unsigned long next, dest;
-            unsigned int i;
-            //Step 1: Encryption
-
-            unsigned long  ciphertext_len = 0;
-            void* out = (void*)((char*) ciphertext_shmem_buffer + leader_rank * (p * recvcnt * recvtype_extent + 12 + 16));
-            RAND_bytes(out, 12); // 12 bytes of nonce
-
-            unsigned long t=0;
-            t = (unsigned long)(p * recvcnt * recvtype_extent);
-            unsigned long   max_out_len = (unsigned long) (16 + t);
-        
-            if(!EVP_AEAD_CTX_seal(ctx, out+12,  
-                                &ciphertext_len, max_out_len,
-                                out, 12,
-                                shmem_buffer + (rank * recvcnt * recvtype_extent),  t,
-                                NULL, 0))
-            {
-                    printf("Error in Naive+ encryption: allgather-shmem\n");
-                    fflush(stdout);
-            }
+            
 
             //printf("%d @ check2\n", rank);
             //Step 2: Data exchange
-            
-            //#TODO: Allocate shared_memory and use it instead of ciphertext_recvbuf
-            
-            mpi_errno = MPIR_Allgather_impl(out, (max_out_len+12), MPI_CHAR,
-                                            ciphertext_shmem_buffer, (max_out_len+12), MPI_CHAR,
+            void* out = (void*)((char*) ciphertext_shmem_buffer + my_node * (p * recvcnt * recvtype_extent + shmem_leaders *(12 + 16)));
+            unsigned long max_out_len = (p * recvcnt * recvtype_extent + shmem_leaders *(12 + 16));
+
+            mpi_errno = MPIR_Allgather_impl(out, (max_out_len), MPI_CHAR,
+                                            ciphertext_shmem_buffer, (max_out_len), MPI_CHAR,
                                             leader_commptr, errflag);
             
             //printf("%d @ check3\n", rank);
             //Step3: Decryption
-            //#TODO: Decrypt from shared_memory and only for a portion
-
-            for( i = 0; i < leader_comm_size; i+=p){
-                if(i != leader_rank){
-                    next =(unsigned long )(i*(max_out_len+12));
-                    dest =(unsigned long )(i*t);
-                    
-                    if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
-                                    &count, t,
-                                    (ciphertext_shmem_buffer+next), 12,
-                                    (ciphertext_shmem_buffer+next+12), t+16,
-                                    NULL, 0)){
-                            printf("Decryption error in Naive+ shmem_allgather I while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
-                    }  
-                }                               
-            }//end for
+            //Working Here
+            unsigned long count=0;
+            int dest, next, i;
+            for( i = 0; i < n; ++i){
+                if(i != my_node){
+                    int l_idx;
+                    for(l_idx=0 ; l_idx<shmem_leaders ; ++l_idx){
+                        if(((i+1)*(l_idx+1))%p == local_rank){
+                            unsigned long t=0;
+                            t = (unsigned long)(workload * recvcnt * recvtype_extent);
+                            if(l_idx == shmem_leaders-1){
+                                t += (p - (shmem_leaders * workload)) * recvcnt * recvtype_extent;
+                            }
+                            
+                            int idx = i*p + l_idx * workload;
+                            next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
+                            dest =(unsigned long )(idx* recvcnt * recvtype_extent);
+                            //if(recvcnt * recvtype_extent == 524288)
+			    //                printf("%d is going to decrypt %d from %d to %d\n", rank, t, next, dest);
+                            if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                            &count, t,
+                                            (ciphertext_shmem_buffer+next), 12,
+                                            (ciphertext_shmem_buffer+next+12), t+16,
+                                            NULL, 0)){
+                                    printf("Decryption error in Naive+ shmem_allgather I while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
+                            }
+                        }//end if local_rank
+                        
+                    }//end for j
+                }//end if my_node                            
+            }//end for i
             //printf("%d @ check4\n", rank);
 
         //End of NAIVE PLUS
@@ -3016,22 +3064,34 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
         unsigned long   max_out_len = (unsigned long) (16 + (p*sendtype_sz*sendcnt));
         int i, next, dest;
         //printf("%d- local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, local_rank, leader_comm_size, (int)(rank/p));
-        for( i = local_rank; i < n; i+=p){
-            //printf("%d- i:%d, local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, i, local_rank, leader_comm_size, (int)(rank/p));
-            if(i != (int)(rank/p)){
-                next =(unsigned long )(i*(max_out_len+12));
-                dest =(unsigned long )(i*(p*sendtype_sz*sendcnt));
-                
-                if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
-                                &count, (unsigned long )((p*recvcnt*recvtype_sz)),
-                                (ciphertext_shmem_buffer+next), 12,
-                                (ciphertext_shmem_buffer+next+12), (unsigned long )((p*recvcnt*recvtype_sz)+16),
-                                NULL, 0)){
-                        printf("Decryption error in Naive+ shmem_allgather II while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
-                }  
-            }
-                                        
-        }//end for
+        for( i = 0; i < n; ++i){
+            if(i != my_node){
+                int l_idx;
+                for(l_idx=0 ; l_idx<shmem_leaders ; ++l_idx){
+                    if(((i+1)*(l_idx+1))%p == local_rank){
+                        unsigned long t=0;
+                        t = (unsigned long)(workload * recvcnt * recvtype_extent);
+                        if(l_idx == shmem_leaders-1){
+                            t += (p - (shmem_leaders * workload)) * recvcnt * recvtype_extent;
+                        }
+                        
+                        int idx = i*p + l_idx * workload;
+                        next =(unsigned long )(idx* recvcnt * recvtype_extent + (i * shmem_leaders + l_idx)*(16+12));
+                        dest =(unsigned long )(idx* recvcnt * recvtype_extent);
+                        //if(recvcnt * recvtype_extent == 524288)
+			//              printf("%d is going to decrypt (II) %d from %d to %d\n", rank, t, next, dest);
+                        if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                        &count, t,
+                                        (ciphertext_shmem_buffer+next), 12,
+                                        (ciphertext_shmem_buffer+next+12), t+16,
+                                        NULL, 0)){
+                                printf("Decryption error in Naive+ shmem_allgather II while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
+                        }
+                    }//end if local_rank
+                    
+                }//end for j
+            }//end if my_node                            
+        }//end for i
     }
 
     if(security_approach == 2){
@@ -3059,8 +3119,7 @@ int MPIR_2lvl_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datat
             MPIR_ERR_POP(mpi_errno);
         }
     }else{
-        // I'm here
-        
+                
         if(comm_ptr->dev.ch.is_global_block==1){
             //Blocked
             mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 

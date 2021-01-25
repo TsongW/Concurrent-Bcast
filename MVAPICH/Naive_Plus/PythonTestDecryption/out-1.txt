@@ -1,0 +1,80 @@
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      50.25
+2                      16.30
+4                      13.08
+8                      14.44
+16                    188.56
+32                     33.12
+64                     56.36
+128                    68.52
+256                   234.45
+512                   240.17
+1024                 2482.34
+2048                  563.10
+4096                  993.08
+8192                 5612.87
+16384                5337.75
+32768                8850.24
+65536               14449.17
+131072              25577.11
+262144              49329.62
+524288              95412.87
+113 is going to decrypt (II) 16777216 from 0 to 0
+114 is going to decrypt (II) 16777216 from 16777244 to 16777216
+115 is going to decrypt (II) 16777216 from 33554488 to 33554432
+116 is going to decrypt (II) 16777216 from 50331732 to 50331648
+117 is going to decrypt (II) 16777216 from 67108976 to 67108864
+118 is going to decrypt (II) 16777216 from 83886220 to 83886080
+119 is going to decrypt (II) 16777216 from 100663464 to 100663296
+2 is going to decrypt (II) 16777216 from 16777244 to 16777216
+3 is going to decrypt (II) 16777216 from 33554488 to 33554432
+4 is going to decrypt (II) 16777216 from 50331732 to 50331648
+5 is going to decrypt (II) 16777216 from 67108976 to 67108864
+6 is going to decrypt (II) 16777216 from 83886220 to 83886080
+7 is going to decrypt (II) 16777216 from 100663464 to 100663296
+8 is going to decrypt (II) 16777216 from 117440708 to 117440512
+17 is going to decrypt (II) 16777216 from 0 to 0
+19 is going to decrypt (II) 16777216 from 33554488 to 33554432
+20 is going to decrypt (II) 16777216 from 50331732 to 50331648
+21 is going to decrypt (II) 16777216 from 67108976 to 67108864
+22 is going to decrypt (II) 16777216 from 83886220 to 83886080
+23 is going to decrypt (II) 16777216 from 100663464 to 100663296
+24 is going to decrypt (II) 16777216 from 117440708 to 117440512
+97 is going to decrypt (II) 16777216 from 0 to 0
+98 is going to decrypt (II) 16777216 from 16777244 to 16777216
+99 is going to decrypt (II) 16777216 from 33554488 to 33554432
+100 is going to decrypt (II) 16777216 from 50331732 to 50331648
+101 is going to decrypt (II) 16777216 from 67108976 to 67108864
+102 is going to decrypt (II) 16777216 from 83886220 to 83886080
+104 is going to decrypt (II) 16777216 from 117440708 to 117440512
+33 is going to decrypt (II) 16777216 from 0 to 0
+34 is going to decrypt (II) 16777216 from 16777244 to 16777216
+36 is going to decrypt (II) 16777216 from 50331732 to 50331648
+37 is going to decrypt (II) 16777216 from 67108976 to 67108864
+38 is going to decrypt (II) 16777216 from 83886220 to 83886080
+39 is going to decrypt (II) 16777216 from 100663464 to 100663296
+40 is going to decrypt (II) 16777216 from 117440708 to 117440512
+81 is going to decrypt (II) 16777216 from 0 to 0
+82 is going to decrypt (II) 16777216 from 16777244 to 16777216
+83 is going to decrypt (II) 16777216 from 33554488 to 33554432
+84 is going to decrypt (II) 16777216 from 50331732 to 50331648
+85 is going to decrypt (II) 16777216 from 67108976 to 67108864
+87 is going to decrypt (II) 16777216 from 100663464 to 100663296
+88 is going to decrypt (II) 16777216 from 117440708 to 117440512
+65 is going to decrypt (II) 16777216 from 0 to 0
+49 is going to decrypt (II) 16777216 from 0 to 0
+66 is going to decrypt (II) 16777216 from 16777244 to 16777216
+50 is going to decrypt (II) 16777216 from 16777244 to 16777216
+67 is going to decrypt (II) 16777216 from 33554488 to 33554432
+51 is going to decrypt (II) 16777216 from 33554488 to 33554432
+68 is going to decrypt (II) 16777216 from 50331732 to 50331648
+53 is going to decrypt (II) 16777216 from 67108976 to 67108864
+70 is going to decrypt (II) 16777216 from 83886220 to 83886080
+54 is going to decrypt (II) 16777216 from 83886220 to 83886080
+71 is going to decrypt (II) 16777216 from 100663464 to 100663296
+55 is going to decrypt (II) 16777216 from 100663464 to 100663296
+72 is going to decrypt (II) 16777216 from 117440708 to 117440512
+56 is going to decrypt (II) 16777216 from 117440708 to 117440512
+1048576            195400.00
