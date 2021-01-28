@@ -14,13 +14,11 @@ set output label.'.eps'
 
 #Block
 plot file using 8:xtic(1) title "C-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 9 title "C-RDB" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 10 title "Shmem-Leader" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 11 title "DE-Shmem" lt rgb "#2b8cbe" fillstyle pattern 3
+ "" using 9 title "C-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
+ "" using 10 title "M-Leader" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 11 title "DM-Leader" lt rgb "#2b8cbe" fillstyle pattern 3
 
 #Cyclic
-#plot file using 2:xtic(1) title "O-RDB" lc rgb "#f0f9e8" fillstyle pattern 3,\
-# "" using 8 title "C-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
-# "" using 9 title "C-RDB" lt rgb "#7bccc4" fillstyle pattern 3,\
-# "" using 10 title "Shmem-Leader" lt rgb "#43a2ca" fillstyle pattern 3,\
-# "" using 11 title "DE-Shmem" lt rgb "#0868ac" fillstyle pattern 3
+#plot file using 8:xtic(1) title "C-Ring" lc rgb "#e0f3db" fillstyle pattern 3,\
+# "" using 10 title "M-Leader" lt rgb "#a8ddb5" fillstyle pattern 3,\
+# "" using 11 title "DM-Leader" lt rgb "#43a2ca" fillstyle pattern 3

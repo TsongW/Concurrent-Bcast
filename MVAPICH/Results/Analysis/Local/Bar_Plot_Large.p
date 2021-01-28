@@ -14,15 +14,15 @@ set output label.'.eps'
 #BLOCK:
 plot file using 2:xtic(1) title "MVAPICH (Ring)" lc rgb "#f0f9e8",\
  "" using 5 title "C-Ring" lt rgb "#bae4bc",\
- "" using 6 title "C-RDB" lt rgb "#7bccc4",\
- "" using 7 title "Shmem-Leader" lt rgb "#2b8cbe"
+ "" using 6 title "C-RD" lt rgb "#7bccc4",\
+ "" using 7 title "M-Leader" lt rgb "#2b8cbe"
 
 
 #CYCLIC:
 
-#plot file using 2:xtic(1) title "Ring" lc rgb "#f0f9e8",\
-# "" using 4 title "RingNB" lt rgb "#bae4bc",\
+#plot file using 2:xtic(1) title "MVAPICH (Ring)" lc rgb "#f0f9e8",\
+# "" using 4 title "Ordered Ring" lt rgb "#bae4bc",\
 # "" using 5 title "C-Ring" lt rgb "#7bccc4",\
-# "" using 7 title "ShMem-NB" lt rgb "#2b8cbe"
+# "" using 7 title "M-Leader" lt rgb "#2b8cbe"
  
  

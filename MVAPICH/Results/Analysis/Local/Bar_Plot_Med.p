@@ -12,5 +12,5 @@ set output label.'.eps'
 
 plot file using 2:xtic(1) title "MVAPICH (Ring)" lc rgb "#f0f9e8",\
  "" using 5 title "C-Ring" lt rgb "#bae4bc",\
- "" using 6 title "C-RDB" lt rgb "#7bccc4",\
- "" using 7 title "Shmem-Leader" lt rgb "#2b8cbe"
+ "" using 6 title "C-RD" lt rgb "#7bccc4",\
+ "" using 7 title "M-Leader" lt rgb "#2b8cbe"

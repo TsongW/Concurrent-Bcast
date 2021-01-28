@@ -1,0 +1,50 @@
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             270615.03
+524288             486009.02
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             268729.52
+524288             488043.06
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267293.67
+524288             486465.78
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267642.67
+524288             487969.48
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267741.92
+524288             487176.37
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267646.45
+524288             486480.91
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267712.44
+524288             488089.41
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             267925.98
+524288             487848.62
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             269161.57
+524288             489045.54
+
+# OSU MPI Allgather Latency Test v5.6.3
+# Size       Avg Latency(us)
+262144             268237.36
+524288             488466.02
