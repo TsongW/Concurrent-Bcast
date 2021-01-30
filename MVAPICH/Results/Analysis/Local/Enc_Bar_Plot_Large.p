@@ -12,15 +12,15 @@ set output label.'.eps'
 
 
 #Block:
-plot file using 5:xtic(1) title "O-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 8 title "C-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 9 title "C-RD" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 10 title "M-Leader" lt rgb "#43a2ca" fillstyle pattern 3,\
- "" using 11 title "DM-Leader" lt rgb "#0868ac" fillstyle pattern 3
-
-#Cyclic:
-#plot file using 7:xtic(1) title "Ordered O-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
-# "" using 12 title "CO-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
-# "" using 8 title "C-Ring" lt rgb "#7bccc4" fillstyle pattern 3,\
+#plot file using 5:xtic(1) title "O-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
+# "" using 8 title "C-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
+# "" using 9 title "C-RD" lt rgb "#7bccc4" fillstyle pattern 3,\
 # "" using 10 title "M-Leader" lt rgb "#43a2ca" fillstyle pattern 3,\
 # "" using 11 title "DM-Leader" lt rgb "#0868ac" fillstyle pattern 3
+
+#Cyclic:
+plot file using 7:xtic(1) title "O-Ordered Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
+ "" using 12 title "CO-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
+ "" using 8 title "C-Ring" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 10 title "M-Leader" lt rgb "#43a2ca" fillstyle pattern 3,\
+ "" using 11 title "DM-Leader" lt rgb "#0868ac" fillstyle pattern 3
