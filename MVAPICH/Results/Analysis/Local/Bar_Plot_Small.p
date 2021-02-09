@@ -12,4 +12,4 @@ set output label.'.eps'
 
 plot file using 2:xtic(1) title "MVAPICH (RD)" lc rgb "#e0f3db",\
  "" using 6 title "C-RD" lt rgb "#a8ddb5",\
- "" using 7 title "M-Leader" lt rgb "#43a2ca"
+ "" using 7 title "HS1" lt rgb "#43a2ca"

@@ -13,7 +13,7 @@ set output label.'.eps'
 
 
 plot file using 5:xtic(1) title "O-RD" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 12 title "CO-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
+ "" using 12 title "O-RD2" lt rgb "#bae4bc" fillstyle pattern 3,\
  "" using 9 title "C-RD" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 10 title "M-Leader" lt rgb "#2b8cbe" fillstyle pattern 3
+ "" using 10 title "HS1" lt rgb "#2b8cbe" fillstyle pattern 3
 

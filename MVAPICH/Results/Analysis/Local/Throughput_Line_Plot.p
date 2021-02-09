@@ -7,7 +7,8 @@ set grid ytics lw 0.7 lt rgb "#939393"
 set term postscript eps font "Times-Roman, 30" enhanced color
 set output 'throughputs.eps'
 set xtic font "Times-Roman,26"
-set ytics 3500,1500 font "Times-Roman,26"
+#set ytics 3500,1500 font "Times-Roman,26"
+set ytics font "Times-Roman,26"
 set yrange [:12250]
 set size 1.5, 1
 
