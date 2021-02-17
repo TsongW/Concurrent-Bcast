@@ -241,7 +241,7 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char *s_value, *o_value, *t_value, *sml_value;
+    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
@@ -264,6 +264,24 @@ int MPI_Init( int *argc, char ***argv )
     if ((sml_value = getenv("SHMEM_LEADERS")) != NULL) {
         shmem_leaders = (atoi(sml_value));
     }
+
+    concurrent_comm = 0;
+    if ((c_value = getenv("CONCURRENT_COMM")) != NULL) {
+        concurrent_comm = (atoi(c_value));
+    }
+    concurrent_bcast = 0;
+    if ((cb_value = getenv("CONCURRENT_BCAST")) != NULL) {
+        concurrent_bcast = (atoi(cb_value));
+    }
+
+    if (concurrent_comm == 1){
+        MPID_Comm *comm_ptr = NULL;
+        MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
+        mpi_errno = create_concurrent_comm(comm_ptr->handle, comm_ptr->local_size, comm_ptr->rank);
+        if(mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
     /******************************************************************/
     /* ... end of body of routine ... */
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT);
@@ -282,6 +300,48 @@ int MPI_Init( int *argc, char ***argv )
     return mpi_errno;
     /* --END ERROR HANDLING-- */
 }
+
+
+
+int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
+{
+    static const char FCNAME[] = "create_concurrent_comm";
+    int mpi_errno = MPI_SUCCESS;
+    MPID_Comm* comm_ptr = NULL;
+    //printf("%d is in create_concurrent_comm\n", my_rank);
+    MPID_Comm_get_ptr( comm, comm_ptr );
+    if (size <= 1) {
+        return mpi_errno;
+    }
+
+    
+    comm_ptr->dev.ch.concurrent_comm =MPI_COMM_NULL;
+    
+    MPID_Comm* shmem_commptr;
+    MPI_Comm shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    
+    /* get our rank and the size of this communicator */
+    int local_rank = shmem_commptr->rank;
+
+
+    mpi_errno = PMPI_Comm_split(comm, local_rank, my_rank, &(comm_ptr->dev.ch.concurrent_comm));
+    if(mpi_errno) {
+       MPIR_ERR_POP(mpi_errno);
+    }
+
+    return (mpi_errno);
+    fn_fail:
+        mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );
+
+    return (mpi_errno);
+}
+
+
+
+
+
+
 
 
 int init_shmem(){

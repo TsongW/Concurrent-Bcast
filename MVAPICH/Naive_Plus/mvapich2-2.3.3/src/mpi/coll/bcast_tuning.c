@@ -2533,6 +2533,13 @@ int MV2_internode_Bcast_is_define(char *mv2_user_bcast_inter, char *mv2_user_bca
 	}
 	break;
 #endif
+
+    case 12:
+    mv2_tmp_bcast_indexed_thresholds_table[0].inter_leader[0].MV2_pt_Bcast_function =
+      &MPIR_Concurrent_Bcast_MV2;
+      mv2_tmp_bcast_indexed_thresholds_table[0].is_two_level_bcast[0] = 1;
+      break;
+
       default:
 	mv2_tmp_bcast_indexed_thresholds_table[0].inter_leader[0].MV2_pt_Bcast_function =
 	  &MPIR_Bcast_binomial_MV2;
@@ -2634,6 +2641,12 @@ int MV2_internode_Bcast_is_define(char *mv2_user_bcast_inter, char *mv2_user_bca
 	  mv2_tmp_bcast_indexed_thresholds_table[0].is_two_level_bcast[i] = 1;
 	  break;
 #endif
+    case 12:
+      mv2_tmp_bcast_indexed_thresholds_table[0].inter_leader[i].MV2_pt_Bcast_function =
+      &MPIR_Concurrent_Bcast_MV2;
+      mv2_tmp_bcast_indexed_thresholds_table[0].is_two_level_bcast[i] = 1;
+      break;
+
 	default:
 	  mv2_tmp_bcast_indexed_thresholds_table[0].inter_leader[i].MV2_pt_Bcast_function =
 	    &MPIR_Bcast_binomial_MV2;
@@ -2740,6 +2753,13 @@ int MV2_internode_Bcast_is_define(char *mv2_user_bcast_inter, char *mv2_user_bca
 	mv2_tmp_bcast_thresholds_table[0].is_two_level_bcast[0] = 1;
 	break;
 #endif
+
+  case 12:
+      mv2_tmp_bcast_thresholds_table[0].inter_leader[0].MV2_pt_Bcast_function =
+      &MPIR_Concurrent_Bcast_MV2;
+      mv2_tmp_bcast_thresholds_table[0].is_two_level_bcast[0] = 1;
+      break;
+
       default:
 	mv2_tmp_bcast_thresholds_table[0].inter_leader[0].MV2_pt_Bcast_function =
 	  &MPIR_Bcast_binomial_MV2;
@@ -2842,6 +2862,13 @@ int MV2_internode_Bcast_is_define(char *mv2_user_bcast_inter, char *mv2_user_bca
 	  mv2_tmp_bcast_thresholds_table[0].is_two_level_bcast[i] = 1;
 	  break;
 #endif
+
+  case 12:
+      mv2_tmp_bcast_thresholds_table[0].inter_leader[i].MV2_pt_Bcast_function =
+      &MPIR_Concurrent_Bcast_MV2;
+      mv2_tmp_bcast_thresholds_table[0].is_two_level_bcast[i] = 1;
+      break;
+
 	default:
 	  mv2_tmp_bcast_thresholds_table[0].inter_leader[i].MV2_pt_Bcast_function =
 	    &MPIR_Bcast_binomial_MV2;

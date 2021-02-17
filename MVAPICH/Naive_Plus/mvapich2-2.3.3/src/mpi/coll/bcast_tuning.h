@@ -99,6 +99,12 @@ extern int MPIR_Bcast_scatter_ring_allgather_MV2(void *buffer,
                                                  int root,
                                                  MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
 
+
+extern int MPIR_Concurrent_Bcast_MV2(void *buffer,
+                                          int count,
+                                          MPI_Datatype datatype,
+                                          int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag);
+
 extern int MPIR_Bcast_scatter_ring_allgather_shm_MV2(void *buffer,
                                                         int count,
                                                         MPI_Datatype datatype,

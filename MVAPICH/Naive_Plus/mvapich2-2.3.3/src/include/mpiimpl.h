@@ -3875,13 +3875,15 @@ extern int reqCounter;
 extern int waitCounter; 
 extern int nonceCounter;
 
-int security_approach, overlap_decryption, shmem_leaders;
+int security_approach, overlap_decryption, shmem_leaders, concurrent_comm;
+int concurrent_bcast;
 key_t shmem_key, ciphertext_shmem_key;
 int shmid, ciphertext_shmid, allocated_shmem;
 void *shmem_buffer, *ciphertext_shmem_buffer;
 
 
 int init_shmem();
+int create_concurrent_comm (MPI_Comm comm, int size, int my_rank);
 /**************************************************************************/
 
 

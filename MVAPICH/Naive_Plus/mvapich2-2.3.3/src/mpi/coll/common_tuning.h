@@ -126,7 +126,9 @@ enum mv2_bcast_tuning
     BCAST_SCATTER_RING_ALLGATHER_SHM, 
     KNOMIAL_BCAST_INTER_NODE_WRAPPER,
     PIPELINED_BCAST,
-    PIPELINED_BCAST_ZCPY
+    PIPELINED_BCAST_ZCPY,
+    /****** Added by Mehran *****/
+    CONCURRENT_BCAST//12
 };
 
 enum mv2_reduce_tuning 

@@ -84,6 +84,11 @@ typedef struct {
     MPI_Comm     leader_comm;
     MPI_Comm     shmem_comm;
     MPI_Comm     allgather_comm;
+
+    /************ Added by Mehran ************/
+    MPI_Comm     concurrent_comm;
+    /*****************************************/
+    
     int*    leader_map;
     int*    leader_rank;
     int*    node_sizes;
