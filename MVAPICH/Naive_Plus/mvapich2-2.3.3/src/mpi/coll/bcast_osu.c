@@ -721,24 +721,20 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-    MPIR_TIMER_START(coll,bcast,scatter_ring_allgather);
+    //MPIR_TIMER_START(coll,bcast,scatter_ring_allgather);
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
-    MPIDI_msg_sz_t nbytes=0, scatter_size=0;
-    int j, i, is_contig, is_homogeneous;
-    MPI_Aint type_size, position;
-    MPIDI_msg_sz_t *recvcnts=NULL, *displs=NULL; 
-    int left, right, jnext;
-    //void *tmp_buf;
-    MPID_Datatype *dtp;
-    MPI_Aint true_extent, true_lb;
+    MPIDI_msg_sz_t scatter_size=0;
+    
     MPIU_CHKLMEM_DECL(3);
 
-    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
+    //MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Concurrent_Bcast_MV2\n", rank);
+    if(rank==0)
+	printf("%d -  Hello\n", count);
+    //    printf("%d @ MPIR_Concurrent_Bcast_MV2\n", rank);
     /* If there is only one process, return */
     if (comm_size == 1)
         goto fn_exit;
@@ -746,78 +742,61 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 
     MPI_Comm shmem_comm, conc_comm;
     MPID_Comm *shmem_commptr=NULL, *conc_commptr = NULL;
-    //printf("%d @ check 0\n", rank);
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-	MPIR_ERR_POP(mpi_errno);
-	goto fn_fail;
-    }
+    
+    
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     conc_comm = comm_ptr->dev.ch.concurrent_comm;
-    //printf("%d @ check 1\n", rank);
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    }
+    if(rank==0)
+        printf("%d -  Check 1 \n", count);
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Comm_get_ptr(conc_comm, conc_commptr);
-    //printf("%d @ check 2\n", rank);
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    }
-    int local_rank, conc_rank, conc_size;
+    // //printf("%d @ check 2\n", rank);
+    // mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
+    // if (mpi_errno) {
+    //     MPIR_ERR_POP(mpi_errno);
+    //     goto fn_fail;
+    // }
+    int local_rank, local_size, conc_rank, conc_size;
     local_rank = shmem_commptr->rank;
-    //printf("%d @ check 3\n", rank);
+    local_size = shmem_commptr->local_size;
+
     conc_rank = conc_commptr->rank;
     conc_size = conc_commptr->local_size;
-    
-
-    printf("%d has local_rank = %d and conc_rank = %d\n", rank, local_rank, conc_rank);
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    }
+    if(rank==0)
+        printf("%d -  Check 2 \n", count);
 
     
-    if(conc_rank == 0){
-        //allocate memory
-        int * tmp_buf = MPIU_Malloc(conc_size * sizeof(int));
+    if(rank == root){
+        //scatter
 
-        
-        if (!tmp_buf) {
-            mpi_errno =
-                MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME,
-                                    __LINE__, MPI_ERR_OTHER, "**nomem", 0);
-            return mpi_errno;
-        }
+        scatter_size = (count + local_size - 1) / local_size;    //ceiling division
 
-        //gather global ranks
-        mpi_errno = MPIR_Gather_impl(&rank, 1, MPI_INT,
-                     tmp_buf, 1, MPI_INT,
-                     0, conc_commptr, errflag);
-
-        //print ranks
-
-        int kk =0;
-        for(; kk< conc_size; ++kk){
-            printf("rank %d in conc_comm of %d is %d\n", kk, rank, tmp_buf[kk]);
-        }
+	printf("%d - scatter size for %d is %d\n", count, rank, scatter_size);
+        mpi_errno = MPIR_Scatter_impl(buffer, scatter_size, datatype,
+                                  buffer, scatter_size, datatype, root,
+                                  shmem_commptr, &errflag);
 
 
-        //release memory
-        MPIU_Free(tmp_buf);
 
     }else{
-        mpi_errno = MPIR_Gather_impl(&rank, 1, MPI_INT,
-                     NULL, 1, MPI_INT,
-                     0, conc_commptr, errflag);
-        //gather global ranks
-    }
+        //compare node id with that of the root, if the same, call scatter
+        MPID_Node_id_t my_node_id, root_node_id;
+        
+        MPID_Get_node_id(comm_ptr, rank, &my_node_id);
+        MPID_Get_node_id(comm_ptr, root, &root_node_id);
 
+        if(my_node_id == root_node_id){
+            scatter_size = (count + local_size - 1) / local_size;    //ceiling division
+
+
+	      mpi_errno = MPIR_Scatter_impl(buffer, scatter_size, datatype,
+                                    buffer, scatter_size, datatype, root,
+                                    shmem_commptr, &errflag);
+
+        }//end if node_id
+
+    }//end else
+    
 
     
 
@@ -3022,7 +3001,7 @@ skip_tuning_tables:
         two_level_bcast = 1;
     }
 #endif
-    if(concurrent_comm == 1 && concurrent_bcast == 1){
+    if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
 	mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
@@ -3300,7 +3279,7 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
     two_level_bcast =
         mv2_bcast_thresholds_table[range].is_two_level_bcast[range_threshold];
 
-    if(concurrent_comm == 1 && concurrent_bcast == 1){
+    if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
         mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
