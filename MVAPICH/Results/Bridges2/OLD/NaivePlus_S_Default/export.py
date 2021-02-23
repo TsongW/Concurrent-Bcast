@@ -2,7 +2,7 @@ import os
 import openpyxl
 
 def write_to_spreadsheet(results, sheet_name, start_row):
-	wb = openpyxl.load_workbook('../Bridges2-Allgather-MVAPICH.xlsx')
+	wb = openpyxl.load_workbook('../OLD-Bridges2-Allgather-MVAPICH.xlsx')
 	
 	
 	sheet = wb[sheet_name]
@@ -13,7 +13,7 @@ def write_to_spreadsheet(results, sheet_name, start_row):
 			sheet[columns[i] + str(j + start_row)].value = results[i][j]
 		
 
-	wb.save('../Bridges2-Allgather-MVAPICH.xlsx')
+	wb.save('../OLD-Bridges2-Allgather-MVAPICH.xlsx')
 
 
 def read_file(path):

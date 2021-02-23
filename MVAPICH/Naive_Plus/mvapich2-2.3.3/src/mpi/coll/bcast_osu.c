@@ -132,7 +132,7 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_binomial, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_binomial_MV2\n", rank);
+    printf("%d @ MPIR_Bcast_binomial_MV2, %d , %d\n", rank, count, comm_size);
     /* If there is only one process, return */
     if (comm_size == 1)
         goto fn_exit;
@@ -204,7 +204,7 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
 
        Note that the process that is the tree root is handled automatically
        by this code, since it has no bits set.  */
-
+    printf("%d @ C1\n", rank);
     mask = 0x1;
     while (mask < comm_size) {
         if (relative_rank & mask) {
@@ -230,12 +230,13 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
                 *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
                 MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
                 MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+		printf("%d @ E1\n", rank);
             }
             break;
         }
         mask <<= 1;
     }
-
+    printf("%d @ C2\n", rank);
     /* This process is responsible for all processes that have bits
        set from the LSB upto (but not including) mask.  Because of
        the "not including", we start by shifting mask back down one.
@@ -270,22 +271,26 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
                 *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
                 MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
                 MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+		printf("%d @ E2\n", rank);
             }
         }
         mask >>= 1;
     }
-
+    printf("%d @ C3\n", rank);
     if (!is_contig || !is_homogeneous) {
-        if (rank != root) {
+	printf("%d contig = %d, homogenous = %d\n", rank, is_contig, is_homogeneous);
+	if (rank != root) {
             position = 0;
             mpi_errno = MPIR_Unpack_impl(tmp_buf, nbytes, &position, buffer,
                                          count, datatype);
-            if (mpi_errno)
+            if (mpi_errno){
                 MPIR_ERR_POP(mpi_errno);
+		printf("%d @ E3\n", rank);
+	    }
 
         }
     }
-
+    printf("%d @ C4\n", rank);
   fn_exit:
     MPIU_CHKLMEM_FREEALL();
     if (mpi_errno_ret)
@@ -746,8 +751,8 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
     
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     conc_comm = comm_ptr->dev.ch.concurrent_comm;
-    if(rank==0)
-        printf("%d -  Check 1 \n", count);
+    //if(rank==0)
+    //  printf("%d -  Check 1 \n", count);
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Comm_get_ptr(conc_comm, conc_commptr);
     // //printf("%d @ check 2\n", rank);
@@ -762,8 +767,8 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 
     conc_rank = conc_commptr->rank;
     conc_size = conc_commptr->local_size;
-    if(rank==0)
-        printf("%d -  Check 2 \n", count);
+    //if(rank==0)
+    //  printf("%d -  Check 2 \n", count);
 
     
     if(rank == root){
@@ -771,11 +776,22 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 
         scatter_size = (count + local_size - 1) / local_size;    //ceiling division
 
-	printf("%d - scatter size for %d is %d\n", count, rank, scatter_size);
+	    //printf("%d - scatter size for %d is %d\n", count, rank, scatter_size);
         mpi_errno = MPIR_Scatter_impl(buffer, scatter_size, datatype,
                                   buffer, scatter_size, datatype, root,
-                                  shmem_commptr, &errflag);
+                                  shmem_commptr, errflag);
 
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
+	//printf("%d is going to call bcast - scatter_size = %d\n", rank, scatter_size);
+        mpi_errno =  MPIR_Bcast_impl(buffer, scatter_size, datatype, 0, conc_commptr, errflag);
+
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        }
 
 
     }else{
@@ -784,23 +800,36 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
         
         MPID_Get_node_id(comm_ptr, rank, &my_node_id);
         MPID_Get_node_id(comm_ptr, root, &root_node_id);
-
+	scatter_size = (count + local_size - 1) / local_size;
         if(my_node_id == root_node_id){
-            scatter_size = (count + local_size - 1) / local_size;    //ceiling division
-
 
 	      mpi_errno = MPIR_Scatter_impl(buffer, scatter_size, datatype,
-                                    buffer, scatter_size, datatype, root,
-                                    shmem_commptr, &errflag);
+                                    buffer+(local_rank*scatter_size), scatter_size, datatype, root,
+                                    shmem_commptr, errflag);
 
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+                goto fn_fail;
+            }
+
+	    //printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
+
+            //mpi_errno =  MPIR_Bcast(buffer, scatter_size, datatype, 0, shmem_commptr, errflag);
         }//end if node_id
+	//if(local_rank==0){
+
+	//printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
+	    
+        mpi_errno =  MPIR_Bcast_impl(buffer+(local_rank*scatter_size), scatter_size, datatype, 0, conc_commptr, errflag);
+
+	    if (mpi_errno) {
+		MPIR_ERR_POP(mpi_errno);
+		goto fn_fail;
+	    }
+	    //}
 
     }//end else
     
-
-    
-
-
 
 
 
@@ -2555,7 +2584,7 @@ int MPIR_Bcast_intra_MV2(void *buffer,
     MPID_Comm *shmem_commptr = NULL;
     MPI_Comm shmem_comm;
     MPID_Datatype *dtp;
-
+    printf("%d - Hello from MPIR_Bcast_intra_MV2\n", count);
     MPIU_THREADPRIV_DECL;
     MPID_MPI_STATE_DECL(MPID_STATE_MPIR_BCAST_INTRA_MV2);
 
@@ -3418,6 +3447,7 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
     nbytes = (MPIDI_msg_sz_t) (count) * (datatype_extent);
     int mem_type = 0;
     int rank = comm_ptr->rank;
+    printf("%d at F3\n", rank);
     if (rdma_enable_cuda) {
         mem_type = is_device_buffer(buf);
     }
