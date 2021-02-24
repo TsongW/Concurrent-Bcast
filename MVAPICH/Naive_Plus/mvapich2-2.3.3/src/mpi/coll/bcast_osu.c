@@ -811,14 +811,9 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
                 MPIR_ERR_POP(mpi_errno);
                 goto fn_fail;
             }
-
-	    //printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
-
-            //mpi_errno =  MPIR_Bcast(buffer, scatter_size, datatype, 0, shmem_commptr, errflag);
         }//end if node_id
-	//if(local_rank==0){
-
-	//printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
+	
+	    //printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
 	    
         mpi_errno =  MPIR_Bcast_impl(buffer+(local_rank*scatter_size), scatter_size, datatype, 0, conc_commptr, errflag);
 
@@ -826,10 +821,11 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 		MPIR_ERR_POP(mpi_errno);
 		goto fn_fail;
 	    }
-	    //}
 
     }//end else
-    
+    mpi_errno = MPIR_Allgather_impl(buffer+(local_rank*scatter_size), scatter_size, datatype,
+                                                buffer, scatter_size, datatype,
+                                                shmem_commptr, errflag);
 
 
 
