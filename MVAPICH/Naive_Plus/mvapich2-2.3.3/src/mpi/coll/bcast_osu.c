@@ -132,7 +132,7 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_binomial, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_binomial_MV2, %d , %d\n", rank, count, comm_size);
+    //printf("%d @ MPIR_Bcast_binomial_MV2, %d , %d\n", rank, count, comm_size);
     /* If there is only one process, return */
     if (comm_size == 1)
         goto fn_exit;
@@ -204,7 +204,7 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
 
        Note that the process that is the tree root is handled automatically
        by this code, since it has no bits set.  */
-    printf("%d @ C1\n", rank);
+
     mask = 0x1;
     while (mask < comm_size) {
         if (relative_rank & mask) {
@@ -230,13 +230,13 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
                 *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
                 MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
                 MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-		printf("%d @ E1\n", rank);
+
             }
             break;
         }
         mask <<= 1;
     }
-    printf("%d @ C2\n", rank);
+
     /* This process is responsible for all processes that have bits
        set from the LSB upto (but not including) mask.  Because of
        the "not including", we start by shifting mask back down one.
@@ -271,26 +271,26 @@ int MPIR_Bcast_binomial_MV2(void *buffer,
                 *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
                 MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
                 MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-		printf("%d @ E2\n", rank);
+
             }
         }
         mask >>= 1;
     }
-    printf("%d @ C3\n", rank);
+
     if (!is_contig || !is_homogeneous) {
-	printf("%d contig = %d, homogenous = %d\n", rank, is_contig, is_homogeneous);
+
 	if (rank != root) {
             position = 0;
             mpi_errno = MPIR_Unpack_impl(tmp_buf, nbytes, &position, buffer,
                                          count, datatype);
             if (mpi_errno){
                 MPIR_ERR_POP(mpi_errno);
-		printf("%d @ E3\n", rank);
+
 	    }
 
         }
     }
-    printf("%d @ C4\n", rank);
+
   fn_exit:
     MPIU_CHKLMEM_FREEALL();
     if (mpi_errno_ret)
@@ -337,7 +337,7 @@ static int scatter_for_bcast_MV2(void *buffer ATTRIBUTE((unused)),
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
     relative_rank = (rank >= root) ? rank - root : rank - root + comm_size;
-    printf("%d @ scatter_for_bcast_MV2\n", rank);
+    //    printf("%d @ scatter_for_bcast_MV2\n", rank);
     
     /* use long message algorithm: binomial tree scatter followed by an
      * allgather */
@@ -485,7 +485,7 @@ int MPIR_Bcast_scatter_doubling_allgather_MV2(void *buffer,
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
     relative_rank = (rank >= root) ? rank - root : rank - root + comm_size;
-    printf("%d @ MPIR_Bcast_scatter_doubling_allgather_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_scatter_doubling_allgather_MV2\n", rank);
     /* If there is only one process, return */
     if (comm_size == 1)
         goto fn_exit;
@@ -737,10 +737,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
     //MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    if(rank==0)
-	printf("%d -  Hello\n", count);
-    //    printf("%d @ MPIR_Concurrent_Bcast_MV2\n", rank);
-    /* If there is only one process, return */
+
     if (comm_size == 1)
         goto fn_exit;
 
@@ -751,24 +748,17 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
     
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     conc_comm = comm_ptr->dev.ch.concurrent_comm;
-    //if(rank==0)
-    //  printf("%d -  Check 1 \n", count);
+
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Comm_get_ptr(conc_comm, conc_commptr);
-    // //printf("%d @ check 2\n", rank);
-    // mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    // if (mpi_errno) {
-    //     MPIR_ERR_POP(mpi_errno);
-    //     goto fn_fail;
-    // }
+
     int local_rank, local_size, conc_rank, conc_size;
     local_rank = shmem_commptr->rank;
     local_size = shmem_commptr->local_size;
 
     conc_rank = conc_commptr->rank;
     conc_size = conc_commptr->local_size;
-    //if(rank==0)
-    //  printf("%d -  Check 2 \n", count);
+
 
     
     if(rank == root){
@@ -776,7 +766,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 
         scatter_size = (count + local_size - 1) / local_size;    //ceiling division
 
-	    //printf("%d - scatter size for %d is %d\n", count, rank, scatter_size);
+
         mpi_errno = MPIR_Scatter_impl(buffer, scatter_size, datatype,
                                   buffer, scatter_size, datatype, root,
                                   shmem_commptr, errflag);
@@ -785,7 +775,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
             MPIR_ERR_POP(mpi_errno);
             goto fn_fail;
         }
-	//printf("%d is going to call bcast - scatter_size = %d\n", rank, scatter_size);
+
         mpi_errno =  MPIR_Bcast_impl(buffer, scatter_size, datatype, 0, conc_commptr, errflag);
 
         if (mpi_errno) {
@@ -811,9 +801,9 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
                 MPIR_ERR_POP(mpi_errno);
                 goto fn_fail;
             }
+
         }//end if node_id
-	
-	    //printf("%d is going to call bcastttt, scatter_size=%d\n", rank, scatter_size);
+
 	    
         mpi_errno =  MPIR_Bcast_impl(buffer+(local_rank*scatter_size), scatter_size, datatype, 0, conc_commptr, errflag);
 
@@ -821,139 +811,26 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 		MPIR_ERR_POP(mpi_errno);
 		goto fn_fail;
 	    }
+	    
 
     }//end else
+    
     mpi_errno = MPIR_Allgather_impl(buffer+(local_rank*scatter_size), scatter_size, datatype,
                                                 buffer, scatter_size, datatype,
                                                 shmem_commptr, errflag);
+    if (mpi_errno) {
+	MPIR_ERR_POP(mpi_errno);
+	goto fn_fail;
+    }
 
-
-
-
-//     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
-//         is_contig = 1;
-//     else {
-//         MPID_Datatype_get_ptr(datatype, dtp);
-//         is_contig = dtp->is_contig;
-//     }
-
-//     is_homogeneous = 1;
-// #ifdef MPID_HAS_HETERO
-//     if (comm_ptr->is_hetero)
-//         is_homogeneous = 0;
-// #endif
-
-//     /* MPI_Type_size() might not give the accurate size of the packed
-//      * datatype for heterogeneous systems (because of padding, encoding,
-//      * etc). On the other hand, MPI_Pack_size() can become very
-//      * expensive, depending on the implementation, especially for
-//      * heterogeneous systems. We want to use MPI_Type_size() wherever
-//      * possible, and MPI_Pack_size() in other places.
-//      */
-//     if (is_homogeneous) {
-//         MPID_Datatype_get_size_macro(datatype, type_size);
-//     } else {
-//         MPIR_Pack_size_impl(1, datatype, &type_size);
-//     }
-
-//     nbytes = (MPIDI_msg_sz_t) (count) * type_size;
-
-//     if (is_contig && is_homogeneous) {
-//         /* contiguous and homogeneous. no need to pack. */
-//         MPIR_Type_get_true_extent_impl(datatype, &true_lb, &true_extent);
-
-//         tmp_buf = (char *) buffer + true_lb;
-//     } else {
-//         MPIU_CHKLMEM_MALLOC(tmp_buf, void *, nbytes, mpi_errno, "tmp_buf");
-
-//         /* TODO: Pipeline the packing and communication */
-//         position = 0;
-//         if (rank == root) {
-//             mpi_errno = MPIR_Pack_impl(buffer, count, datatype, tmp_buf, nbytes,
-//                                        &position);
-//             if (mpi_errno)
-//                 MPIR_ERR_POP(mpi_errno);
-//         }
-//     }
-
-//     scatter_size = (nbytes + comm_size - 1) / comm_size;    /* ceiling division */
-
-//     mpi_errno = scatter_for_bcast_MV2(buffer, count, datatype, root, comm_ptr,
-//                                       nbytes, tmp_buf, is_contig,
-//                                       is_homogeneous, errflag);
-//     if (mpi_errno) {
-//         /* for communication errors, just record the error but continue */
-//         *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-//         MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-//         MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-//     }
-
-//     /* long-message allgather or medium-size but non-power-of-two. use ring
-//      * algorithm. */
-
-//     MPIU_CHKLMEM_MALLOC(recvcnts, MPIDI_msg_sz_t *, comm_size * sizeof (MPIDI_msg_sz_t), 
-//                         mpi_errno, "recvcnts");
-//     MPIU_CHKLMEM_MALLOC(displs, MPIDI_msg_sz_t *, comm_size * sizeof (MPIDI_msg_sz_t),
-//                         mpi_errno, "displs");
-
-//     for (i = 0; i < comm_size; i++) {
-//         recvcnts[i] = nbytes - i * scatter_size;
-//         if (recvcnts[i] > scatter_size)
-//             recvcnts[i] = scatter_size;
-//         if (recvcnts[i] < 0)
-//             recvcnts[i] = 0;
-//     }
-
-//     displs[0] = 0;
-//     for (i = 1; i < comm_size; i++)
-//         displs[i] = displs[i - 1] + recvcnts[i - 1];
-
-//     left = (comm_size + rank - 1) % comm_size;
-//     right = (rank + 1) % comm_size;
-
-//     j = rank;
-//     jnext = left;
-//     for (i = 1; i < comm_size; i++) {
-//         MPIR_PVAR_INC(bcast, scatter_ring_allgather, send, recvcnts[(j - root + comm_size) % comm_size], MPI_BYTE);
-//         MPIR_PVAR_INC(bcast, scatter_ring_allgather, recv, recvcnts[(jnext - root + comm_size) % comm_size], MPI_BYTE);
-//         mpi_errno =
-//             MPIC_Sendrecv((char *) tmp_buf +
-//                              displs[(j - root + comm_size) % comm_size],
-//                              recvcnts[(j - root + comm_size) % comm_size],
-//                              MPI_BYTE, right, MPIR_BCAST_TAG,
-//                              (char *) tmp_buf +
-//                              displs[(jnext - root + comm_size) % comm_size],
-//                              recvcnts[(jnext - root + comm_size) % comm_size],
-//                              MPI_BYTE, left,
-//                              MPIR_BCAST_TAG, comm_ptr, MPI_STATUS_IGNORE, errflag);
-//         if (mpi_errno) {
-//             /* for communication errors, just record the error but continue */
-//             *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-//             MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-//             MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-//         }
-
-//         j = jnext;
-//         jnext = (comm_size + jnext - 1) % comm_size;
-//     }
-
-//     if (!is_contig || !is_homogeneous) {
-//         if (rank != root) {
-//             position = 0;
-//             mpi_errno = MPIR_Unpack_impl(tmp_buf, nbytes, &position, buffer,
-//                                          count, datatype);
-//             if (mpi_errno)
-//                 MPIR_ERR_POP(mpi_errno);
-//         }
-//     }
+    
 
   fn_exit:
-    // MPIU_CHKLMEM_FREEALL();
-    // if (mpi_errno_ret)
-    //     mpi_errno = mpi_errno_ret;
-    // else if (*errflag)
-    //     MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**coll_fail");
-    // MPIR_TIMER_END(coll,bcast,scatter_ring_allgather);
+    MPIU_CHKLMEM_FREEALL();
+    if (mpi_errno_ret)
+        mpi_errno = mpi_errno_ret;
+    else if (*errflag)
+        MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**coll_fail");
     return mpi_errno;
   fn_fail:
     goto fn_exit;
@@ -1016,7 +893,7 @@ int MPIR_Bcast_scatter_ring_allgather_MV2(void *buffer,
     MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_scatter_ring_allgather_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_scatter_ring_allgather_MV2\n", rank);
     /* If there is only one process, return */
     if (comm_size == 1)
         goto fn_exit;
@@ -1201,7 +1078,7 @@ int MPIR_Bcast_scatter_ring_allgather_shm_MV2(void *buffer,
         comm_size = leader_commptr->local_size;
         rank = leader_commptr->rank;
     }
-    printf("%d @ MPIR_Bcast_scatter_ring_allgather_shm_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_scatter_ring_allgather_shm_MV2\n", rank);
     MPIR_Type_get_true_extent_impl(datatype, &true_lb, &true_extent);
     /* even though we always call this algorithm with contigious buffer, still,
      * the datatype might have some holes in the beginning. Therefore, true_lb
@@ -1549,7 +1426,7 @@ int MPIR_Knomial_Bcast_inter_node_MV2(void *buffer,
 
     comm_size = leader_commptr->local_size;
     rank = leader_commptr->rank;
-    printf("%d @ MPIR_Knomial_Bcast_inter_node_MV2\n", rank);
+    //    printf("%d @ MPIR_Knomial_Bcast_inter_node_MV2\n", rank);
     MPIU_CHKLMEM_DECL(2);
 
     MPIU_CHKLMEM_MALLOC(reqarray, MPID_Request **,
@@ -1686,7 +1563,7 @@ int MPIR_Knomial_Bcast_intra_node_MV2(void *buffer,
     local_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
     MPIU_CHKLMEM_DECL(2);
-    printf("%d @ MPIR_Knomial_Bcast_intra_node_MV2\n", rank);
+    //    printf("%d @ MPIR_Knomial_Bcast_intra_node_MV2\n", rank);
     MPIU_CHKLMEM_MALLOC(reqarray, MPID_Request **,
                         2 * mv2_intra_node_knomial_factor * sizeof (MPID_Request*),
                         mpi_errno, "reqarray");
@@ -1828,7 +1705,7 @@ int MPIR_Mcast_inter_node_MV2(void *buffer,
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
     bcast_info = (bcast_info_t *) comm_ptr->dev.ch.bcast_info;
-    printf("%d @ MPIR_Mcast_inter_node_MV2\n", rank);
+    //    printf("%d @ MPIR_Mcast_inter_node_MV2\n", rank);
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
 
@@ -1994,7 +1871,7 @@ int MPIR_Knomial_Bcast_inter_node_trace_MV2(int root, int mv2_bcast_knomial_fact
     int *knomial_bcast_dst_array=NULL;
     rank      = comm_ptr->rank;
     local_size = comm_ptr->local_size;
-    printf("%d @ MPIR_Knomial_Bcast_inter_node_trace_MV2\n", rank);
+    //    printf("%d @ MPIR_Knomial_Bcast_inter_node_trace_MV2\n", rank);
     relative_rank = (rank >= root) ? rank - root : rank - root + local_size;
  
     while (mask < local_size) {
@@ -2149,7 +2026,7 @@ int MPIR_Pipelined_Bcast_Zcpy_MV2(void *buffer,
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Datatype_get_extent_macro(datatype, extent);
-    printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);
+    //    printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);
     
     MPIU_Assert(mv2_enable_zcpy_bcast==1 && mv2_use_slot_shmem_coll==1);
     local_rank = shmem_commptr->rank;
@@ -2299,7 +2176,7 @@ static int MPIR_Bcast_tune_inter_node_helper_MV2(void *buffer,
     int leader_root, leader_of_root;
 
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_tune_inter_node_helper_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_tune_inter_node_helper_MV2\n", rank);
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     local_rank = shmem_commptr->rank;
@@ -2427,7 +2304,7 @@ static int MPIR_Bcast_inter_node_helper_MV2(void *buffer,
     int leader_root, leader_of_root;
 
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_inter_node_helper_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_inter_node_helper_MV2\n", rank);
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     local_rank = shmem_commptr->rank;
@@ -2580,7 +2457,7 @@ int MPIR_Bcast_intra_MV2(void *buffer,
     MPID_Comm *shmem_commptr = NULL;
     MPI_Comm shmem_comm;
     MPID_Datatype *dtp;
-    printf("%d - Hello from MPIR_Bcast_intra_MV2\n", count);
+    //    printf("%d - Hello from MPIR_Bcast_intra_MV2\n", count);
     MPIU_THREADPRIV_DECL;
     MPID_MPI_STATE_DECL(MPID_STATE_MPIR_BCAST_INTRA_MV2);
 
@@ -2598,7 +2475,7 @@ int MPIR_Bcast_intra_MV2(void *buffer,
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    printf("%d @ MPIR_Bcast_intra_MV2\n", rank);
+    //    printf("%d @ MPIR_Bcast_intra_MV2\n", rank);
     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
         is_contig = 1;
     else {
@@ -3443,7 +3320,7 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
     nbytes = (MPIDI_msg_sz_t) (count) * (datatype_extent);
     int mem_type = 0;
     int rank = comm_ptr->rank;
-    printf("%d at F3\n", rank);
+    //    printf("%d at F3\n", rank);
     if (rdma_enable_cuda) {
         mem_type = is_device_buffer(buf);
     }
