@@ -5992,6 +5992,152 @@ int MPIR_2lvl_Allgather_Multileader_Ring_MV2(
 
 
 
+
+/**************** Added by Mehran *****************/
+/**
+ * 
+ * In this function, first, we perform an inter-node 
+ *  allgather where all the ranks exchange 
+ * their data with their peers on other nodes. 
+ * Then, we perform inter-node allgather where all
+ * the ranks at each node, exchange all the data
+ * that they have. This is a simple implementation of 
+ * Concurrent Allgather through calling MPIR_Allgather_impl().
+ * 
+ **/
+#undef FUNCNAME
+#define FUNCNAME MPIR_Concurrent_Allgather_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_Concurrent_Allgather_MV2(
+    const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+          void *recvbuf, int recvcount, MPI_Datatype recvtype,
+    MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
+{
+
+    int mpi_errno = MPI_SUCCESS;
+    int mpi_errno_ret = MPI_SUCCESS;
+    int i, j;
+    
+    /* get info about communicator for ranks on the same node and concurrent comm */
+    MPI_Comm shmem_comm, conc_comm;
+    MPID_Comm *shmem_commptr=NULL, *conc_commptr = NULL;
+    
+    
+    shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    conc_comm = comm_ptr->dev.ch.concurrent_comm;
+
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    MPID_Comm_get_ptr(conc_comm, conc_commptr);
+
+    int local_rank, local_size, conc_rank, conc_size;
+    local_rank = shmem_commptr->rank;
+    local_size = shmem_commptr->local_size;
+
+    conc_rank = conc_commptr->rank;
+    conc_size = conc_commptr->local_size;
+
+    
+    /* get our rank and the size of this communicator */
+    int rank = comm_ptr->rank;
+    int size = comm_ptr->local_size;
+
+    int p = shmem_commptr->local_size; // number of ranks per node
+    int n = (int) (size / p); // number of nodes
+    
+
+
+    /* get extent of receive type */
+    MPI_Aint recvtype_extent, sendtype_extent;
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
+
+    MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_allgather_2lvl_multileader_ring, 1);
+
+    /* First, load the "local" version in the recvbuf. */
+    if (sendbuf != MPI_IN_PLACE) {
+        /* compute location in receive buffer for our data */
+        void* rbuf = (void*)((char*) recvbuf + rank * recvcount * recvtype_extent);
+
+        /* copy data from send buffer to receive buffer */
+        mpi_errno = MPIR_Localcopy(
+            sendbuf, sendcount, sendtype,
+            rbuf,    recvcount, recvtype
+        );
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
+
+
+    //#TODO:  if cyclic, we do not need this
+
+    void* tmpbuf = MPIU_Malloc(size * recvcount * recvtype_extent);
+    if (!tmpbuf) {
+        mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE,
+                                            FCNAME, __LINE__, MPI_ERR_OTHER,
+                                            "**nomem", 0);
+        return mpi_errno;
+    }
+
+    /* Inter-Node Ring*/
+    mpi_errno = MPIR_Allgather_impl(recvbuf + (rank* recvcount), recvcount, recvtype,
+                                            tmpbuf, recvcount, recvtype,
+                                            conc_commptr, errflag);
+
+
+
+    
+    
+    /* Intra-node Ring */
+
+    mpi_errno = MPIR_Allgather_impl(tmpbuf, n*recvcount, recvtype,
+                                            tmpbuf, n*recvcount, recvtype,
+                                            shmem_commptr, errflag);
+
+
+
+    //Sort the data while copying from tmpbuf to recvbuf
+
+    
+    for(i = 0; i < p; ++i){
+        /* copy data for each rank from temp buffer to receive buffer */
+        for (j = 0; j < n; ++j) {
+            /* get next rank in list */
+            int dstrank = comm_ptr->dev.ch.rank_list[j*p + i];
+
+            /* compute position in receive buffer for this rank */
+            void* rbuf = (void*)((char*)recvbuf + dstrank * recvcount * recvtype_extent);
+            void* sbuf = (void*)((char*)tmpbuf + (i*n+j) * recvcount * recvtype_extent);
+
+            /* copy data to its correct place */
+            mpi_errno = MPIR_Localcopy(sbuf, recvcount, recvtype,
+                                       rbuf, recvcount, recvtype);
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+        }//end for j
+	}//end for i
+
+
+    // free the temporary buffer 
+
+    MPIU_Free(tmpbuf);
+
+    fn_fail:
+	    return (mpi_errno);
+}
+
+
+
+
+
+
+
+
+
+
+
 /* Execute an allgather by forwarding data through a ring of
  * processes.  This implementation uses the two-level data
  * structures to account for how procs are assigned to nodes
@@ -7142,6 +7288,7 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Multileader_RD_MV2
             || MV2_Allgather_function == &MPIR_2lvl_SharedMem_Allgather_MV2
             || MV2_Allgather_function == &MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2
+            || MV2_Allgather_function == &MPIR_Concurrent_Allgather_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Encrypted_RDB_MV2
             || MV2_Allgather_function == &MPIR_Allgather_NaivePlus_RDB_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Encrypted_RDB_MV2

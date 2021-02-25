@@ -2839,6 +2839,11 @@ int MV2_internode_Allgather_is_define(char *mv2_user_allgather_inter)
                     mv2_tmp_allgather_indexed_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
                         &MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2;
                     break;
+                case CONCURRENT_ALLGATHER:
+                    mv2_tmp_allgather_indexed_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
+                        &MPIR_Concurrent_Allgather_MV2;
+                    break;
+                    
                 default:
                     mv2_tmp_allgather_indexed_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
                         &MPIR_Allgather_RD_MV2;
@@ -2957,6 +2962,11 @@ int MV2_internode_Allgather_is_define(char *mv2_user_allgather_inter)
                         &MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2;
                     break;
 
+                case CONCURRENT_ALLGATHER:
+                    mv2_tmp_allgather_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
+                        &MPIR_Concurrent_Allgather_MV2;
+                    break;
+
                 default:
                     mv2_tmp_allgather_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
                         &MPIR_Allgather_RD_MV2;
@@ -3066,7 +3076,10 @@ int MV2_internode_Allgather_is_define(char *mv2_user_allgather_inter)
                         mv2_tmp_allgather_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
                             &MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2;
                         break;
-                    
+                    case CONCURRENT_ALLGATHER:
+                        mv2_tmp_allgather_thresholds_table[0].inter_leader[0].MV2_pt_Allgather_function =
+                            &MPIR_Concurrent_Allgather_MV2;
+                        break;
                     default:
                         mv2_tmp_allgather_thresholds_table[0].inter_leader[i].MV2_pt_Allgather_function =
                             &MPIR_Allgather_RD_MV2;
