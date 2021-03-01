@@ -4210,6 +4210,9 @@ int MPIR_Naive_Sec_Allgather(const void *sendbuf, int sendcount, MPI_Datatype se
                         void *recvbuf, int recvcount, MPI_Datatype recvtype,
                              MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag);
 
+int MPIR_Naive_Sec_Alltoall(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+                        void *recvbuf, int recvcount, MPI_Datatype recvtype,
+                        MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag);
 /*********************************************************************/
 
 int MPIR_Allgather_impl(const void *sendbuf, int sendcount, MPI_Datatype sendtype,

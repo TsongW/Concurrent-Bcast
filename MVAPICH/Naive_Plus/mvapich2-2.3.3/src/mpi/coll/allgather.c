@@ -1084,7 +1084,7 @@ int MPI_Allgather(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
     /****************************** Added by Mehran ***********************/
     if(security_approach==1){
         //NAIVE
-        MPIR_Naive_Sec_Allgather(sendbuf, sendcount, sendtype,
+        mpi_errno = MPIR_Naive_Sec_Allgather(sendbuf, sendcount, sendtype,
                                 recvbuf, recvcount, recvtype,
                                 comm_ptr, &errflag);
     }else{
