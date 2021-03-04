@@ -17,6 +17,7 @@
  */
 
 #include "mpiimpl.h"
+#include "secure_allgather.h"
 #include <math.h>
 #include <unistd.h>
 #include "coll_shmem.h"
@@ -318,41 +319,295 @@ int MPIR_Alltoall_bruck_MV2(
                 count++;
             }
         }
-        
-        mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
+
+        /**************** Added by Mehran ***********************/
+
+        MPID_Node_id_t my_node_id, dst_node_id, src_node_id;
+        //get src and dst nodes
+        MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
+        MPID_Get_node_id(comm_ptr, src, &src_node_id);
+        MPID_Get_node_id(comm_ptr, rank, &my_node_id);
+
+
+        if(security_approach == 2){
+	    int dest, next;
+            if(my_node_id != dst_node_id && my_node_id != src_node_id){
+                //encrypt
+
+                //if(one bby one){
+                    
+                    int i;
+                    unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
+                    in_size = (unsigned long)(recvcount * recvtype_extent);
+                    unsigned long max_out_len = (unsigned long) (16 + in_size);
+
+                    for(i=0;  i<count; ++i){
+                        void* in = (void*)((char*) recvbuf + displs[i] * recvtype_extent);
+                        void* out = (void*)((char*) ciphertext_sendbuf + i * (recvcount * recvtype_extent + 16+12));
+
+
+                        RAND_bytes(out, 12);
+                        
+                        if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                                    &ciphertext_len, max_out_len,
+                                    out, 12, in, in_size,
+                                    NULL, 0)){
+                            printf("Error in O-Bruck encryption: alltoall Bruck (1)\n");
+                            fflush(stdout);
+                        }
+                    }//end for
+
+                    // mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
+                    //                                     displs, recvtype, &newtype);
+                    // if (mpi_errno) {
+                    //     MPIR_ERR_POP(mpi_errno);
+                    // }
+                    
+                    // mpi_errno = MPIR_Type_commit_impl(&newtype);
+                    // if (mpi_errno) {
+                    //     MPIR_ERR_POP(mpi_errno);
+                    // }
+                    
+                    // position = 0;
+                    // mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
+                    //                         pack_size, &position);
+                    // if (mpi_errno) {
+                    //     MPIR_ERR_POP(mpi_errno);
+                    // }
+                    
+                    MPIR_PVAR_INC(alltoall, bruck, send, count*(sendcount*sendtype_extent+16+12), MPI_CHAR);
+                    MPIR_PVAR_INC(alltoall, bruck, recv, count*(sendcount*sendtype_extent+16+12), MPI_CHAR);                
+                    mpi_errno = MPIC_Sendrecv(ciphertext_sendbuf, count*(sendcount*sendtype_extent+16+12), MPI_CHAR, dst,
+                                                MPIR_ALLTOALL_TAG, ciphertext_recvbuf, count*(recvcount*recvtype_extent+16+12), MPI_CHAR,
+                                                src, MPIR_ALLTOALL_TAG, comm_ptr,
+                                                MPI_STATUS_IGNORE, errflag);
+                    if (mpi_errno) {
+                        /* for communication errors, just record the error but continue */
+                        *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                        MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                        MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                    }
+                    
+                    //Decrypt
+                    for(i = 0; i < count; ++i){
+                        next =(unsigned long )(i*(recvcount * recvtype_extent + 16+12));
+                        dest =(unsigned long )(displs[i]*(recvtype_extent));
+                        
+
+                        if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                                        &de_count, (unsigned long )((recvcount*recvtype_extent)),
+                                        (ciphertext_recvbuf+next), 12,
+                                        (ciphertext_recvbuf+next+12), (unsigned long )(recvcount*recvtype_extent+16),
+                                        NULL, 0)){
+                                    printf("Decryption error in O-Bruck alltoall (1)\n");fflush(stdout);
+                            }                               
+                    
+                    }
+                    // MPIR_Type_free_impl(&newtype);
+                    
+                    pof2 *= 2;
+            //} end if one by one
+
+            } else if(my_node_id != dst_node_id){
+                int i;
+                unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
+                in_size = (unsigned long)(recvcount * recvtype_extent);
+                unsigned long max_out_len = (unsigned long) (16 + in_size);
+
+                for(i=0;  i<count; ++i){
+                    void* in = (void*)((char*) recvbuf + displs[i] * recvtype_extent);
+                    void* out = (void*)((char*) ciphertext_sendbuf + i * (recvcount * recvtype_extent + 16+12));
+
+
+                    RAND_bytes(out, 12);
+                    
+                    if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                                &ciphertext_len, max_out_len,
+                                out, 12, in, in_size,
+                                NULL, 0)){
+                        printf("Error in O-Bruck encryption: alltoall Bruck (2)\n");
+                        fflush(stdout);
+                    }
+                }//end for
+                mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
                                                   displs, recvtype, &newtype);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                mpi_errno = MPIR_Type_commit_impl(&newtype);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                // position = 0;
+                // mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
+                //                         pack_size, &position);
+                // if (mpi_errno) {
+                //     MPIR_ERR_POP(mpi_errno);
+                // }
+                
+                MPIR_PVAR_INC(alltoall, bruck, send, count*(sendcount*sendtype_extent+16+12), MPI_CHAR);
+                MPIR_PVAR_INC(alltoall, bruck, recv, 1, newtype);                
+                mpi_errno = MPIC_Sendrecv(ciphertext_sendbuf, count*(sendcount*sendtype_extent+16+12), MPI_CHAR, dst,
+                                            MPIR_ALLTOALL_TAG, recvbuf, 1, newtype,
+                                            src, MPIR_ALLTOALL_TAG, comm_ptr,
+                                            MPI_STATUS_IGNORE, errflag);
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                }
+                
+                MPIR_Type_free_impl(&newtype);
+                
+                pof2 *= 2;
+
+
+            }//end if my_node != dst_node
+            else if(my_node_id != src_node_id){
+                mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
+                                                  displs, recvtype, &newtype);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                mpi_errno = MPIR_Type_commit_impl(&newtype);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                position = 0;
+                mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
+                                        pack_size, &position);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                MPIR_PVAR_INC(alltoall, bruck, send, position, MPI_PACKED);
+                MPIR_PVAR_INC(alltoall, bruck, recv, count*(sendcount*sendtype_extent+16+12), MPI_CHAR);                
+                mpi_errno = MPIC_Sendrecv(tmp_buf, position, MPI_PACKED, dst,
+                                            MPIR_ALLTOALL_TAG, ciphertext_recvbuf, count*(sendcount*sendtype_extent+16+12), MPI_CHAR,
+                                            src, MPIR_ALLTOALL_TAG, comm_ptr,
+                                            MPI_STATUS_IGNORE, errflag);
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                }
+                
+                MPIR_Type_free_impl(&newtype);
+                
+
+                //Decrypt
+                unsigned long  de_count=0;
+
+                for(i = 0; i < count; ++i){
+                    next =(unsigned long )(i*(recvcount * recvtype_extent + 16+12));
+                    dest =(unsigned long )(displs[i]*(recvtype_extent));
+                    
+
+                    if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                                    &de_count, (unsigned long )((recvcount*recvtype_extent)),
+                                    (ciphertext_recvbuf+next), 12,
+                                    (ciphertext_recvbuf+next+12), (unsigned long )(recvcount*recvtype_extent+16),
+                                    NULL, 0)){
+                                printf("Decryption error in O-Bruck alltoall (2)\n");fflush(stdout);
+                        }                               
+                
+                }
+
+
+
+
+                pof2 *= 2;
+
+            }//end if my_node != src_node
+            else{
+                //original code
+                mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
+                                                  displs, recvtype, &newtype);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                mpi_errno = MPIR_Type_commit_impl(&newtype);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                position = 0;
+                mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
+                                        pack_size, &position);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                
+                MPIR_PVAR_INC(alltoall, bruck, send, position, MPI_PACKED);
+                MPIR_PVAR_INC(alltoall, bruck, recv, 1, newtype);                
+                mpi_errno = MPIC_Sendrecv(tmp_buf, position, MPI_PACKED, dst,
+                                            MPIR_ALLTOALL_TAG, recvbuf, 1, newtype,
+                                            src, MPIR_ALLTOALL_TAG, comm_ptr,
+                                            MPI_STATUS_IGNORE, errflag);
+                if (mpi_errno) {
+                    /* for communication errors, just record the error but continue */
+                    *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                    MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                    MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+                }
+                
+                MPIR_Type_free_impl(&newtype);
+                
+                pof2 *= 2;
+            }//end else
+
+            
+            
+
+        }//end if security_approach=2
+
+        /*******************************************************/
+        else{
+
+            mpi_errno = MPIR_Type_create_indexed_block_impl(count, recvcount,
+                                                  displs, recvtype, &newtype);
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+            
+            mpi_errno = MPIR_Type_commit_impl(&newtype);
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+            
+            position = 0;
+            mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
+                                    pack_size, &position);
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+            
+            MPIR_PVAR_INC(alltoall, bruck, send, position, MPI_PACKED);
+            MPIR_PVAR_INC(alltoall, bruck, recv, 1, newtype);                
+            mpi_errno = MPIC_Sendrecv(tmp_buf, position, MPI_PACKED, dst,
+                                        MPIR_ALLTOALL_TAG, recvbuf, 1, newtype,
+                                        src, MPIR_ALLTOALL_TAG, comm_ptr,
+                                        MPI_STATUS_IGNORE, errflag);
+            if (mpi_errno) {
+                /* for communication errors, just record the error but continue */
+                *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
+                MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
+                MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
+            }
+            
+            MPIR_Type_free_impl(&newtype);
+            
+            pof2 *= 2;
+
         }
         
-        mpi_errno = MPIR_Type_commit_impl(&newtype);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
-        
-        position = 0;
-        mpi_errno = MPIR_Pack_impl(recvbuf, 1, newtype, tmp_buf, 
-                                   pack_size, &position);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
-        
-        MPIR_PVAR_INC(alltoall, bruck, send, position, MPI_PACKED);
-        MPIR_PVAR_INC(alltoall, bruck, recv, 1, newtype);                
-        mpi_errno = MPIC_Sendrecv(tmp_buf, position, MPI_PACKED, dst,
-                                     MPIR_ALLTOALL_TAG, recvbuf, 1, newtype,
-                                     src, MPIR_ALLTOALL_TAG, comm_ptr,
-                                     MPI_STATUS_IGNORE, errflag);
-        if (mpi_errno) {
-            /* for communication errors, just record the error but continue */
-            *errflag = MPIR_ERR_GET_CLASS(mpi_errno);
-            MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**fail");
-            MPIR_ERR_ADD(mpi_errno_ret, mpi_errno);
-        }
-        
-        MPIR_Type_free_impl(&newtype);
-        
-        pof2 *= 2;
     }
     
     MPIU_Free(displs);
