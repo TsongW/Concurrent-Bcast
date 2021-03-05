@@ -3876,7 +3876,7 @@ extern int waitCounter;
 extern int nonceCounter;
 
 int security_approach, overlap_decryption, shmem_leaders, concurrent_comm;
-int concurrent_bcast;
+int concurrent_bcast, o_bruck2;
 key_t shmem_key, ciphertext_shmem_key;
 int shmid, ciphertext_shmid, allocated_shmem;
 void *shmem_buffer, *ciphertext_shmem_buffer;

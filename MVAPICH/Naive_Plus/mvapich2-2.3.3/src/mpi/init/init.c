@@ -241,7 +241,7 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value;
+    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
@@ -263,6 +263,10 @@ int MPI_Init( int *argc, char ***argv )
     shmem_leaders = 1;
     if ((sml_value = getenv("SHMEM_LEADERS")) != NULL) {
         shmem_leaders = (atoi(sml_value));
+    }
+    o_bruck2 = 0;
+    if ((ob_value = getenv("O_BRUCK2")) != NULL) {
+        o_bruck2 = (atoi(ob_value));
     }
 
     concurrent_comm = 0;
