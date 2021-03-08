@@ -10,8 +10,8 @@ set term postscript eps font "Times-Roman, 35" enhanced color
 set output label.'.eps'
 
 #BLOCK:
-set ytics 0,20,80
-set yrange[0:80]
+#set ytics 0,20,80
+#set yrange[0:80]
 
 
 #CYCLIC:
@@ -20,14 +20,7 @@ set yrange[0:80]
 
 
 #Block:
-plot file using 5:xtic(1) title "O-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 8 title "C-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 9 title "C-RD" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 10 title "HS1" lt rgb "#43a2ca" fillstyle pattern 3,\
- "" using 11 title "HS2" lt rgb "#0868ac" fillstyle pattern 3
+plot file using 7:xtic(1) title "C-RD" lc rgb "#f0f9e8" fillstyle pattern 3,\
+ "" using 8 title "HS1" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 9 title "HS2" lt rgb "#2b8cbe" fillstyle pattern 3
 
-#Cyclic:
-#plot file using 12:xtic(1) title "O-RD2" lc rgb "#f0f9e8" fillstyle pattern 3,\
-# "" using 8 title "C-Ring" lt rgb "#bae4bc" fillstyle pattern 3,\
-# "" using 10 title "HS1" lt rgb "#7bccc4" fillstyle pattern 3,\
-# "" using 11 title "HS2" lt rgb "#2b8cbe" fillstyle pattern 3

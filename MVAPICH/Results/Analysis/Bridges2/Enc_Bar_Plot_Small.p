@@ -12,8 +12,8 @@ set term postscript eps font "Times-Roman, 35" enhanced color
 set output label.'.eps'
 
 
-plot file using 2:xtic(1) title "O-RD" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 7 title "O-RD2" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 6 title "C-RD" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 8 title "HS1" lt rgb "#2b8cbe" fillstyle pattern 3
+plot file using 3:xtic(1) title "O-RD" lc rgb "#f0f9e8" fillstyle pattern 3,\
+ "" using 7 title "C-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
+ "" using 8 title "HS1" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 9 title "HS2" lt rgb "#2b8cbe" fillstyle pattern 3
 

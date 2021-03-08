@@ -17,12 +17,7 @@ set output label.'.eps'
 #set yrange[0:2.5]
 
 #Block
-plot file using 8:xtic(1) title "C-Ring" lc rgb "#f0f9e8" fillstyle pattern 3,\
- "" using 9 title "C-RD" lt rgb "#bae4bc" fillstyle pattern 3,\
- "" using 10 title "HS1" lt rgb "#7bccc4" fillstyle pattern 3,\
- "" using 11 title "HS2" lt rgb "#2b8cbe" fillstyle pattern 3
+plot file using 7:xtic(1) title "C-RD" lc rgb "#f0f9e8" fillstyle pattern 3,\
+ "" using 8 title "HS1" lt rgb "#7bccc4" fillstyle pattern 3,\
+ "" using 9 title "HS2" lt rgb "#2b8cbe" fillstyle pattern 3
 
-#Cyclic
-#plot file using 8:xtic(1) title "C-Ring" lc rgb "#e0f3db" fillstyle pattern 3,\
-# "" using 10 title "HS1" lt rgb "#a8ddb5" fillstyle pattern 3,\
-# "" using 11 title "HS2" lt rgb "#43a2ca" fillstyle pattern 3
