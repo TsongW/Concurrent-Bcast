@@ -982,7 +982,9 @@ int MPIR_Alltoall_Scatter_dest_MV2(
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    
+    if(rank==0){
+        printf("%d - MPIR_Alltoall_Scatter_dest_MV2\n", sendcount);
+    }
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
@@ -1029,12 +1031,45 @@ int MPIR_Alltoall_Scatter_dest_MV2(
     
     MPIU_CHKLMEM_MALLOC(starray, MPI_Status *, 2*bblock*sizeof(MPI_Status),
                         mpi_errno, "starray");
- 
+    
+
+    /***********************      Added by Mehran     ***************************/
+    int dest, next;
+    unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
+    in_size = (unsigned long)(recvcount * recvtype_extent);
+    unsigned long max_out_len = (unsigned long) (16 + in_size);
+    
+    MPID_Node_id_t my_node_id, dst_node_id;
+    //get src and dst nodes
+    MPID_Get_node_id(comm_ptr, rank, &my_node_id);
+    /***************************************************************************/
+
     for (ii=0; ii<comm_size; ii+=bblock) {
         ss = comm_size-ii < bblock ? comm_size-ii : bblock;
         /* do the communication -- post ss sends and receives: */
         for ( i=0; i<ss; i++ ) {
             dst = (rank+i+ii) % comm_size;
+            /***********************      Added by Mehran     ***************************/
+            if(security_approach == 2){
+                MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
+                if(dst_node_id != my_node_id){
+                    MPIR_PVAR_INC(alltoall, sd, recv, recvcount*recvtype_extent + 16 + 12, MPI_CHAR);
+                    mpi_errno = MPIC_Irecv((char *)ciphertext_recvbuf +
+                                      dst*(recvcount*recvtype_extent+16+12),
+                                      recvcount*recvtype_extent + 16 + 12, MPI_CHAR, dst,
+                                      MPIR_ALLTOALL_TAG, comm_ptr,
+                                      &reqarray[i]);
+                }else{
+                    MPIR_PVAR_INC(alltoall, sd, recv, recvcount, recvtype);
+                    mpi_errno = MPIC_Irecv((char *)recvbuf +
+                                      dst*recvcount*recvtype_extent,
+                                      recvcount, recvtype, dst,
+                                      MPIR_ALLTOALL_TAG, comm_ptr,
+                                      &reqarray[i]);
+                }
+                if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+            }
+            /***************************************************************************/
             MPIR_PVAR_INC(alltoall, sd, recv, recvcount, recvtype);
             mpi_errno = MPIC_Irecv((char *)recvbuf +
                                       dst*recvcount*recvtype_extent,
@@ -1045,6 +1080,41 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         }
         for ( i=0; i<ss; i++ ) {
             dst = (rank-i-ii+comm_size) % comm_size;
+            /***********************      Added by Mehran     ***************************/
+            if(security_approach == 2){
+                MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
+                if(dst_node_id != my_node_id){
+                    //encrypt here
+                    void* in = (void*)((char*) sendbuf + dst*sendcount*sendtype_extent);
+                    void* out = (void*)((char*) ciphertext_sendbuf + dst*(sendcount*sendtype_extent+16+12));
+                    
+                    RAND_bytes(out, 12);
+                    
+                    if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                                &ciphertext_len, max_out_len,
+                                out, 12, in, in_size,
+                                NULL, 0)){
+                        printf("Error in O-SD encryption: alltoall SD (1)\n");
+                        fflush(stdout);
+                    }
+
+                    //send
+                    MPIR_PVAR_INC(alltoall, sd, send, sendcount * sendtype_extent + 16 + 12, MPI_CHAR);
+                    mpi_errno = MPIC_Isend(out,
+                                          sendcount * sendtype_extent + 16 + 12, MPI_CHAR, dst,
+                                          MPIR_ALLTOALL_TAG, comm_ptr,
+                                          &reqarray[i+ss], errflag);
+                }else{
+                    MPIR_PVAR_INC(alltoall, sd, send, sendcount, sendtype);
+                    mpi_errno = MPIC_Isend((char *)sendbuf +
+                                          dst*sendcount*sendtype_extent,
+                                          sendcount, sendtype, dst,
+                                          MPIR_ALLTOALL_TAG, comm_ptr,
+                                          &reqarray[i+ss], errflag);
+                }
+                if (mpi_errno) MPIR_ERR_POP(mpi_errno);
+            }
+            /***************************************************************************/
             MPIR_PVAR_INC(alltoall, sd, send, sendcount, sendtype);
             mpi_errno = MPIC_Isend((char *)sendbuf +
                                           dst*sendcount*sendtype_extent,
@@ -1068,6 +1138,29 @@ int MPIR_Alltoall_Scatter_dest_MV2(
                      }
                 }
         }
+
+        /***********************      Added by Mehran     ***************************/
+        //decrypt here
+        for ( i=0; i<ss; i++ ) {
+            dst = (rank+i+ii) % comm_size;
+            
+            if(security_approach == 2){
+                MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
+                if(dst_node_id != my_node_id){
+                    next =(unsigned long )(dst*(recvcount * recvtype_extent + 16+12));
+                    dest =(unsigned long )(dst*(recvcount * recvtype_extent));
+                    if(!EVP_AEAD_CTX_open(ctx, ((recvbuf+dest)),
+                                    &de_count, (unsigned long )((recvcount*recvtype_extent)),
+                                    (ciphertext_recvbuf+next), 12,
+                                    (ciphertext_recvbuf+next+12), (unsigned long )(recvcount*recvtype_extent+16),
+                                    NULL, 0)){
+                                printf("Decryption error in O-SD alltoall (1)\n");fflush(stdout);
+                    }
+                }//end if inter node
+            } //end if security_approach
+        }//end for
+        /***************************************************************************/
+
     }
     /* --END ERROR HANDLING-- */
     MPIU_CHKLMEM_FREEALL();
