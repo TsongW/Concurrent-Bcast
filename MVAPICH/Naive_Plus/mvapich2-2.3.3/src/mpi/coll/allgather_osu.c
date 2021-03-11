@@ -2941,7 +2941,7 @@ int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf
         //unsigned long count=0;
         
         max_out_len = (unsigned long) (16 + (recvtype_extent*sendcnt));
-	//        int i, next, dest;
+	    //        int i, next, dest;
         //printf("%d- local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, local_rank, leader_comm_size, (int)(rank/p));
         for(i = 0; i < n; i+=1){
             //printf("%d- i:%d, local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, i, local_rank, leader_comm_size, (int)(rank/p));
@@ -3024,7 +3024,7 @@ int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf
         int s=0;
         for(; s<n; ++s){
             in = (void*)((char*)recvbuf + (s * recvcnt * recvtype_extent));
-            void* out = (void*)((char*)shmem_buffer + ((s*p+local_rank) * recvcnt * recvtype_extent));
+            void* out = (void*)((char*)shmem_buffer + (comm_ptr->dev.ch.rank_list[(s*p+local_rank)] * recvcnt * recvtype_extent));
 
             mpi_errno = MPIR_Localcopy(in, recvcnt, recvtype, 
                                 out, recvcnt, recvtype);
@@ -3044,7 +3044,7 @@ int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf
 
 
         //copy to user buffer
-         if(comm_ptr->dev.ch.is_global_block==1){
+        //  if(comm_ptr->dev.ch.is_global_block==1){
             //Blocked
             mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
                                     (void*)((char*)recvbuf), recvcnt * size, recvtype);
@@ -3054,20 +3054,20 @@ int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf
             }
 
 
-        }else{
-            //NonBlocked
-            int s=0;
-            for(; s<size; ++s){
+        // }else{
+        //     //NonBlocked
+        //     int s=0;
+        //     for(; s<size; ++s){
                 
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
-                                        (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+        //         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+        //                                 (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
 
-                if (mpi_errno) {
-                    MPIR_ERR_POP(mpi_errno);
-                }
+        //         if (mpi_errno) {
+        //             MPIR_ERR_POP(mpi_errno);
+        //         }
    
-            }
-        }
+        //     }
+        // }
         
     }
 
