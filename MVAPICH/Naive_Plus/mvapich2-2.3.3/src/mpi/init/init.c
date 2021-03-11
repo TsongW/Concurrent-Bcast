@@ -252,7 +252,7 @@ int MPI_Init( int *argc, char ***argv )
     allocated_shmem = 0;
     if ((t_value = getenv("MV2_INTER_ALLGATHER_TUNING")) != NULL) {
         int alg = (atoi(t_value));
-        if(alg==14 || alg ==18){
+        if(alg==14 || alg ==18 || alg==20){
             allocated_shmem = 1;
             if(security_approach==2){
                 allocated_shmem = 2;

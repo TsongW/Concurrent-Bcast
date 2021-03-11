@@ -2839,6 +2839,255 @@ int MPIR_Allgather_intra_MV2(const void *sendbuf,
 }
 
 /**************** Added by Mehran *********************/
+#undef FUNCNAME
+#define FUNCNAME MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf,int sendcnt, MPI_Datatype sendtype,
+                            void *recvbuf, int recvcnt,MPI_Datatype recvtype,
+                            MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag){
+    int rank, size;
+    int local_rank, local_size, idx;
+     
+    int mpi_errno = MPI_SUCCESS;
+    MPI_Aint recvtype_extent = 0;  
+    MPI_Comm shmem_comm, conc_comm;
+    MPID_Comm *shmem_commptr=NULL, *conc_commptr = NULL;
+    MPID_Node_id_t node_id;    
+    rank = comm_ptr->rank;
+    size = comm_ptr->local_size;
+
+    MPID_Get_node_id(comm_ptr, rank, &node_id);
+    int my_node = node_id;
+    
+    if (recvcnt == 0) {
+        return MPI_SUCCESS;
+    }
+
+    // extract the rank,size information for the intra-node communicator
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    
+    shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    local_rank = shmem_commptr->rank;
+    local_size = shmem_commptr->local_size;
+    int p = shmem_commptr->local_size; // number of ranks per node
+    int n = (int) (size / p); // number of nodes
+
+    conc_comm = comm_ptr->dev.ch.concurrent_comm;    
+    MPID_Comm_get_ptr(conc_comm, conc_commptr);
+
+    
+    
+    
+    if(security_approach == 2){
+
+        //First, copy plaintext to the shmem_buf
+        void* in;
+        if(sendbuf == MPI_IN_PLACE) {
+            in = (void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent));
+        }else{
+            in = (void*)((char*)sendbuf);
+        }  
+
+        mpi_errno = MPIR_Localcopy(in, recvcnt, recvtype, 
+                                (void*)((char*)shmem_buffer + (my_node * p + local_rank)*(recvcnt * recvtype_extent)),
+                                recvcnt, recvtype);
+
+
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+
+
+        //Then, each process should encrypt its data
+        unsigned long count=0;
+        unsigned long next, dest;
+        unsigned int i;
+
+        unsigned long  ciphertext_len = 0;
+        //void* out = (void*)((char*) ciphertext_shmem_buffer + (my_node * p + local_rank) * (recvcnt * recvtype_extent + 12 + 16));
+        void* out = (void*)((char*) ciphertext_recvbuf + (my_node * p + local_rank) * (recvcnt * recvtype_extent + 12 + 16));
+        
+
+        RAND_bytes(out, 12); // 12 bytes of nonce
+
+        unsigned long t=0;
+        t = (unsigned long)(recvcnt * recvtype_extent);
+        unsigned long   max_out_len = (unsigned long) (16 + t);
+    
+        if(!EVP_AEAD_CTX_seal(ctx, out+12,  
+                            &ciphertext_len, max_out_len,
+                            out, 12,
+                            in, t,
+                            NULL, 0))
+        {
+                printf("Error in Naive+ concurrent encryption: allgather-shmem\n");
+                fflush(stdout);
+        }
+        
+        // Processes perform concurrent inter-node all-gather
+        
+        mpi_errno = MPIR_Allgather_impl(out, (max_out_len+12), MPI_CHAR,
+                                            ciphertext_recvbuf, (max_out_len+12), MPI_CHAR,
+                                            conc_commptr, errflag);
+
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+
+        // decrypt
+        
+        //unsigned long count=0;
+        
+        max_out_len = (unsigned long) (16 + (recvtype_extent*sendcnt));
+	//        int i, next, dest;
+        //printf("%d- local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, local_rank, leader_comm_size, (int)(rank/p));
+        for(i = 0; i < n; i+=1){
+            //printf("%d- i:%d, local_rank:%d, leader_Comm_size: %d, rank/p:%d\n", rank, i, local_rank, leader_comm_size, (int)(rank/p));
+            if(i != my_node){
+                idx = i * p + local_rank;
+                next =(unsigned long )(i*(max_out_len+12));
+                dest =(unsigned long )(idx*(recvtype_extent*sendcnt));
+                
+                if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                &count, (unsigned long )((recvcnt*recvtype_extent)),
+                                (ciphertext_recvbuf+next), 12,
+                                (ciphertext_recvbuf+next+12), (unsigned long )((recvcnt*recvtype_extent)+16),
+                                NULL, 0)){
+                        printf("Decryption error in Naive+ shmem_allgather Conncurrent Encryption II while %d tried to decrypt %d from %d to %d\n", rank, count, next, dest);fflush(stdout);        
+                }
+            }
+                                        
+        }//end for
+
+
+        //barrier
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        } 
+
+        //copy to user buffer
+        if(comm_ptr->dev.ch.is_global_block==1){
+            //Blocked
+            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+                                    (void*)((char*)recvbuf), recvcnt * size, recvtype);
+                
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+
+
+        }else{
+            //NonBlocked
+            int s=0;
+            for(; s<size; ++s){
+                
+                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+                                        (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+   
+            }
+        }
+
+    }else{
+        //For the unencrypted version, we first need to perform concurrent allgather
+        void* in;
+        if(sendbuf == MPI_IN_PLACE) {
+
+            in = (void*)((char*)recvbuf + (rank * recvcnt * recvtype_extent));
+            mpi_errno = MPIR_Localcopy(in, recvcnt, recvtype, 
+                                sendbuf, recvcnt, recvtype);
+
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+
+        }
+        in = (void*)((char*)sendbuf);
+        
+        
+        mpi_errno = MPIR_Allgather_impl(in, recvcnt, recvtype,
+                                            recvbuf, recvcnt, recvtype,
+                                            conc_commptr, errflag);
+
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+
+        //copy each message to the appropriate location in shmem_buffer
+        int s=0;
+        for(; s<n; ++s){
+            in = (void*)((char*)recvbuf + (s * recvcnt * recvtype_extent));
+            void* out = (void*)((char*)shmem_buffer + ((s*p+local_rank) * recvcnt * recvtype_extent));
+
+            mpi_errno = MPIR_Localcopy(in, recvcnt, recvtype, 
+                                out, recvcnt, recvtype);
+
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+        }
+
+
+        //barrier
+        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        } 
+
+
+        //copy to user buffer
+         if(comm_ptr->dev.ch.is_global_block==1){
+            //Blocked
+            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+                                    (void*)((char*)recvbuf), recvcnt * size, recvtype);
+                
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+
+
+        }else{
+            //NonBlocked
+            int s=0;
+            for(; s<size; ++s){
+                
+                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
+                                        (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+   
+            }
+        }
+        
+    }
+
+
+  fn_fail:
+    return (mpi_errno);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #undef FUNCNAME
@@ -7289,6 +7538,7 @@ conf_check_end:
             || MV2_Allgather_function == &MPIR_2lvl_SharedMem_Allgather_MV2
             || MV2_Allgather_function == &MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2
             || MV2_Allgather_function == &MPIR_Concurrent_Allgather_MV2
+            || MV2_Allgather_function == &MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2
             || MV2_Allgather_function == &MPIR_Allgather_Encrypted_RDB_MV2
             || MV2_Allgather_function == &MPIR_Allgather_NaivePlus_RDB_MV2
             || MV2_Allgather_function == &MPIR_2lvl_Allgather_Encrypted_RDB_MV2
@@ -7307,7 +7557,7 @@ conf_check_end:
         }else{
             MV2_Allgather_function = &MPIR_2lvl_Allgather_Ring_nonblocked_MV2;
         } 
-    }else if((MV2_Allgather_function == &MPIR_2lvl_SharedMem_Allgather_MV2 || MV2_Allgather_function == MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2)
+    }else if((MV2_Allgather_function == &MPIR_2lvl_SharedMem_Allgather_MV2 || MV2_Allgather_function == MPIR_2lvl_SharedMem_Concurrent_Encryption_Allgather_MV2 || MV2_Allgather_function == MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2)
      && comm_ptr->dev.ch.equal_local_sizes!=1){
          MV2_Allgather_function = &MPIR_2lvl_Allgather_Ring_nonblocked_MV2;
     }
