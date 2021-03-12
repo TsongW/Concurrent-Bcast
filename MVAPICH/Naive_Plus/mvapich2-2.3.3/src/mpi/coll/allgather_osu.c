@@ -3043,49 +3043,19 @@ int MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2(const void *sendbuf
         } 
 
 
-        //copy to user buffer
-        //  if(comm_ptr->dev.ch.is_global_block==1){
-            //Blocked
-            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
-                                    (void*)((char*)recvbuf), recvcnt * size, recvtype);
-                
-            if (mpi_errno) {
-                MPIR_ERR_POP(mpi_errno);
-            }
+        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+                                (void*)((char*)recvbuf), recvcnt * size, recvtype);
+            
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
 
-
-        // }else{
-        //     //NonBlocked
-        //     int s=0;
-        //     for(; s<size; ++s){
-                
-        //         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer + s * recvcnt  * recvtype_extent), recvcnt , recvtype, 
-        //                                 (void*)((char*)recvbuf + comm_ptr->dev.ch.rank_list[s] * recvcnt * recvtype_extent), recvcnt, recvtype);
-
-        //         if (mpi_errno) {
-        //             MPIR_ERR_POP(mpi_errno);
-        //         }
-   
-        //     }
-        // }
-        
     }
 
 
   fn_fail:
     return (mpi_errno);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
