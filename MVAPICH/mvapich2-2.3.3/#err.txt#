@@ -1,0 +1,1629 @@
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/attr_put.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/attr_put.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-attr_put.lo] Error 1
+make[2]: *** Waiting for unfinished jobs....
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/attr_delete.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/attr_delete.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/comm_delete_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/comm_delete_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-attr_delete.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-comm_delete_attr.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/type_free_keyval.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/type_free_keyval.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/win_set_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/win_set_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-type_free_keyval.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/comm_get_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/comm_get_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/win_free_keyval.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/win_free_keyval.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-win_set_attr.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/comm_create_keyval.c:17:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/win_get_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/comm_create_keyval.c:17:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/win_get_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/gather.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/gather.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-comm_get_attr.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-win_free_keyval.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allgather.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allgather.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-win_get_attr.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-comm_create_keyval.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/op_free.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/op_free.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/keyval_free.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/keyval_free.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/type_create_keyval.c:17:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/comm_free_keyval.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aintchar
+
+out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/comm_free_keyval.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/type_create_keyval.c:17:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/win_delete_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/barrier.c:21:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/win_delete_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/barrier.c:21:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/keyval_create.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoall.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/keyval_create.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoall.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-keyval_free.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/type_set_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/type_set_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-op_free.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-type_create_keyval.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-comm_free_keyval.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-win_delete_attr.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/scatterv.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/scatterv.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgather.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/attr_get.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/attr_get.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-gather.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/exscan.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/win_create_keyval.c:17:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/exscan.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoall.lo] Error 1
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/win_create_keyval.c:17:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-keyval_create.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-type_set_attr.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-scatterv.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/reduce.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/reduce.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-exscan.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allreduce.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allreduce.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-attr_get.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-barrier.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/type_get_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/type_get_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoallw.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoallw.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/type_delete_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/type_delete_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/gatherv.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/gatherv.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/attr/comm_set_attr.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/bcast.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/op_create.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/attr/comm_set_attr.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/op_create.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-win_create_keyval.lo] Error 1
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/bcast.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/scatter.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/scatter.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/scan.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/scan.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/attr/lib_libmpi_la-type_get_attr.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-type_delete_attr.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoallw.lo] Error 1
+make[2]: *** [src/mpi/attr/lib_libmpi_la-comm_set_attr.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allreduce.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-op_create.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-gatherv.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-scan.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/red_scat.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/red_scat.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-reduce.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-scatter.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-bcast.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allgatherv.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoallv.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoallv.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allgatherv.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallgather.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallgather.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoallv.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ialltoall.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ialltoall.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgatherv.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgather.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ialltoallv.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ialltoallv.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/red_scat_block.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/red_scat_block.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/op_commutative.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/op_commutative.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/igather.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/igather.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iexscan.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallreduce.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iscatterv.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iexscan.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iscatterv.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallreduce.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallgatherv.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallgatherv.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/igatherv.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ibarrier.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/igatherv.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ibarrier.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoall.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ibcast.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ibcast.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallgather_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iscan.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallgather_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iscan.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+*** [src/mpi/coll/lib_libmpi_la-ialltoallv.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-op_commutative.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat_block.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iexscan.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-igather.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iscatterv.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallreduce.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/reduce_local.c:8:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/reduce_local.c:8:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgatherv.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-igatherv.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ireduce.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ireduce.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibarrier.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibcast.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iscan.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ialltoallv_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ialltoallv_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-reduce_local.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ired_scat_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ired_scat_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ired_scat_block.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ired_scat.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ired_scat.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ired_scat_block.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ireduce.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgather_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallreduce_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallreduce_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iscatter.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ialltoallw.c:7:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iscatter.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ialltoallw.c:7:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ired_scat.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoallv_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allgather_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iallgatherv_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iallgatherv_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allgather_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ired_scat_block.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ired_scat_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iscatter.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoallw.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ireduce_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allreduce_osu.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ireduce_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allreduce_osu.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoallv_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoallv_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/iscatter_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/iscatter_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/igather_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/igather_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/scan_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/exscan_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/scan_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallreduce_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgatherv_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/exscan_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/barrier_osu.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/barrier_osu.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ibcast_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/reduce_osu.c:20:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ibcast_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/reduce_osu.c:20:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/gather_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/gather_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allgatherv_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ibarrier_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allgatherv_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ibarrier_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/bcast_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ireduce_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/bcast_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoallv_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-scan_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-igather_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iscatter_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allreduce_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoall_osu.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoall_osu.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgather_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-exscan_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/ialltoall_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/ialltoall_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-barrier_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/red_scat_osu.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/red_scat_osu.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/gatherv_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/scatter_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/alltoall_cuda_osu.c:13:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/gatherv_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/scatter_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/alltoall_cuda_osu.c:13:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibarrier_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibcast_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-reduce_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-gather_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgatherv_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoall_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/allgather_cuda_osu.c:18:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/allgather_cuda_osu.c:18:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoall_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-gatherv_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/mpid/ch3/channels/mrail/include/mpidi_ch3_impl.h:23,
+                 from ./src/mpid/ch3/channels/mrail/src/gen2/rdma_impl.h:22,
+                 from src/mpi/coll/ch3_shmem_coll.c:45:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/mpid/ch3/channels/mrail/include/mpidi_ch3_impl.h:23,
+                 from ./src/mpid/ch3/channels/mrail/src/gen2/rdma_impl.h:22,
+                 from src/mpi/coll/ch3_shmem_coll.c:45:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoall_cuda_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-bcast_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allgather_tuning.h:16,
+                 from src/mpi/coll/allgather_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allgather_tuning.h:16,
+                 from src/mpi/coll/allgather_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/red_scat_tuning.h:16,
+                 from src/mpi/coll/red_scat_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/gather_tuning.h:16,
+                 from src/mpi/coll/gather_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/red_scat_tuning.h:16,
+                 from src/mpi/coll/red_scat_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/reduce_tuning.h:16,
+                 from src/mpi/coll/reduce_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgather_cuda_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from src/mpi/coll/red_scat_block_osu.c:19:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from src/mpi/coll/red_scat_block_osu.c:19:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/reduce_tuning.h:16,
+                 from src/mpi/coll/reduce_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ibcast_tuning.h:16,
+                 from src/mpi/coll/ibcast_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/gather_tuning.h:16,
+                 from src/mpi/coll/gather_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ibcast_tuning.h:16,
+                 from src/mpi/coll/ibcast_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/red_scat_block_tuning.h:16,
+                 from src/mpi/coll/red_scat_block_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ibarrier_tuning.h:16,
+                 from src/mpi/coll/ibarrier_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/red_scat_block_tuning.h:16,
+                 from src/mpi/coll/red_scat_block_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/bcast_tuning.h:16,
+                 from src/mpi/coll/bcast_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/igather_tuning.h:16,
+                 from src/mpi/coll/igather_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ibarrier_tuning.h:16,
+                 from src/mpi/coll/ibarrier_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/bcast_tuning.h:16,
+                 from src/mpi/coll/bcast_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/igather_tuning.h:16,
+                 from src/mpi/coll/igather_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ialltoallv_tuning.h:16,
+                 from src/mpi/coll/ialltoallv_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ialltoallv_tuning.h:16,
+                 from src/mpi/coll/ialltoallv_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ired_scat_tuning.h:16,
+                 from src/mpi/coll/ired_scat_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allreduce_tuning.h:16,
+                 from src/mpi/coll/allreduce_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ialltoall_tuning.h:16,
+                 from src/mpi/coll/ialltoall_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/alltoall_tuning.h:16,
+                 from src/mpi/coll/alltoall_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallgather_tuning.h:16,
+                 from src/mpi/coll/iallgather_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allreduce_tuning.h:16,
+                 from src/mpi/coll/allreduce_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ialltoall_tuning.h:16,
+                 from src/mpi/coll/ialltoall_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ired_scat_tuning.h:16,
+                 from src/mpi/coll/ired_scat_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallgather_tuning.h:16,
+                 from src/mpi/coll/iallgather_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/alltoall_tuning.h:16,
+                 from src/mpi/coll/alltoall_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallreduce_tuning.h:16,
+                 from src/mpi/coll/iallreduce_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallreduce_tuning.h:16,
+                 from src/mpi/coll/iallreduce_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-scatter_osu.lo] Error 1
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allgatherv_tuning.h:16,
+                 from src/mpi/coll/allgatherv_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/allgatherv_tuning.h:16,
+                 from src/mpi/coll/allgatherv_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ireduce_tuning.h:16,
+                 from src/mpi/coll/ireduce_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/ireduce_tuning.h:16,
+                 from src/mpi/coll/ireduce_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallgatherv_tuning.h:16,
+                 from src/mpi/coll/iallgatherv_tuning.c:14:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat_tuning.lo] Error 1
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/iallgatherv_tuning.h:16,
+                 from src/mpi/coll/iallgatherv_tuning.c:14:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+In file included from ./src/include/mpiimpl.h:97:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/alltoallv_tuning.h:16,
+                 from src/mpi/coll/alltoallv_tuning.c:15:
+./src/include/mpi.h:109:43: error: expected ‘)’ before numeric constant
+ #define MPI_CHAR           ((MPI_Datatype)0x4c000101)
+                                           ^
+./src/include/mpir_nbc.h:79:185: note: in expansion of macro ‘MPI_CHAR’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                         ^
+In file included from ./src/include/mpiimpl.h:3857:0,
+                 from ./src/mpid/ch3/include/mpidimpl.h:36,
+                 from ./src/include/coll_shmem.h:26,
+                 from src/mpi/coll/alltoallv_tuning.h:16,
+                 from src/mpi/coll/alltoallv_tuning.c:15:
+./src/include/mpir_nbc.h:79:199: error: expected ‘;’, ‘,’ or ‘)’ before ‘MPID_Sched_t’
+ int MPID_Sched_crypt(const void *inbuf, const MPI_Aint in_len, const MPI_Aint enc_overhead, const MPI_Aint nonce_len, void *outbuf, MPI_Aint out_len, const MPI_Aint max_out_len, const MPI_CHAR opt, MPID_Sched_t s);
+                                                                                                                                                                                                       ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat_block_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibcast_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ibarrier_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-igather_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoallv_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ired_scat_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ialltoall_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-red_scat_block_osu.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallreduce_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgather_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgatherv_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ireduce_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-iallgatherv_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoallv_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-ch3_shmem_coll.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgather_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-alltoall_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-gather_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allreduce_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-reduce_tuning.lo] Error 1
+make[2]: *** [src/mpi/coll/lib_libmpi_la-bcast_tuning.lo] Error 1
+make[1]: *** [all-recursive] Error 1
+make: *** [all] Error 2

@@ -1,0 +1,24 @@
+src/mpi/coll/allgather_osu.c: In function ‘MPIR_2lvl_Concurrent_Multileader_SharedMem_Allgather_MV2’:
+src/mpi/coll/allgather_osu.c:2943:23: error: redefinition of ‘count’
+         unsigned long count=0;
+                       ^
+src/mpi/coll/allgather_osu.c:2906:23: note: previous definition of ‘count’ was here
+         unsigned long count=0;
+                       ^
+src/mpi/coll/allgather_osu.c:2945:25: error: redefinition of ‘max_out_len’
+         unsigned long   max_out_len = (unsigned long) (16 + (recvtype_extent*sendcnt));
+                         ^
+src/mpi/coll/allgather_osu.c:2919:25: note: previous definition of ‘max_out_len’ was here
+         unsigned long   max_out_len = (unsigned long) (16 + t);
+                         ^
+src/mpi/coll/allgather_osu.c:3007:33: warning: passing argument 4 of ‘MPIR_Localcopy’ discards ‘const’ qualifier from pointer target type [enabled by default]
+                                 sendbuf, recvcnt, recvtype);
+                                 ^
+In file included from src/mpi/coll/allgather_osu.c:18:0:
+./src/include/mpiimpl.h:4023:5: note: expected ‘void *’ but argument is of type ‘const void *’
+ int MPIR_Localcopy(const void *sendbuf, MPI_Aint sendcount, MPI_Datatype sendtype,
+     ^
+make[2]: *** [src/mpi/coll/lib_libmpi_la-allgather_osu.lo] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [all-recursive] Error 1
+make: *** [all] Error 2
