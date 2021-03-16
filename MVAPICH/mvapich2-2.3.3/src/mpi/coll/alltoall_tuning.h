@@ -108,7 +108,16 @@ extern int MPIR_Alltoall_RD_MV2(
                             MPID_Comm *comm_ptr,
                             MPIR_Errflag_t *errflag );
 
-
+extern int MPIR_Alltoall_Conc_ShMem_MV2(
+                            const void *sendbuf,
+                            int sendcount,
+                            MPI_Datatype sendtype,
+                            void *recvbuf,
+                            int recvcount,
+                            MPI_Datatype recvtype,
+                            MPID_Comm *comm_ptr,
+                            MPIR_Errflag_t *errflag );
+                            
 extern int MPIR_Alltoall_Scatter_dest_MV2(
                             const void *sendbuf,
                             int sendcount,

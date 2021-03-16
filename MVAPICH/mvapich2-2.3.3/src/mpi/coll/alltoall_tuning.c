@@ -2419,6 +2419,10 @@ int MV2_Alltoall_is_define(char *mv2_user_alltoall)
 	  mv2_tmp_alltoall_indexed_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
 	    &MPIR_Alltoall_inplace_MV2;
 	  break;
+	  	case ALLTOALL_CONC_SHMEM_MV2:
+	  mv2_tmp_alltoall_indexed_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
+	  	&MPIR_Alltoall_Conc_ShMem_MV2;
+		  break;
         default:
 	  mv2_tmp_alltoall_indexed_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
 	    &MPIR_Alltoall_bruck_MV2;
@@ -2483,7 +2487,13 @@ int MV2_Alltoall_is_define(char *mv2_user_alltoall)
 	  mv2_tmp_alltoall_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
 	    &MPIR_Alltoall_inplace_MV2;
 	  break;
-        default:
+
+	  	case ALLTOALL_CONC_SHMEM_MV2:
+	  mv2_tmp_alltoall_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
+	  	&MPIR_Alltoall_Conc_ShMem_MV2;
+		  break;
+      
+	    default:
 	  mv2_tmp_alltoall_thresholds_table[0].algo_table[0].MV2_pt_Alltoall_function =
 	    &MPIR_Alltoall_bruck_MV2;
         }
@@ -2536,6 +2546,12 @@ int MV2_Alltoall_is_define(char *mv2_user_alltoall)
 	    mv2_tmp_alltoall_thresholds_table[0].in_place_algo_table[i].
 	      MV2_pt_Alltoall_function = &MPIR_Alltoall_inplace_MV2;
 	    break;
+
+		case ALLTOALL_CONC_SHMEM_MV2:
+	  mv2_tmp_alltoall_thresholds_table[0].algo_table[i].MV2_pt_Alltoall_function =
+	  	&MPIR_Alltoall_Conc_ShMem_MV2;
+		  break;
+	  
 	  default:
 	    mv2_tmp_alltoall_thresholds_table[0].algo_table[i].MV2_pt_Alltoall_function =
 	      &MPIR_Alltoall_bruck_MV2;

@@ -241,7 +241,7 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
-    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value;
+    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value, *a_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
@@ -257,6 +257,16 @@ int MPI_Init( int *argc, char ***argv )
     if ((t_value = getenv("MV2_INTER_ALLGATHER_TUNING")) != NULL) {
         int alg = (atoi(t_value));
         if(alg == 14 || alg == 18 || alg == 20){
+            allocated_shmem = 1;
+            if(security_approach==2){
+                allocated_shmem = 2;
+            }
+            init_shmem();
+        }
+    }
+    if ((a_value = getenv("MV2_ALLTOALL_TUNING")) != NULL) {
+        int alg = (atoi(a_value));
+        if(alg == 5){
             allocated_shmem = 1;
             if(security_approach==2){
                 allocated_shmem = 2;
@@ -359,8 +369,8 @@ int init_shmem(){
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
     
     //TODO: Allocate Shmem
-    size_t shmem_size = (comm_ptr->local_size) * 4 * 1024 *1024;
-    size_t ciphertext_shmem_size = (comm_ptr->local_size) * (1024 * 1024 * 4 + 16 + 12);
+    size_t shmem_size = 16 * (comm_ptr->local_size) * 4 * 1024 *1024;
+    size_t ciphertext_shmem_size =  (comm_ptr->local_size) * (1024 * 1024 * 4 + 16 + 12);
     shmem_key = 32984;
     ciphertext_shmem_key = 56982;
     

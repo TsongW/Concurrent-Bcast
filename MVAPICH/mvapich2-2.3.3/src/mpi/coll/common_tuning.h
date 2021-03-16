@@ -201,7 +201,8 @@ enum mv2_alltoall_tuning
     ALLTOALL_RD_MV2,
     ALLTOALL_SCATTER_DEST_MV2,
     ALLTOALL_PAIRWISE_MV2,
-    ALLTOALL_INPLACE_MV2
+    ALLTOALL_INPLACE_MV2,
+    ALLTOALL_CONC_SHMEM_MV2 //5
 };
 
 enum mv2_alltoallv_tuning

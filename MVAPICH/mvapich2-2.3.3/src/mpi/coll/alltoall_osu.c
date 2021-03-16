@@ -945,6 +945,243 @@ int MPIR_Alltoall_RD_MV2(
     }      
 }
 
+
+/*********************************     Added by Mehran     ***********************************/
+
+#undef FUNCNAME
+#define FUNCNAME MPIR_Alltoall_Conc_ShMem_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+int MPIR_Alltoall_Conc_ShMem_MV2(
+                            const void *sendbuf,
+                            int sendcount,
+                            MPI_Datatype sendtype,
+                            void *recvbuf,
+                            int recvcount,
+                            MPI_Datatype recvtype,
+                            MPID_Comm *comm_ptr,
+                            MPIR_Errflag_t *errflag )
+{
+    // MPIR_TIMER_START(coll,alltoall,sd);
+    // MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_alltoall_sd, 1);
+    int          comm_size, i, j;
+    MPI_Aint     sendtype_extent = 0, recvtype_extent = 0;
+    int mpi_errno=MPI_SUCCESS;
+    int dst, rank, local_rank, local_size;
+    MPID_Request **reqarray;
+    MPI_Status *starray;
+    int sendtype_size, nbytes;
+
+    MPI_Comm shmem_comm, conc_comm;
+    MPID_Comm *shmem_commptr=NULL, *conc_commptr = NULL;
+    
+    char* tmp_buf;
+    MPID_Node_id_t my_node_id, dst_node_id;
+    
+    if (recvcount == 0) 
+    {
+    //   MPIR_TIMER_END(coll,alltoall,sd);
+      return MPI_SUCCESS;
+    }
+    
+    // MPID_Datatype_get_size_macro(sendtype, sendtype_size);
+    // nbytes = sendtype_size * sendcount;
+
+    comm_size = comm_ptr->local_size;
+    rank = comm_ptr->rank;
+    
+    if(rank==0){
+        printf("%d - MPIR_Alltoall_Scatter_dest_MV2\n", sendcount);
+	}
+
+    shmem_comm = comm_ptr->dev.ch.shmem_comm;
+    conc_comm = comm_ptr->dev.ch.concurrent_comm;
+
+    MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
+    MPID_Comm_get_ptr(conc_comm, conc_commptr);
+    
+    local_size = shmem_commptr->local_size;
+    local_rank = shmem_commptr->rank;
+    
+    MPID_Get_node_id(comm_ptr, rank, &my_node_id);
+
+    
+
+    /* Get extent of send and recv types */
+    MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
+    MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
+    /* check if multiple threads are calling this collective function */
+    MPIDU_ERR_CHECK_MULTIPLE_THREADS_ENTER( comm_ptr );
+
+
+    tmp_buf = MPIU_Malloc((comm_size - local_size) * recvcount * recvtype_extent);
+        
+    if (!tmp_buf) {
+        mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, 
+                                            FCNAME, __LINE__, 
+                                            MPI_ERR_OTHER, "**nomem", 0 );
+        return mpi_errno;
+    }
+
+    /**
+     *  Here we split the messages. Messages that should be sent out to other nodes, 
+     * will be copied to the tmp_buf (sorted based on the node number and local rank).
+     * Messages that should be sent to processes on the same node will be copied to 
+     * the shmem buffer at the proper location such that there is only one copy needed 
+     * at the end for each process
+     **/
+
+    //TODO: optimize for block
+
+    // if(comm_ptr->dev.ch.is_global_block==1){
+    //     //Blocked
+    //     mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), recvcnt * size, recvtype, 
+    //                             (void*)((char*)recvbuf), recvcnt * size, recvtype);
+            
+    //     if (mpi_errno) {
+    //         MPIR_ERR_POP(mpi_errno);
+    //     }
+
+
+    // }else{
+        //NonBlocked
+        int s=0, dst_local_rank=0;
+        void *in, *out;
+        if(sendbuf != MPI_IN_PLACE){
+            in = sendbuf;
+        }else{
+            in = recvbuf;
+        }
+        for(; s<comm_size; ++s){
+            MPID_Get_node_id(comm_ptr, s, &dst_node_id);
+            for(i=0; i<local_size; ++i){
+                if(comm_ptr->dev.ch.rank_list[i + dst_node_id*local_size] == s){
+                    dst_local_rank = i;
+                }
+                }
+            if(dst_node_id == my_node_id){
+                //copy to shmem
+                
+                
+                out = (void*)((char*)shmem_buffer + ((dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent));
+
+            }else{
+                //copy to tmp_buf, sort based on node and locak rank
+                //TODO: needs fixes
+                out = (void*)((char*)tmp_buf + (dst_node_id * local_size + local_rank)*sendcount * sendtype_extent);
+
+            }
+            mpi_errno = MPIR_Localcopy(in, sendcount, sendtype, 
+                                    out, sendcount, sendtype);
+
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+             
+            in += recvcount * recvtype_extent;
+        }
+    // }
+
+
+
+    /**
+     * Intra-node step is done.
+     * For the inter-node step, first each process encrypts 
+     * the messages it has to send to other nodes.
+     **/
+    int n = (int) (comm_size / local_size);
+    unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
+    in_size = (unsigned long)(local_size * sendcount * sendtype_extent);
+    unsigned long max_out_len = (unsigned long) (16 + in_size);
+    for(i=0; i<n; ++i){
+        out = (void*)((char*)ciphertext_sendbuf + (i * local_size) * (sendcount * sendtype_extent + 16 + 12));
+        if(i != my_node_id){
+            //encrypt
+            in = (void*)((char*)tmp_buf + (i * local_size) * (sendcount * sendtype_extent));
+            RAND_bytes(out, 12);
+                    
+            if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                        &ciphertext_len, max_out_len,
+                        out, 12, in, in_size,
+                        NULL, 0)){
+                printf("Error in encryption: Concurrent ShMem Alltoall (1)\n");
+                fflush(stdout);
+            }
+
+        }else{
+            //set a junk data to avoid seg. fault
+            
+            MPIU_Memset(out, 0, local_size * sendcount * sendtype_extent);
+        }
+    }
+
+    
+    
+    // Concurrent alltoall
+    mpi_errno = MPIR_Alltoall_impl(ciphertext_sendbuf, local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR,
+                                ciphertext_recvbuf, local_size * recvcount * recvtype_extent, MPI_CHAR, conc_commptr, errflag);
+    if (mpi_errno) {
+        MPIR_ERR_POP(mpi_errno);
+    }
+
+    //working here
+    //Decrypt and copy to shmem_buffer
+    for(i=0; i<n; ++i){
+        //decrypt
+        if(i != my_node_id){
+            int next =(unsigned long )(i*(local_size * recvcount * recvtype_extent + 16+12));
+            int dest =(unsigned long )(i*(local_size * recvcount * recvtype_extent));
+            if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                            &de_count, (unsigned long )((local_size * recvcount*recvtype_extent)),
+                            (ciphertext_recvbuf+next), 12,
+                            (ciphertext_recvbuf+next+12), (unsigned long )(local_size * recvcount*recvtype_extent+16),
+                            NULL, 0)){
+                printf("Decryption error in Concurrent ShMem Alltoall (1)\n");
+                fflush(stdout);
+            }
+        }//end if inter node
+    }//end for
+
+    //Copy to user buffer
+    for(i=0; i<local_size; i+=1){
+        int idx = i*local_size + local_size;
+        
+        in = shmem_buffer + (idx*recvcount*recvtype_extent);
+        out = recvbuf + (idx*recvcount*recvtype_extent);
+
+        mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
+                                    out, recvcount, recvtype);
+
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }//end for
+
+    //Delete tmp_buff
+    MPIU_Free(tmp_buf);
+    
+    //MPIU_CHKLMEM_FREEALL();
+    
+    
+fn_fail:
+    /* check if multiple threads are calling this collective function */
+    MPIDU_ERR_CHECK_MULTIPLE_THREADS_EXIT( comm_ptr );
+    // MPIR_TIMER_END(coll,alltoall,sd);
+    return (mpi_errno);
+    
+}
+
+
+
+/*********************************************************************************************/
+
+
+
+
+
+
+
+
 #undef FUNCNAME
 #define FUNCNAME MPIR_Alltoall_Scatter_dest_MV2
 #undef FCNAME
