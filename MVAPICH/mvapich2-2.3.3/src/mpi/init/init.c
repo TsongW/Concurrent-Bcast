@@ -241,10 +241,16 @@ int MPI_Init( int *argc, char ***argv )
 #endif /*defined(CHANNEL_MRAIL_GEN2) || defined(CHANNEL_PSM)*/
 
     /************************** Added by Mehran ***********************/
+    MPID_Comm *comm_ptr = NULL;
+    MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
+
     char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value, *a_value;
+    char *rl_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
+    if(comm_ptr->rank==0)
+        printf("Flag 0\n");
     overlap_decryption = 0;
     if ((o_value = getenv("OVERLAP_DECRYPTION")) != NULL) {
         overlap_decryption = (atoi(o_value));
@@ -264,16 +270,22 @@ int MPI_Init( int *argc, char ***argv )
             init_shmem();
         }
     }
+    if(comm_ptr->rank==0)
+        printf("Flag 1\n");
+    int initialize_rank_list = 0;
     if ((a_value = getenv("MV2_ALLTOALL_TUNING")) != NULL) {
         int alg = (atoi(a_value));
         if(alg == 5){
-            allocated_shmem = 1;
-            if(security_approach==2){
+            //allocated_shmem = 1;
+            //initialize_rank_list = 1;
+            /*if(security_approach==2){
                 allocated_shmem = 2;
-            }
-            init_shmem();
+                }*/
+            //init_shmem();
         }
     }
+    if(comm_ptr->rank==0)
+        printf("Flag 2\n");
     shmem_leaders = 1;
     if ((sml_value = getenv("SHMEM_LEADERS")) != NULL) {
         shmem_leaders = (atoi(sml_value));
@@ -287,15 +299,34 @@ int MPI_Init( int *argc, char ***argv )
     if ((cb_value = getenv("CONCURRENT_BCAST")) != NULL) {
         concurrent_bcast = (atoi(cb_value));
     }
+    
+    if(comm_ptr->rank==0)
+        printf("Flag 3, %d , %d\n",comm_ptr->local_size, comm_ptr->rank);
 
     if (concurrent_comm == 1){
-        MPID_Comm *comm_ptr = NULL;
-        MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
+        
         mpi_errno = create_concurrent_comm(comm_ptr->handle, comm_ptr->local_size, comm_ptr->rank);
         if(mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
     }
+
+    if(comm_ptr->rank==0)
+        printf("Flag 4\n");
+    
+    if ((rl_value = getenv("INIT_RANK_LIST")) != NULL) {
+        initialize_rank_list = (atoi(c_value));
+    }
+    if(initialize_rank_list == 1 && NULL == comm_ptr->dev.ch.rank_list){
+        MPIR_Errflag_t errflag = MPIR_ERR_NONE;
+        mpi_errno = create_allgather_comm(comm_ptr, &errflag);
+        if(mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+        }
+    }
+
+    if(comm_ptr->rank==0)
+        printf("Flag 5\n");
     /******************************************************************/
     /* ... end of body of routine ... */
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT);
@@ -316,11 +347,11 @@ int MPI_Init( int *argc, char ***argv )
 }
 
 
-
 int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
-{
+{   
     static const char FCNAME[] = "create_concurrent_comm";
     int mpi_errno = MPI_SUCCESS;
+
     MPID_Comm* comm_ptr = NULL;
 
     MPID_Comm_get_ptr( comm, comm_ptr );
@@ -328,7 +359,9 @@ int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
         return mpi_errno;
     }
 
-    
+    if(comm_ptr->rank==0)
+        printf("Flag 11\n");
+
     comm_ptr->dev.ch.concurrent_comm =MPI_COMM_NULL;
     
     MPID_Comm* shmem_commptr;
@@ -337,13 +370,15 @@ int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
     
     /* get our rank and the size of this communicator */
     int local_rank = shmem_commptr->rank;
+    if(comm_ptr->rank==0)
+        printf("Flag 12\n");
 
-
-    mpi_errno = PMPI_Comm_split(comm, local_rank, my_rank, &(comm_ptr->dev.ch.concurrent_comm));
+    mpi_errno = PMPI_Comm_split(MPI_COMM_WORLD, local_rank, my_rank, &(comm_ptr->dev.ch.concurrent_comm));
     if(mpi_errno) {
        MPIR_ERR_POP(mpi_errno);
     }
-
+    if(comm_ptr->rank==0)
+        printf("Flag 13\n");
     return (mpi_errno);
     fn_fail:
         mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );
@@ -369,10 +404,10 @@ int init_shmem(){
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
     
     //TODO: Allocate Shmem
-    size_t shmem_size = 16 * (comm_ptr->local_size) * 4 * 1024 *1024;
-    size_t ciphertext_shmem_size =  (comm_ptr->local_size) * (1024 * 1024 * 4 + 16 + 12);
-    shmem_key = 32984;
-    ciphertext_shmem_key = 56982;
+    size_t shmem_size =  8 * (comm_ptr->local_size) * 1 * 1024 *1024;
+    size_t ciphertext_shmem_size =  (comm_ptr->local_size) * (1024 * 1024 * 2 + 16 + 12);
+    shmem_key = 13579;
+    ciphertext_shmem_key = 24680;
     
 
     if(shmem_comm_ptr->rank == 0){
