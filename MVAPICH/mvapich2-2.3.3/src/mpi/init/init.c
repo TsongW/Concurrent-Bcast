@@ -249,8 +249,8 @@ int MPI_Init( int *argc, char ***argv )
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
     }
-    if(comm_ptr->rank==0)
-        printf("Flag 0\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 0\n");
     overlap_decryption = 0;
     if ((o_value = getenv("OVERLAP_DECRYPTION")) != NULL) {
         overlap_decryption = (atoi(o_value));
@@ -270,22 +270,22 @@ int MPI_Init( int *argc, char ***argv )
             init_shmem();
         }
     }
-    if(comm_ptr->rank==0)
-        printf("Flag 1\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 1\n");
     int initialize_rank_list = 0;
     if ((a_value = getenv("MV2_ALLTOALL_TUNING")) != NULL) {
         int alg = (atoi(a_value));
         if(alg == 5){
-            //allocated_shmem = 1;
-            //initialize_rank_list = 1;
+            allocated_shmem = 1;
+            initialize_rank_list = 1;
             /*if(security_approach==2){
                 allocated_shmem = 2;
                 }*/
-            //init_shmem();
+            init_shmem();
         }
     }
-    if(comm_ptr->rank==0)
-        printf("Flag 2\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 2\n");
     shmem_leaders = 1;
     if ((sml_value = getenv("SHMEM_LEADERS")) != NULL) {
         shmem_leaders = (atoi(sml_value));
@@ -300,8 +300,8 @@ int MPI_Init( int *argc, char ***argv )
         concurrent_bcast = (atoi(cb_value));
     }
     
-    if(comm_ptr->rank==0)
-        printf("Flag 3, %d , %d\n",comm_ptr->local_size, comm_ptr->rank);
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 3, %d , %d\n",comm_ptr->local_size, comm_ptr->rank);
 
     if (concurrent_comm == 1){
         
@@ -311,8 +311,8 @@ int MPI_Init( int *argc, char ***argv )
         }
     }
 
-    if(comm_ptr->rank==0)
-        printf("Flag 4\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 4\n");
     
     if ((rl_value = getenv("INIT_RANK_LIST")) != NULL) {
         initialize_rank_list = (atoi(c_value));
@@ -325,8 +325,8 @@ int MPI_Init( int *argc, char ***argv )
         }
     }
 
-    if(comm_ptr->rank==0)
-        printf("Flag 5\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 5\n");
     /******************************************************************/
     /* ... end of body of routine ... */
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT);
@@ -359,8 +359,8 @@ int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
         return mpi_errno;
     }
 
-    if(comm_ptr->rank==0)
-        printf("Flag 11\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 11\n");
 
     comm_ptr->dev.ch.concurrent_comm =MPI_COMM_NULL;
     
@@ -370,15 +370,15 @@ int create_concurrent_comm (MPI_Comm comm, int size, int my_rank)
     
     /* get our rank and the size of this communicator */
     int local_rank = shmem_commptr->rank;
-    if(comm_ptr->rank==0)
-        printf("Flag 12\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 12\n");
 
     mpi_errno = PMPI_Comm_split(MPI_COMM_WORLD, local_rank, my_rank, &(comm_ptr->dev.ch.concurrent_comm));
     if(mpi_errno) {
        MPIR_ERR_POP(mpi_errno);
     }
-    if(comm_ptr->rank==0)
-        printf("Flag 13\n");
+    // if(comm_ptr->rank==0)
+    //     printf("Flag 13\n");
     return (mpi_errno);
     fn_fail:
         mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );

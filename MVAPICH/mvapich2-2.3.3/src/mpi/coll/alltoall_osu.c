@@ -330,7 +330,7 @@ int MPIR_Alltoall_bruck_MV2(
         MPID_Get_node_id(comm_ptr, rank, &my_node_id);
 
 
-        if(security_approach == 2){
+        if(security_approach == 2 && concurrent_comm!=1){
 
 	        int dest, next, i;
             unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
@@ -991,6 +991,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
+    int n = (int) (comm_size/local_size);
     mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
@@ -1068,16 +1069,16 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
             }
         }
         //printf("%d: %d is in node %d and has local_rank=%d\n",rank, s, dst_node_id, dst_local_rank);
-        if(dst_node_id == my_node_id){
-            //copy to shmem
-            out = (void*)((char*)shmem_buffer + ((dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent));
-            mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
-                                out, sendcount, sendtype);
+        // if(dst_node_id == my_node_id){
+        //     //copy to shmem
+        //     out = (void*)((char*)shmem_buffer + ((dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent));
+        //     mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
+        //                         out, sendcount, sendtype);
 
-            if (mpi_errno) {
-                MPIR_ERR_POP(mpi_errno);
-            }
-        }
+        //     if (mpi_errno) {
+        //         MPIR_ERR_POP(mpi_errno);
+        //     }
+        // }
         //copy to tmp_buf, sort based on node and locak rank
         //printf("%d is going to copy %d (%d B)from %d\n", rank, sendcount, sendcount * sendtype_extent, (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
         out = (void*)((char*)tmp_buf + (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
@@ -1109,6 +1110,10 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
          * For the inter-node step, first each process encrypts 
          * the messages it has to send to other nodes.
          **/
+
+        if(rank==0){
+           printf("%d - C10\n", sendcount);
+	    }
         int n = (int) (comm_size / local_size);
         unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
         in_size = (unsigned long)(local_size * sendcount * sendtype_extent);
@@ -1131,18 +1136,30 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
             }else{
                 //set a junk data to avoid seg. fault
                 
-                MPIU_Memset(out, 0, local_size * sendcount * sendtype_extent);
+                mpi_errno = MPIR_Localcopy(ciphertext_sendbuf + ((i-1) * local_size) * (sendcount * sendtype_extent + 16 + 12), local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR, 
+                                out, local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
             }
         }//end for
 
         
-        
+        if(rank==0){
+           printf("%d - C11\n", sendcount);
+	    }
         // Concurrent alltoall
         mpi_errno = MPIR_Alltoall_impl(ciphertext_sendbuf, local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR,
-                                    ciphertext_recvbuf, local_size * recvcount * recvtype_extent, MPI_CHAR, conc_commptr, errflag);
+                                    ciphertext_recvbuf, local_size * recvcount * recvtype_extent + 16 + 12, MPI_CHAR, conc_commptr, errflag);
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
+
+
+        if(rank==0){
+           printf("%d - C12\n", sendcount);
+	    }
 
         //working here
         //Decrypt and copy to shmem_buffer
@@ -1161,49 +1178,99 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
                 }
             }//end if inter node
         }//end for
+
+        if(rank==0){
+           printf("%d - C13\n", sendcount);
+	    }
+
+
+        // //Copy to user buffer
+        for(i=0; i<comm_size; i+=1){
+            int idx = i*local_size + local_size;
+            
+            in = shmem_buffer + (idx*recvcount*recvtype_extent);
+            out = recvbuf + (i*recvcount*recvtype_extent);
+
+            mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
+                                        out, recvcount, recvtype);
+
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+        }//end for
+
+
+        mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        } 
+        if(rank==0){
+            printf("%d - C3\n", sendcount);
+        }
+
     }//end security approach == 2
     else{
         // Concurrent alltoall
         
         mpi_errno = MPIR_Alltoall_impl(tmp_buf, local_size * sendcount, sendtype,
-                                    shmem_buffer, local_size * recvcount, recvtype, conc_commptr, errflag);
+                                    shmem_buffer+local_rank*(comm_size * recvcount*recvtype_extent), local_size * recvcount, recvtype, conc_commptr, errflag);
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
+        }
+
+        mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        } 
+        if(rank==0){
+            printf("%d - C2\n", sendcount);
+        }
+
+        //Copy to user buffer
+        for(i=0; i<n; ++i){
+            int idx = my_node_id * local_size + local_rank + i*(local_size * comm_size);
+
+            for(j=0; j<local_size; ++j){
+                //int idx = i*local_size + local_size;
+                in = shmem_buffer + (idx  + j * comm_size)*(recvcount*recvtype_extent);
+                out = recvbuf + (i*recvcount*recvtype_extent);
+
+                mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
+                                            out, recvcount, recvtype);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+            }//end for j
+
+        }//end for i
+        
+        
+
+
+        // in = shmem_buffer + (local_rank * comm_size*recvcount*recvtype_extent);
+        // out = recvbuf;
+
+        // mpi_errno = MPIR_Localcopy(in, comm_size * recvcount, recvtype, 
+        //                             out, comm_size * recvcount, recvtype);
+
+        // if (mpi_errno) {
+        //     MPIR_ERR_POP(mpi_errno);
+        // }
+
+
+        mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
+        if (mpi_errno) {
+            MPIR_ERR_POP(mpi_errno);
+            goto fn_fail;
+        } 
+        if(rank==0){
+            printf("%d - C3\n", sendcount);
         }
     }
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    } 
-    if(rank==0){
-        printf("%d - C3\n", sendcount);
-	}
-
-    // //Copy to user buffer
-    for(i=0; i<comm_size; i+=1){
-        int idx = i*local_size + local_size;
-        
-        in = shmem_buffer + (idx*recvcount*recvtype_extent);
-        out = recvbuf + (i*recvcount*recvtype_extent);
-
-        mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
-                                    out, recvcount, recvtype);
-
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
-    }//end for
-
-
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    } 
-    if(rank==0){
-        printf("%d - C3\n", sendcount);
-	}
+    
 
     //Delete tmp_buff
     MPIU_Free(tmp_buf);
@@ -1334,7 +1401,7 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank+i+ii) % comm_size;
             /***********************      Added by Mehran     ***************************/
-            if(security_approach == 2){
+            if(security_approach == 2 && concurrent_comm!=1){
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     MPIR_PVAR_INC(alltoall, sd, recv, recvcount*recvtype_extent + 16 + 12, MPI_CHAR);
@@ -1365,7 +1432,7 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank-i-ii+comm_size) % comm_size;
             /***********************      Added by Mehran     ***************************/
-            if(security_approach == 2){
+            if(security_approach == 2 && concurrent_comm!=1){
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     //encrypt here
@@ -1428,7 +1495,7 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank+i+ii) % comm_size;
             
-            if(security_approach == 2){
+            if(security_approach == 2 && concurrent_comm!=1){
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     next =(unsigned long )(dst*(recvcount * recvtype_extent + 16+12));

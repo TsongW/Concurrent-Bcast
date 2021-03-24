@@ -1,15 +1,315 @@
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
 
 # OSU MPI Allgather Latency Test v5.6.2
 # Size       Avg Latency(us)
-1                      41.32
-2                      40.66
-4                      41.38
-8                      43.83
+1                      41.16
+2                      40.51
+4                      41.34
+8                      43.79
 16                     40.15
-32                     43.34
+32                     43.24
+64                     46.21
+128                    52.10
+256                    61.10
+512                    78.55
+1024                  119.93
+2048                  212.43
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.63
+2                      40.69
+4                      41.48
+8                      43.93
+16                     40.31
+32                     43.25
+64                     46.22
+128                    52.25
+256                    60.98
+512                    78.10
+1024                  119.46
+2048                  212.37
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.17
+2                      40.60
+4                      41.37
+8                      43.76
+16                     40.31
+32                     43.17
+64                     46.18
+128                    52.05
+256                    60.87
+512                    78.06
+1024                  118.93
+2048                  211.21
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.92
+2                      41.08
+4                      41.76
+8                      44.25
+16                     40.65
+32                     43.62
+64                     46.55
+128                    52.34
+256                    61.10
+512                    78.16
+1024                  119.91
+2048                  213.42
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      42.81
+2                      41.67
+4                      42.44
+8                      44.91
+16                     41.46
+32                     44.49
+64                     47.02
+128                    52.88
+256                    61.08
+512                    78.16
+1024                  119.89
+2048                  212.24
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.13
+2                      40.35
+4                      41.47
+8                      43.61
+16                     40.01
+32                     42.94
+64                     45.97
+128                    52.04
+256                    60.97
+512                    78.16
+1024                  120.00
+2048                  212.85
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.64
+2                      40.76
+4                      41.56
+8                      44.06
+16                     40.28
+32                     43.32
 64                     46.25
-128                    52.13
-256                    61.01
-512                    78.30
-1024                  119.35
-2048                  212.23
+128                    52.17
+256                    61.07
+512                    78.24
+1024                  119.48
+2048                  211.83
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.10
+2                      40.34
+4                      41.25
+8                      43.61
+16                     40.20
+32                     42.98
+64                     46.10
+128                    52.07
+256                    60.84
+512                    78.18
+1024                  119.78
+2048                  212.99
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.21
+2                      40.46
+4                      41.37
+8                      43.74
+16                     40.12
+32                     43.05
+64                     46.10
+128                    52.08
+256                    60.95
+512                    78.28
+1024                  119.84
+2048                  212.53
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.03
+2                      40.34
+4                      41.22
+8                      43.62
+16                     40.10
+32                     43.00
+64                     45.94
+128                    51.96
+256                    60.99
+512                    78.14
+1024                  119.41
+2048                  211.89
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.27
+2                      40.36
+4                      41.30
+8                      43.72
+16                     40.10
+32                     42.98
+64                     45.95
+128                    52.06
+256                    60.96
+512                    78.16
+1024                  120.44
+2048                  212.26
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.24
+2                      40.53
+4                      41.56
+8                      43.84
+16                     40.28
+32                     43.12
+64                     46.28
+128                    52.09
+256                    60.97
+512                    78.12
+1024                  119.73
+2048                  212.54
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.06
+2                      40.39
+4                      41.24
+8                      43.70
+16                     40.04
+32                     42.97
+64                     46.01
+128                    51.98
+256                    60.91
+512                    78.02
+1024                  119.74
+2048                  212.36
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.34
+2                      40.55
+4                      41.56
+8                      43.99
+16                     40.26
+32                     43.33
+64                     46.16
+128                    52.32
+256                    60.97
+512                    78.13
+1024                  119.75
+2048                  212.10
+Flag 0
+Flag 1
+Flag 2
+Flag 3
+Flag 4
+Flag 5
+
+# OSU MPI Allgather Latency Test v5.6.2
+# Size       Avg Latency(us)
+1                      41.72
+2                      40.60
+4                      41.42
+8                      43.97
+16                     40.43
+32                     43.25
+64                     46.25
+128                    52.40
+256                    61.07
+512                    78.25
+1024                  119.79
+2048                  212.17

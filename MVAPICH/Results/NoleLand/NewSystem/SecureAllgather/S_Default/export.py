@@ -8,7 +8,7 @@ def write_to_spreadsheet(results, sheet_name, start_row):
 	sheet = wb[sheet_name]
 	# print(len(results), [len(x) for x in results], sheet_name, start_row)
 	columns = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V']
-	for i in range(min([len(results), 20])):
+	for i in range(min([len(results), 10])):
 		for j in range(len(results[i])):
 			sheet[columns[i] + str(j + start_row)].value = results[i][j]
 		

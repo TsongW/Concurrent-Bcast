@@ -905,7 +905,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
 			"table");
     table[rank].color = color;
     table[rank].key   = key;
-
+    // if(rank==0){
+    //     printf("Flag 2210\n");
+    // }
     /* Get the communicator to use in collectives on the local group of 
        processes */
     if (comm_ptr->comm_kind == MPID_INTERCOMM) {
@@ -917,6 +919,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
     else {
 	local_comm_ptr = comm_ptr;
     }
+    // if(rank==0){
+    //     printf("Flag 2211\n");
+    // }
     /* Gather information on the local group of processes */
     mpi_errno = MPIR_Allgather_impl( MPI_IN_PLACE, 2, MPI_INT, table, 2, MPI_INT, local_comm_ptr, &errflag );
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
@@ -940,6 +945,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
 	    }
 	}
     }
+    // if(rank==0){
+    //     printf("Flag 2212\n");
+    // }
     /* We don't need to set the last value to -1 because we loop through
        the list for only the known size of the group */
 
@@ -993,7 +1001,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
 	   group (must create comm_null) */
 	new_remote_size = new_size;
     }
-
+    // if(rank==0){
+    //     printf("Flag 2213\n");
+    // }
     in_newcomm = (color != MPI_UNDEFINED && new_remote_size > 0);
 
     /* Step 3: Create the communicator */
@@ -1025,7 +1035,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
             MPIR_ERR_CHKANDJUMP(errflag, mpi_errno, MPI_ERR_OTHER, "**coll_fail");
 	}
     }
-
+    // if(rank==0){
+    //     printf("Flag 2214\n");
+    // }
     *newcomm_ptr = NULL;
 
     /* Now, create the new communicator structure if necessary */
@@ -1055,7 +1067,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
 	/* sort key table.  The "color" entry is the rank of the corresponding
 	   process in the input communicator */
 	MPIU_Sort_inttable( keytable, new_size );
-
+    // if(rank==0){
+    //     printf("Flag 2215\n");
+    // }
 	if (comm_ptr->comm_kind == MPID_INTERCOMM) {
 	    MPIU_CHKLMEM_MALLOC(remotekeytable,sorttype*,
 				new_remote_size*sizeof(sorttype),
@@ -1123,6 +1137,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
 		    (*newcomm_ptr)->rank = i;
             }
 	}
+    // if(rank==0){
+    //     printf("Flag 2216\n");
+    // }
 
 	/* Inherit the error handler (if any) */
         MPID_THREAD_CS_ENTER(POBJ, MPIR_THREAD_POBJ_COMM_MUTEX(comm_ptr));
@@ -1135,6 +1152,9 @@ int MPIR_Comm_split_allgather(MPID_Comm *comm_ptr, int color, int key, MPID_Comm
         mpi_errno = MPIR_Comm_commit(*newcomm_ptr);
         if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     }
+    // if(rank==0){
+    //     printf("Flag 2217\n");
+    // }
     
  fn_exit:
     MPIU_CHKLMEM_FREEALL();
@@ -1156,8 +1176,12 @@ int MPIR_Comm_split_impl(MPID_Comm *comm_ptr, int color, int key, MPID_Comm **ne
     int rc;
 #if defined(CHANNEL_MRAIL) || defined(CHANNEL_PSM) || defined(CHANNEL_NEMESIS_IB)
     if (comm_ptr->comm_kind == MPID_INTERCOMM) {
+        // if(comm_ptr->rank == 0){
+        //     printf("Flag 21\n");
+        // }
         rc = MPIR_Comm_split_allgather(comm_ptr, color, key, newcomm_ptr);
 
+        
         /* TODO: bitonic sort algorithm for intercomm split:
          *   each process stores local group as chain
          *   and stores address of remote process having same local rank (if any)
@@ -1173,15 +1197,29 @@ int MPIR_Comm_split_impl(MPID_Comm *comm_ptr, int color, int key, MPID_Comm **ne
          *      record address of remote process having same color and newrank (if any)
          *      send back to original rank paying attention to its group */
     } else {
+        // if(comm_ptr->rank == 0){
+        //     printf("Flag 22\n");
+        // }
         /* TODO: for small input comms, better to call allgather/qsort vs bitonic */
         int ranks = comm_ptr->local_size;
         if (mv2_use_bitonic_comm_split && (ranks > mv2_bitonic_comm_split_threshold)) {
+            // if(comm_ptr->rank == 0){
+            //     printf("Flag 220\n");
+            // }
+
             rc = MPIR_Comm_split_intra_bitonic(comm_ptr, color, key, newcomm_ptr);
         } else {
+            // if(comm_ptr->rank == 0){
+            //     printf("Flag 221\n");
+            // }
+
             rc = MPIR_Comm_split_allgather(comm_ptr, color, key, newcomm_ptr);
         }
     }
 #else
+    // if(comm_ptr->rank == 0){
+    //     printf("Flag 23\n");
+    // }
     rc = MPIR_Comm_split_allgather(comm_ptr, color, key, newcomm_ptr);
 #endif /* defined(CHANNEL_MRAIL) || defined(CHANNEL_PSM) || defined(CHANNEL_NEMESIS_IB) */
     return rc;
@@ -1273,7 +1311,9 @@ int MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
-    
+    // if(comm_ptr->rank == 0){
+    //     printf("Flag 20\n");
+    // }
     mpi_errno = MPIR_Comm_split_impl(comm_ptr, color, key, &newcomm_ptr);
     if (mpi_errno) MPIR_ERR_POP(mpi_errno);
     if (newcomm_ptr)
