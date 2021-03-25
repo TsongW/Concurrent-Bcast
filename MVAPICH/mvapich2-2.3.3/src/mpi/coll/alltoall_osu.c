@@ -991,7 +991,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    int n = (int) (comm_size/local_size);
+    
     mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
     if (mpi_errno) {
         MPIR_ERR_POP(mpi_errno);
@@ -1008,7 +1008,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
     
     local_size = shmem_commptr->local_size;
     local_rank = shmem_commptr->rank;
-    
+    int n = (int) (comm_size/local_size);
     MPID_Get_node_id(comm_ptr, rank, &my_node_id);
     
     
@@ -1161,7 +1161,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
            printf("%d - C12\n", sendcount);
 	    }
 
-        //working here
+        
         //Decrypt and copy to shmem_buffer
         for(i=0; i<n; ++i){
             //decrypt
@@ -1185,6 +1185,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
 
 
         // //Copy to user buffer
+        
         for(i=0; i<comm_size; i+=1){
             int idx = i*local_size + local_size;
             
@@ -1219,23 +1220,14 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
             MPIR_ERR_POP(mpi_errno);
         }
 
-        mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-            goto fn_fail;
-        } 
-        if(rank==0){
-            printf("%d - C2\n", sendcount);
-        }
-
         //Copy to user buffer
         for(i=0; i<n; ++i){
-            int idx = my_node_id * local_size + local_rank + i*(local_size * comm_size);
 
+            int idx =  (local_rank + i * local_size) * (recvcount*recvtype_extent);
             for(j=0; j<local_size; ++j){
-                //int idx = i*local_size + local_size;
-                in = shmem_buffer + (idx  + j * comm_size)*(recvcount*recvtype_extent);
-                out = recvbuf + (i*recvcount*recvtype_extent);
+                
+                in = ((char*)shmem_buffer + idx  + j * (comm_size*recvcount*recvtype_extent));
+                out = ((char*)recvbuf + comm_ptr->dev.ch.rank_list[(i*local_size + j)]*(recvcount*recvtype_extent));
 
                 mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
                                             out, recvcount, recvtype);
@@ -1247,28 +1239,6 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
 
         }//end for i
         
-        
-
-
-        // in = shmem_buffer + (local_rank * comm_size*recvcount*recvtype_extent);
-        // out = recvbuf;
-
-        // mpi_errno = MPIR_Localcopy(in, comm_size * recvcount, recvtype, 
-        //                             out, comm_size * recvcount, recvtype);
-
-        // if (mpi_errno) {
-        //     MPIR_ERR_POP(mpi_errno);
-        // }
-
-
-        mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-            goto fn_fail;
-        } 
-        if(rank==0){
-            printf("%d - C3\n", sendcount);
-        }
     }
     
 
