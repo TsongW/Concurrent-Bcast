@@ -267,7 +267,7 @@ int MPI_Init( int *argc, char ***argv )
             if(security_approach==2){
                 allocated_shmem = 2;
             }
-            init_shmem();
+            //init_shmem();
         }
     }
     // if(comm_ptr->rank==0)
@@ -276,13 +276,17 @@ int MPI_Init( int *argc, char ***argv )
     if ((a_value = getenv("MV2_ALLTOALL_TUNING")) != NULL) {
         int alg = (atoi(a_value));
         if(alg == 5){
-            allocated_shmem = 1;
+            if(allocated_shmem == 0){
+                allocated_shmem = 1;
+            }
             initialize_rank_list = 1;
             /*if(security_approach==2){
                 allocated_shmem = 2;
                 }*/
-            init_shmem();
         }
+    }
+    if(allocated_shmem != 0){
+        init_shmem();
     }
     // if(comm_ptr->rank==0)
     //     printf("Flag 2\n");

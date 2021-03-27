@@ -245,8 +245,7 @@ int MPIR_Alltoall_bruck_MV2(
     
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    if(rank==0)
-        printf("MPIR_Alltoall_bruck_MV2\n");
+
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
@@ -861,8 +860,7 @@ int MPIR_Alltoall_ALG_MV2(
     
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    if(rank==0)
-        printf("MPIR_Alltoall_ALG_MV2\n");
+
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
@@ -997,9 +995,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         MPIR_ERR_POP(mpi_errno);
         goto fn_fail;
     } 
-    if(rank==0){
-        printf("%d - MPIR_Alltoall_Conc_ShMem_MV2\n", sendcount);
-	}
+    
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     conc_comm = comm_ptr->dev.ch.concurrent_comm;
 
@@ -1011,17 +1007,11 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
     int n = (int) (comm_size/local_size);
     MPID_Get_node_id(comm_ptr, rank, &my_node_id);
     
-    
-    
-    
-    
-    
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
     /* check if multiple threads are calling this collective function */
     MPIDU_ERR_CHECK_MULTIPLE_THREADS_ENTER( comm_ptr );
-
 
     tmp_buf = MPIU_Malloc((comm_size) * recvcount * recvtype_extent);
         
@@ -1032,21 +1022,10 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         return mpi_errno;
     }
 
-
-
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    } 
-    if(rank==0){
-        printf("%d - C0\n", sendcount);
-	}
-
-
+    
 
     /**
-     *  Here we split the messages. Messages that should be sent out to other nodes, 
+     *  Here we sort the messages. Messages that should be sent out to other nodes, 
      * will be copied to the tmp_buf (sorted based on the node number and local rank).
      * Messages that should be sent to processes on the same node will be copied to 
      * the shmem buffer at the proper location such that there is only one copy needed 
@@ -1068,19 +1047,7 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
                 dst_local_rank = i;
             }
         }
-        //printf("%d: %d is in node %d and has local_rank=%d\n",rank, s, dst_node_id, dst_local_rank);
-        // if(dst_node_id == my_node_id){
-        //     //copy to shmem
-        //     out = (void*)((char*)shmem_buffer + ((dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent));
-        //     mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
-        //                         out, sendcount, sendtype);
-
-        //     if (mpi_errno) {
-        //         MPIR_ERR_POP(mpi_errno);
-        //     }
-        // }
-        //copy to tmp_buf, sort based on node and locak rank
-        //printf("%d is going to copy %d (%d B)from %d\n", rank, sendcount, sendcount * sendtype_extent, (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
+        
         out = (void*)((char*)tmp_buf + (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
 
         mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
@@ -1091,17 +1058,6 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         }
             
     }
-    
-    
-    mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
-    if (mpi_errno) {
-        MPIR_ERR_POP(mpi_errno);
-        goto fn_fail;
-    } 
-    if(rank==0){
-        printf("%d - C1\n", sendcount);
-	}
-
 
 
     if(security_approach == 2){
@@ -1111,104 +1067,91 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
          * the messages it has to send to other nodes.
          **/
 
-        if(rank==0){
-           printf("%d - C10\n", sendcount);
-	    }
+
+        //encryption
+
+
         int n = (int) (comm_size / local_size);
         unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
         in_size = (unsigned long)(local_size * sendcount * sendtype_extent);
         unsigned long max_out_len = (unsigned long) (16 + in_size);
         for(i=0; i<n; ++i){
-            out = (void*)((char*)ciphertext_sendbuf + (i * local_size) * (sendcount * sendtype_extent + 16 + 12));
-            if(i != my_node_id){
-                //encrypt
-                in = (void*)((char*)tmp_buf + (i * local_size) * (sendcount * sendtype_extent));
-                RAND_bytes(out, 12);
-                        
-                if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                            &ciphertext_len, max_out_len,
-                            out, 12, in, in_size,
-                            NULL, 0)){
-                    printf("Error in encryption: Concurrent ShMem Alltoall (1)\n");
-                    fflush(stdout);
-                }
+            out = (void*)((char*)ciphertext_sendbuf + i * (local_size * sendcount * sendtype_extent + 16 + 12));
+            // //#TODO: Remove one extra encryption
 
-            }else{
-                //set a junk data to avoid seg. fault
-                
-                mpi_errno = MPIR_Localcopy(ciphertext_sendbuf + ((i-1) * local_size) * (sendcount * sendtype_extent + 16 + 12), local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR, 
-                                out, local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR);
-
-                if (mpi_errno) {
-                    MPIR_ERR_POP(mpi_errno);
-                }
+            in = (void*)((char*)tmp_buf + i * (local_size * sendcount * sendtype_extent));
+            RAND_bytes(out, 12);
+                    
+            if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                        &ciphertext_len, max_out_len,
+                        out, 12, in, in_size,
+                        NULL, 0)){
+                printf("Error in encryption: Concurrent ShMem Alltoall (1)\n");
+                fflush(stdout);
             }
         }//end for
 
         
-        if(rank==0){
-           printf("%d - C11\n", sendcount);
-	    }
+
         // Concurrent alltoall
         mpi_errno = MPIR_Alltoall_impl(ciphertext_sendbuf, local_size * sendcount * sendtype_extent +16 +12, MPI_CHAR,
                                     ciphertext_recvbuf, local_size * recvcount * recvtype_extent + 16 + 12, MPI_CHAR, conc_commptr, errflag);
+
+                           
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
         }
-
-
-        if(rank==0){
-           printf("%d - C12\n", sendcount);
-	    }
-
         
         //Decrypt and copy to shmem_buffer
         for(i=0; i<n; ++i){
-            //decrypt
-            if(i != my_node_id){
-                int next =(unsigned long )(i*(local_size * recvcount * recvtype_extent + 16+12));
-                int dest =(unsigned long )(i*(local_size * recvcount * recvtype_extent));
-                if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
-                                &de_count, (unsigned long )((local_size * recvcount*recvtype_extent)),
-                                (ciphertext_recvbuf+next), 12,
-                                (ciphertext_recvbuf+next+12), (unsigned long )(local_size * recvcount*recvtype_extent+16),
-                                NULL, 0)){
-                    printf("Decryption error in Concurrent ShMem Alltoall (1)\n");
-                    fflush(stdout);
-                }
-            }//end if inter node
-        }//end for
-
-        if(rank==0){
-           printf("%d - C13\n", sendcount);
-	    }
-
-
-        // //Copy to user buffer
-        
-        for(i=0; i<comm_size; i+=1){
-            int idx = i*local_size + local_size;
             
-            in = shmem_buffer + (idx*recvcount*recvtype_extent);
-            out = recvbuf + (i*recvcount*recvtype_extent);
-
-            mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
-                                        out, recvcount, recvtype);
-
-            if (mpi_errno) {
-                MPIR_ERR_POP(mpi_errno);
+            //TODO: Remove the one extra decryption
+            int next =(unsigned long )(i*(local_size * recvcount * recvtype_extent + 16+12));
+            int dest =(unsigned long ) ((local_rank * comm_size) + (i*local_size)) * (recvcount * recvtype_extent);
+            if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                            &de_count, (unsigned long )((local_size * recvcount*recvtype_extent)),
+                            (ciphertext_recvbuf+next), 12,
+                            (ciphertext_recvbuf+next+12), (unsigned long )(local_size * recvcount*recvtype_extent+16),
+                            NULL, 0)){
+                printf("Decryption error in Concurrent ShMem Alltoall (1) while %d tried to decrypt from %d to %d\n", rank, next, dest);
+                fflush(stdout);
             }
-        }//end for
 
+        }//end for
 
         mpi_errno = MPIR_Barrier_impl(comm_ptr, errflag);
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
             goto fn_fail;
         } 
-        if(rank==0){
-            printf("%d - C3\n", sendcount);
-        }
+
+
+
+        // //Copy to user buffer
+        for(i=0; i<n; ++i){
+            
+            int idx =  (local_rank + i * local_size) * (recvcount*recvtype_extent);
+            // if(rank ==0){
+            //     printf("i= %d, idx= %d\n", i, idx);
+            // }
+            for(j=0; j<local_size; ++j){
+                // if(rank ==0){
+                //     printf("j= %d, gonna copy from %d to %d\n", j, idx  + j * (comm_size*recvcount*recvtype_extent), comm_ptr->dev.ch.rank_list[(i*local_size + j)]*(recvcount*recvtype_extent));
+                // }
+                
+                in = ((char*)shmem_buffer + idx  + j * (comm_size*recvcount*recvtype_extent));
+                out = ((char*)recvbuf + comm_ptr->dev.ch.rank_list[(i*local_size + j)]*(recvcount*recvtype_extent));
+
+                mpi_errno = MPIR_Localcopy(in, recvcount, recvtype, 
+                                            out, recvcount, recvtype);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+            }//end for j
+
+        }//end for i
+
 
     }//end security approach == 2
     else{
@@ -1303,9 +1246,7 @@ int MPIR_Alltoall_Scatter_dest_MV2(
 
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    if(rank==0){
-        printf("%d - MPIR_Alltoall_Scatter_dest_MV2\n", sendcount);
-	}
+    
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
@@ -1528,8 +1469,7 @@ int MPIR_Alltoall_pairwise_MV2(
     
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
-    if(rank==0)
-        printf("MPIR_Alltoall_pairwise_MV2\n");
+
     /* Get extent of send and recv types */
     MPID_Datatype_get_extent_macro(recvtype, recvtype_extent);
     MPID_Datatype_get_extent_macro(sendtype, sendtype_extent);
