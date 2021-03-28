@@ -1035,29 +1035,33 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
     //TODO: optimize for block
 
     
+    
     int s, dst_local_rank=0;
     void *in, *out;
     
-    for(s=0; s<comm_size; ++s){
-        MPID_Get_node_id(comm_ptr, s, &dst_node_id);
-        
-        for(i=0; i<local_size; ++i){
+    if(comm_ptr->dev.ch.is_global_block!=1){
+        for(s=0; s<comm_size; ++s){
+            MPID_Get_node_id(comm_ptr, s, &dst_node_id);
             
-            if(comm_ptr->dev.ch.rank_list[i + dst_node_id*local_size] == s){
-                dst_local_rank = i;
+            for(i=0; i<local_size; ++i){
+                
+                if(comm_ptr->dev.ch.rank_list[i + dst_node_id*local_size] == s){
+                    dst_local_rank = i;
+                }
             }
-        }
-        
-        out = (void*)((char*)tmp_buf + (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
-
-        mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
-                                out, sendcount, sendtype);
-
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-        }
             
+            out = (void*)((char*)tmp_buf + (dst_node_id * local_size + dst_local_rank)*sendcount * sendtype_extent);
+
+            mpi_errno = MPIR_Localcopy(sendbuf + (s * sendcount * sendtype_extent), sendcount, sendtype, 
+                                    out, sendcount, sendtype);
+
+            if (mpi_errno) {
+                MPIR_ERR_POP(mpi_errno);
+            }
+                
+        }
     }
+    
 
 
     if(security_approach == 2){
@@ -1078,17 +1082,25 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         for(i=0; i<n; ++i){
             out = (void*)((char*)ciphertext_sendbuf + i * (local_size * sendcount * sendtype_extent + 16 + 12));
             // //#TODO: Remove one extra encryption
-
-            in = (void*)((char*)tmp_buf + i * (local_size * sendcount * sendtype_extent));
-            RAND_bytes(out, 12);
-                    
-            if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                        &ciphertext_len, max_out_len,
-                        out, 12, in, in_size,
-                        NULL, 0)){
-                printf("Error in encryption: Concurrent ShMem Alltoall (1)\n");
-                fflush(stdout);
+            if(i == my_node_id){
+                memset(out, 0, (local_size * sendcount * sendtype_extent + 16 + 12));
+            }else{
+                if(comm_ptr->dev.ch.is_global_block!=1){
+                    in = (void*)((char*)tmp_buf + i * (local_size * sendcount * sendtype_extent));
+                }else{
+                    in = (void*)((char*)sendbuf + i * (local_size * sendcount * sendtype_extent));
+                }
+                RAND_bytes(out, 12);
+                        
+                if(!EVP_AEAD_CTX_seal(ctx, out+12,
+                            &ciphertext_len, max_out_len,
+                            out, 12, in, in_size,
+                            NULL, 0)){
+                    printf("Error in encryption: Concurrent ShMem Alltoall (1)\n");
+                    fflush(stdout);
+                }
             }
+            
         }//end for
 
         
@@ -1104,18 +1116,33 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         
         //Decrypt and copy to shmem_buffer
         for(i=0; i<n; ++i){
-            
-            //TODO: Remove the one extra decryption
-            int next =(unsigned long )(i*(local_size * recvcount * recvtype_extent + 16+12));
             int dest =(unsigned long ) ((local_rank * comm_size) + (i*local_size)) * (recvcount * recvtype_extent);
-            if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
-                            &de_count, (unsigned long )((local_size * recvcount*recvtype_extent)),
-                            (ciphertext_recvbuf+next), 12,
-                            (ciphertext_recvbuf+next+12), (unsigned long )(local_size * recvcount*recvtype_extent+16),
-                            NULL, 0)){
-                printf("Decryption error in Concurrent ShMem Alltoall (1) while %d tried to decrypt from %d to %d\n", rank, next, dest);
-                fflush(stdout);
+            //TODO: Remove the one extra decryption
+            if(i == my_node_id){
+                if(comm_ptr->dev.ch.is_global_block!=1){
+                    in = (void*)((char*)tmp_buf + i * (local_size * sendcount * sendtype_extent));
+                }else{
+                    in = (void*)((char*)sendbuf + i * (local_size * sendcount * sendtype_extent));
+                }
+                mpi_errno = MPIR_Localcopy(in, local_size * sendcount, recvtype, 
+                                            shmem_buffer + dest, local_size * sendcount, recvtype);
+
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+            }else{
+                int next =(unsigned long )(i*(local_size * recvcount * recvtype_extent + 16+12));
+                
+                if(!EVP_AEAD_CTX_open(ctx, ((shmem_buffer+dest)),
+                                &de_count, (unsigned long )((local_size * recvcount*recvtype_extent)),
+                                (ciphertext_recvbuf+next), 12,
+                                (ciphertext_recvbuf+next+12), (unsigned long )(local_size * recvcount*recvtype_extent+16),
+                                NULL, 0)){
+                    printf("Decryption error in Concurrent ShMem Alltoall (1) while %d tried to decrypt from %d to %d\n", rank, next, dest);
+                    fflush(stdout);
+                }
             }
+            
 
         }//end for
 
@@ -1156,8 +1183,12 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
     }//end security approach == 2
     else{
         // Concurrent alltoall
-        
-        mpi_errno = MPIR_Alltoall_impl(tmp_buf, local_size * sendcount, sendtype,
+        if(comm_ptr->dev.ch.is_global_block!=1){
+            in = tmp_buf;
+        }else{
+            in = sendbuf;
+        }
+        mpi_errno = MPIR_Alltoall_impl(in, local_size * sendcount, sendtype,
                                     shmem_buffer+local_rank*(comm_size * recvcount*recvtype_extent), local_size * recvcount, recvtype, conc_commptr, errflag);
         if (mpi_errno) {
             MPIR_ERR_POP(mpi_errno);
