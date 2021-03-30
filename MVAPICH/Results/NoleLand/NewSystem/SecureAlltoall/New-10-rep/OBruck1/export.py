@@ -2,7 +2,7 @@ import os
 import openpyxl
 
 def write_to_spreadsheet(results, sheet_name, start_row):
-	wb = openpyxl.load_workbook('../10Rep-NS-AlltoAll-MVAPICH.xlsx')
+	wb = openpyxl.load_workbook('../10rep-NS-AlltoAll-MVAPICH.xlsx')
 	
 	
 	sheet = wb[sheet_name]
@@ -13,7 +13,7 @@ def write_to_spreadsheet(results, sheet_name, start_row):
 			sheet[columns[i] + str(j + start_row)].value = results[i][j]
 		
 
-	wb.save('../10Rep-NS-AlltoAll-MVAPICH.xlsx')
+	wb.save('../10rep-NS-AlltoAll-MVAPICH.xlsx')
 
 
 def read_file(path):
@@ -40,10 +40,11 @@ def read_file(path):
 
 if __name__ == '__main__':
 	start_rows = {}
-	start_rows['out_7_91'] = 5
-	start_rows['out_c_7_91'] = 34
-	start_rows['out_8_128'] = 63
-	start_rows['out_c_8_128'] = 92
+	# start_rows['out_7_91'] = 5
+	# start_rows['out_c_7_91'] = 34
+	# start_rows['out_8_128'] = 63
+	# start_rows['out_c_8_128'] = 92
+	start_rows['out_8_128'] = 5
 
 	
 	

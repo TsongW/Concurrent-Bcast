@@ -10,7 +10,7 @@ def summarize(file_name):
 	columns = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V']
 	idx=0
 	summary = wb['Summary']
-	result_c='H'
+	result_c='M'
 	
 	for sheet in wb.sheetnames:
 		if sheet != 'Summary':
@@ -24,4 +24,4 @@ def summarize(file_name):
 	wb.save(file_name)
 
 if __name__ == '__main__':
-	summarize('10Rep-NS-AlltoAll-MVAPICH.xlsx')
+	summarize('10rep-NS-AlltoAll-MVAPICH.xlsx')

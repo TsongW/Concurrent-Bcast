@@ -329,8 +329,8 @@ int MPIR_Alltoall_bruck_MV2(
         MPID_Get_node_id(comm_ptr, rank, &my_node_id);
 
 
-        if(security_approach == 2 && concurrent_comm!=1){
-
+        if(security_approach == 2 ){
+            
 	        int dest, next, i;
             unsigned long  ciphertext_len = 0, de_count=0, in_size=0;
             in_size = (unsigned long)(recvcount * recvtype_extent);
@@ -1064,8 +1064,9 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
     
 
 
-    if(security_approach == 2){
+    if(security_approach == 3){
         /**
+         * Here we use a naive approach for the concurrent alltoall
          * Intra-node step is done.
          * For the inter-node step, first each process encrypts 
          * the messages it has to send to other nodes.
@@ -1180,7 +1181,25 @@ int MPIR_Alltoall_Conc_ShMem_MV2(
         }//end for i
 
 
-    }//end security approach == 2
+    }//end security approach == 3
+    // else if(security_approach==2){
+    //     /** Here we use a Naive+ approach for the concurrent alltoall
+    //      * 
+    //      */
+    //     if(comm_ptr->dev.ch.is_global_block!=1){
+    //         in = tmp_buf;
+    //     }else{
+    //         in = sendbuf;
+    //     }
+    //     mpi_errno = MPIR_Alltoall_impl(in, local_size * sendcount, sendtype,
+    //                                 shmem_buffer+local_rank*(comm_size * recvcount*recvtype_extent), local_size * recvcount, recvtype, conc_commptr, errflag);
+    //     if (mpi_errno) {
+    //         MPIR_ERR_POP(mpi_errno);
+    //     }
+
+
+
+    // }
     else{
         // Concurrent alltoall
         if(comm_ptr->dev.ch.is_global_block!=1){
@@ -1343,7 +1362,8 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank+i+ii) % comm_size;
             /***********************      Added by Mehran     ***************************/
-            if(security_approach == 2 && concurrent_comm!=1){
+            if(security_approach == 2){
+
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     MPIR_PVAR_INC(alltoall, sd, recv, recvcount*recvtype_extent + 16 + 12, MPI_CHAR);
@@ -1374,7 +1394,8 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank-i-ii+comm_size) % comm_size;
             /***********************      Added by Mehran     ***************************/
-            if(security_approach == 2 && concurrent_comm!=1){
+            if(security_approach == 2){
+
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     //encrypt here
@@ -1437,7 +1458,8 @@ int MPIR_Alltoall_Scatter_dest_MV2(
         for ( i=0; i<ss; i++ ) {
             dst = (rank+i+ii) % comm_size;
             
-            if(security_approach == 2 && concurrent_comm!=1){
+            if(security_approach == 2 ){
+
                 MPID_Get_node_id(comm_ptr, dst, &dst_node_id);
                 if(dst_node_id != my_node_id){
                     next =(unsigned long )(dst*(recvcount * recvtype_extent + 16+12));
