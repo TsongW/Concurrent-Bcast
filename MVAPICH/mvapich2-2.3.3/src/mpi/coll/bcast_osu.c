@@ -722,7 +722,7 @@ int MPIR_Bcast_scatter_doubling_allgather_MV2(void *buffer,
 #undef FCNAME
 #define FCNAME MPL_QUOTE(FUNCNAME)
 
-#if 0
+
 int MPIR_Concurrent_Bcast_MV2(void *buffer,
                                           int count,
                                           MPI_Datatype datatype,
@@ -839,15 +839,24 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 }
 
 
-#endif
 /****************************************************************/
 
 
 
-/*Shmem-ML (I): (m/l)-byte encryption + concurrent bcast*/
-#if 1
 
-int MPIR_Concurrent_Bcast_MV2(void *buffer,
+
+
+
+/********************* Added by Cong *********************/
+#undef FUNCNAME
+#define FUNCNAME MPIR_Bcast_ML_Shmem_MV2
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+
+/*Shmem-ML (I): (m/l)-byte encryption + concurrent bcast*/
+
+
+int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           int count,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
@@ -897,7 +906,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
             goto fn_fail;
         }
 
-        if(security_approach ==4 ){ 
+        if(security_approach ==2 ){ 
             /*Encrypts (m/l) to SHM cipher*/
                 unsigned long ciphertext_len = 0;
                 void* out;
@@ -3139,7 +3148,20 @@ skip_tuning_tables:
         two_level_bcast = 1;
     }
 #endif
-    if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
+
+/*****************Add by Cong ************************************/
+if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+	mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
+                            datatype, root,
+                            comm_ptr, errflag);
+
+    }
+
+
+/******************************************************************/
+
+
+  else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
 	mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
@@ -3417,7 +3439,22 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
     two_level_bcast =
         mv2_bcast_thresholds_table[range].is_two_level_bcast[range_threshold];
 
-    if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
+
+
+
+    /*****************Add by Cong ************************************/
+    if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+        mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
+                                datatype, root,
+                                comm_ptr, errflag);
+
+        }
+
+
+/******************************************************************/
+
+
+   else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
         mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
