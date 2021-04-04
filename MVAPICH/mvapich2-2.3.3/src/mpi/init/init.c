@@ -293,7 +293,6 @@ int MPI_Init( int *argc, char ***argv )
             allocated_shmem = 2;
         }
     }
-
 /******************************************************************/
 
     if(allocated_shmem != 0){
