@@ -954,7 +954,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
             }
             
             
-            if (security_approach ==4){
+            if (security_approach ==2){
                 /*Encrypts (m/l) to shared cipher buffer*/
                 unsigned long ciphertext_len = 0;
                 void* out;
@@ -1013,7 +1013,7 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
         }//end if node_id
         else{
             
-            if (security_approach ==4){
+            if (security_approach ==2){
                 //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 
