@@ -722,7 +722,7 @@ int MPIR_Bcast_scatter_doubling_allgather_MV2(void *buffer,
 #undef FCNAME
 #define FCNAME MPL_QUOTE(FUNCNAME)
 
-#if 0
+
 int MPIR_Concurrent_Bcast_MV2(void *buffer,
                                           int count,
                                           MPI_Datatype datatype,
@@ -839,239 +839,8 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 }
 
 
-#endif
-
-int MPIR_Concurrent_Bcast_MV2(void *buffer,
-                                          int count,
-                                          MPI_Datatype datatype,
-                                          int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
-{
-    int rank, comm_size;
-    int mpi_errno = MPI_SUCCESS;
-    int mpi_errno_ret = MPI_SUCCESS;
-    MPIDI_msg_sz_t nbytes, scatter_size;
-    MPI_Aint type_size;
-    
-    
-    MPIU_CHKLMEM_DECL(3);
-
-    //MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
-    comm_size = comm_ptr->local_size;
-    rank = comm_ptr->rank;
-
-    if (comm_size == 1)
-        goto fn_exit;
 
 
-    MPID_Comm *shmem_commptr=NULL, *conc_commptr = NULL;
-    MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_commptr);
-    MPID_Comm_get_ptr(comm_ptr->dev.ch.concurrent_comm, conc_commptr);
-
-    int local_rank, local_size;
-    local_rank = shmem_commptr->rank;
-    local_size = shmem_commptr->local_size;
-    
-
-    MPID_Datatype_get_size_macro(datatype, type_size);
-    nbytes = (MPIDI_msg_sz_t) (count) * (type_size);
-    scatter_size = (nbytes + local_size - 1) / local_size;    
-    
-
-    
-    if(rank == root){
-
-        //printf("MPIR_Bcast_ML_Shmem_MV2\n");
-        
-        /*Copy plaintext to the shared memory  buffer*/
-        mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
-                                    (void*)((char*)shmem_buffer), count, datatype);
-        mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-
-        if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-            goto fn_fail;
-        }
-
-        if(security_approach ==2 ){ 
-            /*Encrypts (m/l) to SHM cipher*/
-                unsigned long ciphertext_len = 0;
-                void* out;
-                void* in;
-                unsigned long in_size;
-                if (scatter_size < 16){
-                    in_size = scatter_size;
-                }else{
-                    in_size = (unsigned long)(scatter_size); 
-                }
-                //out = (void*)( large_send_buffer);
-                out = (void*)( ciphertext_shmem_buffer);
-                RAND_bytes(out, 12); // 12 bytes of nonce
-                in = (void*)(shmem_buffer);
-                unsigned long max_out_len = (16 + in_size);
-            
-                
-            if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                                    &ciphertext_len, max_out_len,
-                                    out, 12,
-                                    in, in_size,
-                                    NULL, 0))
-                {
-                        printf("Error in  encryption: SHM-ML-2  \n");
-                        fflush(stdout);
-                }    
-
-            /*Concurrent Bcast*/
-           // mpi_errno = MPIR_Bcast_impl(large_send_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
-           mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
-
-        }
-        else{    
-            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), scatter_size, MPI_BYTE, 
-                                    (void*)((char*)ciphertext_shmem_buffer), scatter_size, MPI_BYTE);
-            mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
-        }
-
-    }//end if root
-    else{
-        //compare node id with that of the root
-        MPID_Node_id_t node_id, root_node_id;
-        MPID_Get_node_id(comm_ptr, rank, &node_id);
-        MPID_Get_node_id(comm_ptr, root, &root_node_id);
-
-
-        if(node_id == root_node_id){
-            
-            mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);  /*Wait for  Copy*/
-
-            if (mpi_errno) {
-                MPIR_ERR_POP(mpi_errno);
-                goto fn_fail;
-            }
-            
-            
-            if (security_approach ==2){
-                /*Encrypts (m/l) to shared cipher buffer*/
-                unsigned long ciphertext_len = 0;
-                void* out;
-                void* in;
-                unsigned long in_size;
-                if (scatter_size < 16){
-                    in_size = scatter_size;
-                }else{
-                    in_size = (unsigned long)(scatter_size); 
-                }
-                //out = (void*)( large_send_buffer);
-                out = (void*)( ciphertext_shmem_buffer+local_rank*(scatter_size+28));
-                RAND_bytes(out, 12); // 12 bytes of nonce
-                in = (void*)(shmem_buffer +local_rank*scatter_size);
-                unsigned long max_out_len = (16 + in_size);
-            
-                
-                if(!EVP_AEAD_CTX_seal(ctx, out+12,
-                                    &ciphertext_len, max_out_len,
-                                    out, 12,
-                                    in, in_size,
-                                    NULL, 0))
-                {
-                        printf("Error in  encryption: SHM-ML-1  \n");
-                        fflush(stdout);
-                }    
-
-                //mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); 
-
-                /*Concurrent Bcast*/
-        
-                //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
-                mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), 
-                                                scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
-                /*Local copy */
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
-                                    (void*)((char*)buffer), count, datatype);
-
-            }
-            else{
-                //Unecrypted 
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE, 
-                                    (void*)((char*)ciphertext_shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE);
-                mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
-
-                /*Local copy */
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
-                                    (void*)((char*)buffer), count, datatype);
-            }
-
-            if (mpi_errno) {
-            MPIR_ERR_POP(mpi_errno);
-            goto fn_fail;
-            }
-
-        }//end if node_id
-        else{
-            
-            if (security_approach ==2){
-                //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
-                mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
-                
-                if (mpi_errno) {
-                MPIR_ERR_POP(mpi_errno);
-                goto fn_fail;
-                }
-                /*Decrypt to the buffer*/
-                void* out;
-                void* in;
-                unsigned long  decrypted_len;
-                unsigned long  ciphertext_len = (scatter_size+16);
-
-                //in = (void*)(large_send_buffer);
-                in = (void*)(ciphertext_shmem_buffer+local_rank*(scatter_size+28));
-                out = (void*)(shmem_buffer +local_rank*scatter_size);
-
-                if(!EVP_AEAD_CTX_open(ctx, out, &decrypted_len, (ciphertext_len-16),
-                        in, 12, in+12, (unsigned long )(ciphertext_len),
-                        NULL, 0)){
-                        printf("Error in SHM-ML-1 decryption:  while %d tried to decrypt\n", rank);
-                        fflush(stdout);   
-                    }
-                //printf("rank=%d, size=%d, dec is done\n",rank, scatter_size);
-                
-                mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); /*Wait for decryption*/
-
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
-                                    (void*)((char*)buffer), count, datatype);
-
-            }else{
-                 mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
-                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-                  mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
-                                         (void*)((char*)buffer), count, datatype);
-
-
-            }
-
-        }//end of other nodes
-       
-    }//end all ranks
-
-
-    if (mpi_errno) {
-	MPIR_ERR_POP(mpi_errno);
-	goto fn_fail;
-    }
-
-    
-
-  fn_exit:
-    MPIU_CHKLMEM_FREEALL();
-    if (mpi_errno_ret)
-        mpi_errno = mpi_errno_ret;
-    else if (*errflag)
-        MPIR_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**coll_fail");
-    return mpi_errno;
-  fn_fail:
-    goto fn_exit;
-}
-
-/****************************************************************/
 
 
 /****************************************************************/
@@ -1096,6 +865,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    //MPIR_TIMER_START(coll,bcast,scatter_ring_allgather);
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
@@ -1130,8 +900,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     
     if(rank == root){
 
-        //printf("MPIR_Bcast_ML_Shmem_MV2\n");
-        
         /*Copy plaintext to the shared memory  buffer*/
         mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
                                     (void*)((char*)shmem_buffer), count, datatype);
@@ -1142,7 +910,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             goto fn_fail;
         }
 
-        if(security_approach ==2 ){ 
+        if(security_approach == 2 ){ 
             /*Encrypts (m/l) to SHM cipher*/
                 unsigned long ciphertext_len = 0;
                 void* out;
@@ -1301,11 +1069,9 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
         }//end of other nodes
        
     }//end all ranks
-
-
     if (mpi_errno) {
-	MPIR_ERR_POP(mpi_errno);
-	goto fn_fail;
+        MPIR_ERR_POP(mpi_errno);
+        goto fn_fail;
     }
 
     
@@ -1319,7 +1085,13 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     return mpi_errno;
   fn_fail:
     goto fn_exit;
+
+
 }
+
+
+
+
 
 /****************************************************************/
 
