@@ -285,6 +285,17 @@ int MPI_Init( int *argc, char ***argv )
                 }*/
         }
     }
+/***********************Added by Cong******************************/
+
+    if ((t_value = getenv("MV2_INTER_BCAST_TUNING")) != NULL) {
+        int alg = (atoi(t_value));
+        if(alg == 12){
+            allocated_shmem = 2;
+        }
+    }
+
+/******************************************************************/
+
     if(allocated_shmem != 0){
         init_shmem();
     }
