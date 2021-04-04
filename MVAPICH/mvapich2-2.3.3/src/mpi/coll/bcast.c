@@ -19,6 +19,11 @@
 
 #include "mpiimpl.h"
 #include "collutil.h"
+
+/**********Added by Cong *********/
+#include "secure_allgather.h"
+/********************/
+
 #ifdef _OSU_MVAPICH_
 #   include "coll_shmem.h"
 #endif /* _OSU_MVAPICH_ */
@@ -1497,6 +1502,98 @@ int MPIR_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPID_Co
 }
 
 
+
+/****************************** Added by Cong ***********************/
+#undef FUNCNAME
+#define FUNCNAME MPI_Naive_Sec_Bcast
+#undef FCNAME
+#define FCNAME MPL_QUOTE(FUNCNAME)
+
+int MPI_Naive_Sec_Bcast( void *buffer, int count, MPI_Datatype datatype, int root, 
+                MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
+{
+    int mpi_errno = MPI_SUCCESS;
+    //MPID_Comm *comm_ptr = NULL;
+    //MPIR_Errflag_t errflag = MPIR_ERR_NONE;
+    //MPID_MPI_STATE_DECL(MPID_STATE_MPI_BCAST);
+	
+	unsigned long ciphertext_len = 0;
+    int  sendtype_sz=0;           
+    
+    MPI_Type_size(datatype, &sendtype_sz);         
+    unsigned long   max_out_len = (unsigned long)(16 + (sendtype_sz*count));
+    unsigned long decrypted_len=0;
+	
+	//MPID_Comm_get_ptr( comm, comm_ptr );
+	int rank = comm_ptr->rank;
+
+	if (rank == root) {
+        
+        /* Set the nonce in send_ciphertext */
+        RAND_bytes(ciphertext_sendbuf, 12); 
+
+		if(!EVP_AEAD_CTX_seal(ctx, (ciphertext_sendbuf+12),
+                            &ciphertext_len, max_out_len,
+                            ciphertext_sendbuf, 12, 
+                            buffer, (unsigned long)(count*sendtype_sz),
+                             NULL, 0)){  
+                    printf("Error in encryption: MPI_SEC_Bcast\n");		
+                    fflush(stdout);
+            }
+            
+            #if ENABLE_SECURE_MPI_DEBUG
+            else{
+                MPID_Comm *debug_comm_ptr = NULL;
+                MPID_Comm_get_ptr( comm, debug_comm_ptr );
+                printf("MPI_SEC_Bcast: ciphertext_len = %d Rank = %d\n",ciphertext_len, debug_comm_ptr->rank);
+                fflush(stdout);
+            }
+            #endif              
+		
+		mpi_errno = MPIR_Bcast_impl(ciphertext_sendbuf, ((sendtype_sz*count)+16+12), MPI_CHAR, root, comm_ptr, errflag);
+		
+	}
+	else if (rank != root) {	
+	
+		ciphertext_len = (unsigned long)((count*sendtype_sz)+16);
+		
+		mpi_errno = MPIR_Bcast_impl(ciphertext_recvbuf, ((sendtype_sz*count)+16+12), MPI_CHAR, root, comm_ptr, errflag);
+		
+		if(!EVP_AEAD_CTX_open(ctx, buffer, 
+                            &decrypted_len, (ciphertext_len-16), 
+                            ciphertext_recvbuf, 12, 
+                            (ciphertext_recvbuf+12), ciphertext_len, 
+                            NULL, 0)){
+                printf("Decryption error: MPI_SEC_Bcast\n");	
+                fflush(stdout);
+            }
+            
+            #if ENABLE_SECURE_MPI_DEBUG
+            else{
+                MPID_Comm *debug_comm_ptr = NULL;
+                MPID_Comm_get_ptr( comm, debug_comm_ptr );
+                printf("MPI_SEC_Bcast: decrypted_len = %d Rank = %d\n",decrypted_len, debug_comm_ptr->rank);
+                fflush(stdout);
+            }
+            #endif                		
+		
+	}
+	
+	return mpi_errno;
+
+}
+
+/***********************************End of Add************************************/
+
+
+
+
+
+
+
+
+
+
 #endif /* MPICH_MPI_FROM_PMPI */
 
 #undef FUNCNAME
@@ -1591,7 +1688,19 @@ int MPI_Bcast( void *buffer, int count, MPI_Datatype datatype, int root,
 
     /* ... body of routine ...  */
     
-    mpi_errno = MPIR_Bcast_impl( buffer, count, datatype, root, comm_ptr, &errflag );
+    /****************************** Added by Cong ***********************/
+
+    if(security_approach==1){
+        //NAIVE
+        mpi_errno = MPI_Naive_Sec_Bcast( buffer, count, datatype, root, comm_ptr, &errflag);
+    }else{
+        mpi_errno = MPIR_Bcast_impl( buffer, count, datatype, root, comm_ptr, &errflag );
+    }
+     // mpi_errno = MPIR_Bcast_impl( buffer, count, datatype, root, comm_ptr, &errflag );
+     
+    /*********************************End of Add*******************************/
+    
+  
     if (mpi_errno) goto fn_fail;
 
 #ifdef _OSU_MVAPICH_
