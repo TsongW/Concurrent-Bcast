@@ -3150,6 +3150,8 @@ skip_tuning_tables:
 
 /*****************Add by Cong ************************************/
 if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+
+
 	mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
