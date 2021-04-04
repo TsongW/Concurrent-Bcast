@@ -895,7 +895,8 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     
     if(rank == root){
 
-        printf("MPIR_Bcast_ML_Shmem_MV2\n");
+        //printf("MPIR_Bcast_ML_Shmem_MV2\n");
+        
         /*Copy plaintext to the shared memory  buffer*/
         mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
                                     (void*)((char*)shmem_buffer), count, datatype);
