@@ -861,7 +861,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-    //MPIR_TIMER_START(coll,bcast,scatter_ring_allgather);
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
@@ -896,6 +895,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     
     if(rank == root){
 
+        printf("MPIR_Bcast_ML_Shmem_MV2\n");
         /*Copy plaintext to the shared memory  buffer*/
         mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
                                     (void*)((char*)shmem_buffer), count, datatype);
