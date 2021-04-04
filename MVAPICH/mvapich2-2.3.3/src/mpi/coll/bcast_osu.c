@@ -936,7 +936,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         printf("Error in  encryption: SHM-ML-2  \n");
                         fflush(stdout);
                 }    
-
+            printf("root enc is done\n");
             /*Concurrent Bcast*/
            // mpi_errno = MPIR_Bcast_impl(large_send_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
            mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
@@ -994,6 +994,8 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         fflush(stdout);
                 }    
 
+                printf("NODE enc is done\n");
+
                 //mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); 
 
                 /*Concurrent Bcast*/
@@ -1049,7 +1051,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         printf("Error in SHM-ML-1 decryption:  while %d tried to decrypt\n", rank);
                         fflush(stdout);   
                     }
-                //printf("rank=%d, size=%d, dec is done\n",rank, scatter_size);
+                printf("rank=%d, size=%d, dec is done\n",rank, scatter_size);
                 
                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); /*Wait for decryption*/
 
