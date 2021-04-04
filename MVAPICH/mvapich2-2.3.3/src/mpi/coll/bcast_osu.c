@@ -1085,7 +1085,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     goto fn_exit;
 }
 
-#endif
 /****************************************************************/
 
 
