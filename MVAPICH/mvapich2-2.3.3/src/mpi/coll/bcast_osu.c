@@ -859,7 +859,6 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
 
 /*Shmem-ML (I): (m/l)-byte encryption + concurrent bcast*/
 
-
 int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           int count,
                                           MPI_Datatype datatype,
@@ -1060,7 +1059,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             }else{
                  mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
                  mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-                  mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
+                  mpi_errno = MPIR_Localcopy((void*)((char*)ciphertext_shmem_buffer), count, datatype, 
                                          (void*)((char*)buffer), count, datatype);
 
 

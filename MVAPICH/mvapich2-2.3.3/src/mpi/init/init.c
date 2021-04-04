@@ -289,7 +289,7 @@ int MPI_Init( int *argc, char ***argv )
 
     if ((t_value = getenv("MV2_INTER_BCAST_TUNING")) != NULL) {
         int alg = (atoi(t_value));
-        if(alg == 13||alg == 12){
+        if(alg == 13){
             allocated_shmem = 2;
         }
     }
