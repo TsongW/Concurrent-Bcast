@@ -1033,8 +1033,8 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 //in = (void*)(large_send_buffer);
                 in = (void*)(ciphertext_shmem_buffer+local_rank*(scatter_size+28));
                 out = (void*)(shmem_buffer +local_rank*scatter_size);
-                printf("dec starts, size=%d, rank=%d\n", ciphertext_len, rank);
-                fflush(stdout);
+                /*printf("dec starts, size=%d, rank=%d\n", ciphertext_len, rank);
+                fflush(stdout);*/
 
                 if(!EVP_AEAD_CTX_open(ctx, out, &decrypted_len, (ciphertext_len-16),
                         in, 12, in+12, (unsigned long )(ciphertext_len),
@@ -1042,7 +1042,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         printf("Error in SHM-ML-1 decryption:  while %d tried to decrypt\n", rank);
                         fflush(stdout);   
                     }
-                printf(" dec is done\n");
+                //printf(" dec is done\n");
                 
                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); /*Wait for decryption*/
 
