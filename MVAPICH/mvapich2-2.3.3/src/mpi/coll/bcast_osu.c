@@ -864,7 +864,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-    printf("MPIR_Bcast_ML_Shmem_MV2\n");
+
 
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
@@ -3159,7 +3159,6 @@ skip_tuning_tables:
 
 /*****************Add by Cong ************************************/
 if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
-    printf("concurrent_comm == 1 && concurrent_bcast == 2\n");
 
 	mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                             datatype, root,
@@ -3351,10 +3350,10 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
 
+/******************Added by Cong (debug)********************************/
+   /* printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
+    fflush(stdout);*/
 /*******************************************************/
-    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
-    fflush(stdout);
-
     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
         is_contig = 1;
     else {
@@ -3461,8 +3460,6 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 
     /*****************Add by Cong ************************************/
     if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
-
-        printf("concurrent_comm == 1 && concurrent_bcast == 2\n");
 
         mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                                 datatype, root,
@@ -3633,10 +3630,10 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
     }
 #endif                          /*#ifdef _ENABLE_CUDA_ */
 
-    int rank = comm_ptr->rank;
+  /*  int rank = comm_ptr->rank;
 
     printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank, security_approach);
-    fflush(stdout);
+    fflush(stdout);*/
 
 
     if (mv2_use_old_bcast == 0) {
