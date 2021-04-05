@@ -864,8 +864,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-
-
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
@@ -942,9 +940,9 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
         }
         else{    
-            mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), scatter_size, MPI_BYTE, 
-                                    (void*)((char*)ciphertext_shmem_buffer), scatter_size, MPI_BYTE);
-            mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
+            /*mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), scatter_size, MPI_BYTE, 
+                                    (void*)((char*)ciphertext_shmem_buffer), scatter_size, MPI_BYTE);*/
+            mpi_errno = MPIR_Bcast_impl(shmem_buffer, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
         }
 
     }//end if root
@@ -978,7 +976,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 }
                 //out = (void*)( large_send_buffer);
                 out = (void*)( ciphertext_shmem_buffer+local_rank*(scatter_size+28));
-                RAND_bytes(out, 12); // 12 bytes of nonce
+                RAND_bytes(out, 12); //nonce
                 in = (void*)(shmem_buffer +local_rank*scatter_size);
                 unsigned long max_out_len = (16 + in_size);
             
@@ -993,7 +991,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         fflush(stdout);
                 }    
 
-               // printf("NODE enc is done\n");
 
                 //mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); 
 
@@ -1009,9 +1006,9 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             }
             else{
                 //Unecrypted 
-                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE, 
-                                    (void*)((char*)ciphertext_shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE);
-                mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
+               /* mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE, 
+                                    (void*)((char*)ciphertext_shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE);*/
+                mpi_errno = MPIR_Bcast_impl(shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
 
                 /*Local copy */
                 mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
@@ -1058,9 +1055,9 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                     (void*)((char*)buffer), count, datatype);
 
             }else{
-                 mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
+                 mpi_errno = MPIR_Bcast_impl(shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
                  mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-                  mpi_errno = MPIR_Localcopy((void*)((char*)ciphertext_shmem_buffer), count, datatype, 
+                 mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
                                          (void*)((char*)buffer), count, datatype);
 
 
@@ -3353,7 +3350,7 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 /******************Added by Cong (debug)********************************/
    /* printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
     fflush(stdout);*/
-    
+
 /*******************************************************/
     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
         is_contig = 1;
