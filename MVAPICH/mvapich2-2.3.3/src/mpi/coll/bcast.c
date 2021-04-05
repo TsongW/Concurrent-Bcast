@@ -1448,7 +1448,10 @@ int MPIR_Bcast_inter (
 #define FCNAME MPL_QUOTE(FUNCNAME)
 int MPIR_Bcast_impl(void *buffer, int count, MPI_Datatype datatype, int root, MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
-     printf("MPIR_Bcast_impl, security_approach=%d",security_approach);
+    
+    int rank = comm_ptr->rank;
+    printf("MPIR_Bcast_impl, rank =%d, security_approach=%d",rank,security_approach);
+    fflush(stdout);
     
     int mpi_errno = MPI_SUCCESS;
 

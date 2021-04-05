@@ -3318,7 +3318,10 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
                               int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
 
-    printf("MPIR_Bcast_tune_intra_MV2, security_approach=%d",security_approach);
+    int rank = comm_ptr->rank;
+    printf("MPIR_Bcast_impl, rank =%d, security_approach=%d",rank,security_approach);
+    fflush(stdout);
+    
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int comm_size, rank;
