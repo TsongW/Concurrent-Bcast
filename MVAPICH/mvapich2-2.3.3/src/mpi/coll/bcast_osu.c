@@ -2268,9 +2268,9 @@ int MPIR_Pipelined_Bcast_Zcpy_MV2(void *buffer,
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Datatype_get_extent_macro(datatype, extent);
-    
-   if (rank==0) 
-        printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);
+
+   /*if (rank==0) 
+        printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);*/
     
     MPIU_Assert(mv2_enable_zcpy_bcast==1 && mv2_use_slot_shmem_coll==1);
     local_rank = shmem_commptr->rank;
