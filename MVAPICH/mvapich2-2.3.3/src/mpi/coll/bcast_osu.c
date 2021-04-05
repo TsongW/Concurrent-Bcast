@@ -907,7 +907,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             goto fn_fail;
         }
 
-        if(security_approach == 2 ){ 
+        if(security_approach == 3 ){ 
             /*Encrypts (m/l) to SHM cipher*/
 
                 unsigned long ciphertext_len = 0;
@@ -965,7 +965,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             }
             
             
-            if (security_approach ==2){
+            if (security_approach ==3 ){
                 /*Encrypts (m/l) to shared cipher buffer*/
                 unsigned long ciphertext_len = 0;
                 void* out;
@@ -1026,7 +1026,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
         }//end if node_id
         else{
             
-            if (security_approach ==2){
+            if (security_approach ==3){
                 //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 
@@ -3635,7 +3635,7 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
 
     int rank = comm_ptr->rank;
 
-    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
+    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank, security_approach);
     fflush(stdout);
 
 
