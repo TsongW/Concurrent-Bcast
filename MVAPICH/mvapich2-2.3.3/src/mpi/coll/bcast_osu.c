@@ -909,7 +909,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
         if(security_approach == 2 ){ 
             /*Encrypts (m/l) to SHM cipher*/
-            printf("security_approach == 2\n");
+
                 unsigned long ciphertext_len = 0;
                 void* out;
                 void* in;
@@ -3352,7 +3352,7 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
     rank = comm_ptr->rank;
 
 /*******************************************************/
-    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d",rank,security_approach);
+    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
     fflush(stdout);
 
     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
@@ -3605,8 +3605,6 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
                    int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
 
-
-    printf("MPIR_Bcast_MV2\n");
     int mpi_errno = MPI_SUCCESS;
     MPIR_T_PVAR_COMM_COUNTER_INC(MV2,mv2_coll_bcast_subcomm,1,comm_ptr);
 #ifdef _ENABLE_CUDA_
@@ -3634,6 +3632,13 @@ int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
         }
     }
 #endif                          /*#ifdef _ENABLE_CUDA_ */
+
+    int rank = comm_ptr->rank;
+
+    printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
+    fflush(stdout);
+
+
     if (mv2_use_old_bcast == 0) {
         /* Use the new tuned bcast */
 	if (mv2_use_indexed_tuning || mv2_use_indexed_bcast_tuning) {

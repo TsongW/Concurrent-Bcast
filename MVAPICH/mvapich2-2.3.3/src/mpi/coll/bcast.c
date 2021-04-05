@@ -1449,10 +1449,6 @@ int MPIR_Bcast_inter (
 int MPIR_Bcast_impl(void *buffer, int count, MPI_Datatype datatype, int root, MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
     
-    int rank = comm_ptr->rank;
-    printf("MPIR_Bcast_impl, rank =%d, security_approach=%d",rank,security_approach);
-    fflush(stdout);
-    
     int mpi_errno = MPI_SUCCESS;
 
     if (comm_ptr->coll_fns != NULL && comm_ptr->coll_fns->Bcast != NULL)
