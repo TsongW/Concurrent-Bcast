@@ -887,8 +887,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     nbytes = (MPIDI_msg_sz_t) (count) * (type_size);
     scatter_size = (nbytes + local_size - 1) / local_size;    
     
-    
-    
+
     if(rank == root){
         /*Copy plaintext to the shared memory  buffer*/
         mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
@@ -930,7 +929,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 }    
     
             /*Concurrent Bcast*/
-           // mpi_errno = MPIR_Bcast_impl(large_send_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
+    
            mpi_errno = MPIR_Bcast_impl(ciphertext_shmem_buffer, (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
 
         }
@@ -1034,6 +1033,8 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 //in = (void*)(large_send_buffer);
                 in = (void*)(ciphertext_shmem_buffer+local_rank*(scatter_size+28));
                 out = (void*)(shmem_buffer +local_rank*scatter_size);
+                printf("dec starts, size=%d, rank=%d\n", ciphertext_len, rank);
+                fflush(stdout);
 
                 if(!EVP_AEAD_CTX_open(ctx, out, &decrypted_len, (ciphertext_len-16),
                         in, 12, in+12, (unsigned long )(ciphertext_len),
@@ -1041,7 +1042,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                         printf("Error in SHM-ML-1 decryption:  while %d tried to decrypt\n", rank);
                         fflush(stdout);   
                     }
-               // printf("rank=%d, size=%d, dec is done\n",rank, scatter_size);
+                printf(" dec is done\n");
                 
                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag); /*Wait for decryption*/
 
