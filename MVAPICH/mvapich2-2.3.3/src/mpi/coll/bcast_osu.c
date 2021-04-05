@@ -864,17 +864,16 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                                           MPI_Datatype datatype,
                                           int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
-    //MPIR_TIMER_START(coll,bcast,scatter_ring_allgather);
+    printf("MPIR_Bcast_ML_Shmem_MV2\n");
+
     int rank, comm_size;
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     MPIDI_msg_sz_t nbytes, scatter_size;
     MPI_Aint type_size;
-    
-    
+ 
     MPIU_CHKLMEM_DECL(3);
 
-    //MPIR_T_PVAR_COUNTER_INC(MV2, mv2_coll_bcast_scatter_ring_allgather, 1);
     comm_size = comm_ptr->local_size;
     rank = comm_ptr->rank;
 
@@ -898,8 +897,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
     
     
     if(rank == root){
-        printf("MPIR_Bcast_ML_Shmem_MV2\n");
-
         /*Copy plaintext to the shared memory  buffer*/
         mpi_errno = MPIR_Localcopy((void*)((char*)buffer), count, datatype, 
                                     (void*)((char*)shmem_buffer), count, datatype);
@@ -3161,7 +3158,7 @@ skip_tuning_tables:
 
 /*****************Add by Cong ************************************/
 if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
-
+    printf("concurrent_comm == 1 && concurrent_bcast == 2\n");
 
 	mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                             datatype, root,
@@ -3456,6 +3453,9 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 
     /*****************Add by Cong ************************************/
     if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+
+        printf("concurrent_comm == 1 && concurrent_bcast == 2\n");
+
         mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                                 datatype, root,
                                 comm_ptr, errflag);
