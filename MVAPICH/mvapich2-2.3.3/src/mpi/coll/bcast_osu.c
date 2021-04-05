@@ -3353,6 +3353,7 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 /******************Added by Cong (debug)********************************/
    /* printf("MPIR_Bcast_tune_intra_MV2, rank =%d, security_approach=%d\n",rank,security_approach);
     fflush(stdout);*/
+    
 /*******************************************************/
     if (HANDLE_GET_KIND(datatype) == HANDLE_KIND_BUILTIN)
         is_contig = 1;
