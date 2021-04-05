@@ -292,7 +292,7 @@ int MPI_Init( int *argc, char ***argv )
         if(alg == 13){
             allocated_shmem = 2;
         }
-        printf("security_approach=%d\n",security_approach);flush(stdout);
+        printf("security_approach=%d\n",security_approach);
     }
 /******************************************************************/
 

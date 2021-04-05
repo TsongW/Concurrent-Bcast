@@ -1448,6 +1448,8 @@ int MPIR_Bcast_inter (
 #define FCNAME MPL_QUOTE(FUNCNAME)
 int MPIR_Bcast_impl(void *buffer, int count, MPI_Datatype datatype, int root, MPID_Comm *comm_ptr, MPIR_Errflag_t *errflag)
 {
+     printf("MPIR_Bcast_impl, security_approach=%d",security_approach);
+    
     int mpi_errno = MPI_SUCCESS;
 
     if (comm_ptr->coll_fns != NULL && comm_ptr->coll_fns->Bcast != NULL)
@@ -1694,6 +1696,7 @@ int MPI_Bcast( void *buffer, int count, MPI_Datatype datatype, int root,
         //NAIVE
         mpi_errno = MPI_Naive_Sec_Bcast( buffer, count, datatype, root, comm_ptr, &errflag);
     }else{
+       
         mpi_errno = MPIR_Bcast_impl( buffer, count, datatype, root, comm_ptr, &errflag );
     }
      // mpi_errno = MPIR_Bcast_impl( buffer, count, datatype, root, comm_ptr, &errflag );

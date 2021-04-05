@@ -2890,6 +2890,9 @@ int MPIR_Bcast_index_tuned_intra_MV2(void *buffer,
                               MPI_Datatype datatype,
                               int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+    printf("MPIR_Bcast_index_tuned_intra_MV2, security_approach=%d",security_approach);
+    
+    
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int comm_size, rank;
@@ -3314,6 +3317,8 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
                               MPI_Datatype datatype,
                               int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+
+    printf("MPIR_Bcast_tune_intra_MV2, security_approach=%d",security_approach);
     int mpi_errno = MPI_SUCCESS;
     int mpi_errno_ret = MPI_SUCCESS;
     int comm_size, rank;
@@ -3596,6 +3601,9 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 int MPIR_Bcast_MV2(void *buf, int count, MPI_Datatype datatype,
                    int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {
+
+
+    printf("MPIR_Bcast_MV2\n");
     int mpi_errno = MPI_SUCCESS;
     MPIR_T_PVAR_COMM_COUNTER_INC(MV2,mv2_coll_bcast_subcomm,1,comm_ptr);
 #ifdef _ENABLE_CUDA_
