@@ -934,8 +934,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
         }
         else{    
-            /*mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), scatter_size, MPI_BYTE, 
-                                    (void*)((char*)ciphertext_shmem_buffer), scatter_size, MPI_BYTE);*/
+
             mpi_errno = MPIR_Bcast_impl(shmem_buffer, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
         }
 
@@ -2238,6 +2237,7 @@ int MPIR_Pipelined_Bcast_Zcpy_MV2(void *buffer,
                              MPI_Datatype datatype,
                              int root, MPID_Comm * comm_ptr, MPIR_Errflag_t *errflag)
 {   
+    
     MPIR_TIMER_START(coll,bcast,pipelined_zcpy);
     MPI_Comm shmem_comm;
     MPID_Comm *shmem_commptr = NULL;
@@ -2268,7 +2268,9 @@ int MPIR_Pipelined_Bcast_Zcpy_MV2(void *buffer,
     shmem_comm = comm_ptr->dev.ch.shmem_comm;
     MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
     MPID_Datatype_get_extent_macro(datatype, extent);
-    //    printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);
+    
+   if (rank==0) 
+        printf("%d @ MPIR_Pipelined_Bcast_Zcpy_MV2\n", rank);
     
     MPIU_Assert(mv2_enable_zcpy_bcast==1 && mv2_use_slot_shmem_coll==1);
     local_rank = shmem_commptr->rank;
