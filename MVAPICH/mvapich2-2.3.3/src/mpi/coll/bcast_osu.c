@@ -1021,7 +1021,6 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
             if (security_approach ==3){
                 //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
-                mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
                 if (mpi_errno) {
                 MPIR_ERR_POP(mpi_errno);
                 goto fn_fail;
