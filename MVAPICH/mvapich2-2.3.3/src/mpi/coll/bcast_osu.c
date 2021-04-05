@@ -838,11 +838,6 @@ int MPIR_Concurrent_Bcast_MV2(void *buffer,
     goto fn_exit;
 }
 
-
-
-
-
-
 /****************************************************************/
 
 
@@ -998,7 +993,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
         
                 //mpi_errno = MPIR_Bcast_impl(large_send_buffer, scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
                 mpi_errno = MPIR_Bcast_impl(( ciphertext_shmem_buffer+local_rank*(scatter_size+28)), 
-                                                scatter_size+28, MPI_BYTE, 0, conc_commptr, errflag);
+                                                (scatter_size+28), MPI_BYTE, 0, conc_commptr, errflag);
                 /*Local copy */
                 mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
                                     (void*)((char*)buffer), count, datatype);
@@ -1056,7 +1051,8 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
             }else{
                  mpi_errno = MPIR_Bcast_impl(shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag);
-                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+                 
+                // mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
                  mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
                                          (void*)((char*)buffer), count, datatype);
 
