@@ -1050,9 +1050,29 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
             }else{
                  mpi_errno = MPIR_Bcast_impl(shmem_buffer+local_rank*scatter_size, scatter_size, MPI_BYTE, 0, conc_commptr, errflag); 
-                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+                 /*mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
                  mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), count, datatype, 
-                                         (void*)((char*)buffer), count, datatype);
+                                         (void*)((char*)buffer), count, datatype);*/
+
+
+                mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+local_rank*scatter_size), scatter_size, MPI_BYTE, 
+                                         (void*)((char*)buffer+local_rank*scatter_size), scatter_size, MPI_BYTE);
+                if (mpi_errno) {
+                    MPIR_ERR_POP(mpi_errno);
+                }
+                int s=0;
+                mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
+
+                for (;s<local_size;s++){
+                    if(s!=local_rank){
+                        mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+s*scatter_size), scatter_size, MPI_BYTE, 
+                                         (void*)((char*)buffer+s*scatter_size), scatter_size, MPI_BYTE);
+                    }
+                }
+
+
+                
+                
             }
 
         }//end of other nodes
