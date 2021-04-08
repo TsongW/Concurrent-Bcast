@@ -901,7 +901,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
         if(security_approach == 3 ){ 
             /*Encrypts (m/l) to SHM cipher*/
-        printf("MPIR_Bcast_ML_Shmem_MV2, concurrent_comm=%d, concurrent_bcast=%d\n", 
+       // printf("MPIR_Bcast_ML_Shmem_MV2, concurrent_comm=%d, concurrent_bcast=%d\n", 
              concurrent_comm,  concurrent_bcast);
                 unsigned long ciphertext_len = 0;
                 void* out;
