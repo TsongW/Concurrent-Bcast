@@ -21,6 +21,12 @@
 #include <unistd.h>
 #include "common_tuning.h"
 #include "bcast_tuning.h"
+
+
+/**********Added by Cong *********/
+#include "secure_allgather.h"
+/********************/
+
 #define INTRA_NODE_ROOT 0
 
 MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_bcast_binomial);
@@ -901,8 +907,7 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
 
         if(security_approach == 3 ){ 
             /*Encrypts (m/l) to SHM cipher*/
-       // printf("MPIR_Bcast_ML_Shmem_MV2, concurrent_comm=%d, concurrent_bcast=%d\n", 
-             concurrent_comm,  concurrent_bcast);
+
                 unsigned long ciphertext_len = 0;
                 void* out;
                 void* in;
@@ -1061,28 +1066,12 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 }
                 int s=0;
                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
-
                 for (;s<local_size;s++){
                     if(s!=local_rank){
                         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+s*scatter_size), scatter_size, MPI_BYTE, 
                                          (void*)((char*)buffer+s*scatter_size), scatter_size, MPI_BYTE);
                     }
                 }
-                /*if(local_rank==0){
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+scatter_size), (nbytes-scatter_size), MPI_BYTE, 
-                                         (void*)((char*)buffer+scatter_size), (nbytes-scatter_size), MPI_BYTE);
-                }else if(local_rank == (local_size-1)){
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), (nbytes-scatter_size), MPI_BYTE, 
-                                         (void*)((char*)buffer), (nbytes-scatter_size), MPI_BYTE);
-
-                }else{
-                    /*first (r-1) segments for rank r*/
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), ((local_size-1)*scatter_size), MPI_BYTE, 
-                                         (void*)((char*)buffer), ((local_size-1)*scatter_size), MPI_BYTE);
-                    /*last (s-r) */
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+((local_size+1)*scatter_size)), nbytes-(local_size*scatter_size), MPI_BYTE, 
-                                         (void*)((char*)buffer+((local_size+1)*scatter_size)), nbytes-(local_size*scatter_size), MPI_BYTE);
-                }*/
 
                 
             }
