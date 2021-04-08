@@ -1,0 +1,33 @@
+Your default charging project charge id  is ccr200025p.  If you would like to change the default charging project use the command change_primary_group ~charge_id~. Use the charge id listed below for the project you would like to make the default in place of ~charge_id~
+
+Project: CCR200025P
+     PI: Xin Yuan
+  Title: Data Insurance in the Cluster Environment
+
+      Resource: Bridges 2 Ocean Storage
+    Allocation: 500.00
+       Balance: 500.00
+      End Date: 2021-09-30
+  Award Active: Yes
+   User Active: Yes
+     Charge ID: ccr200025p
+     *** Default charging project ***
+   Directories:
+       HOME /jet/home/sadeghil
+       STORAGE /ocean/projects/ccr200025p
+       STORAGE /ocean/projects/ccr200025p/sadeghil
+       STORAGE /ocean/projects/ccr200025p/shared
+
+      Resource: Bridges 2 Regular Memory
+    Allocation: 246,154.00
+       Balance: 246,154.00
+      End Date: 2021-09-30
+  Award Active: Yes
+   User Active: Yes
+     Charge ID: ccr200025p
+     *** Default charging project ***
+   Directories:
+       HOME /jet/home/sadeghil
+
+---------------------------------------------------
+
