@@ -1067,23 +1067,12 @@ int MPIR_Bcast_ML_Shmem_MV2(void *buffer,
                 int s=0;
                 mpi_errno = MPIR_Barrier_impl(comm_ptr->node_comm, errflag);
 
-                /*for (;s<local_size;s++){
+                for (;s<local_size;s++){
                     if(s!=local_rank){
                         mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+s*scatter_size), scatter_size, MPI_BYTE, 
                                          (void*)((char*)buffer+s*scatter_size), scatter_size, MPI_BYTE);
                     }
-                }*/
-                if(local_rank==0){
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer+scatter_size), nbytes-scatter_size, MPI_BYTE, 
-                                         (void*)((char*)buffer+scatter_size), nbytes-scatter_size, MPI_BYTE);
-                }else if(local_rank == (local_size-1)){
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), nbytes-scatter_size, MPI_BYTE, 
-                                         (void*)((char*)buffer), nbytes-scatter_size, MPI_BYTE);
-                }else{
-                    mpi_errno = MPIR_Localcopy((void*)((char*)shmem_buffer), nbytes, MPI_BYTE, 
-                                         (void*)((char*)buffer), nbytes, MPI_BYTE);
                 }
-
                 
             }
 
