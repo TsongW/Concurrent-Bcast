@@ -21,9 +21,6 @@
 #include <unistd.h>
 #include "common_tuning.h"
 #include "bcast_tuning.h"
-/**********Added by Cong *********/
-#include "secure_allgather.h"
-/********************/
 #define INTRA_NODE_ROOT 0
 
 MPIR_T_PVAR_DOUBLE_TIMER_DECL_EXTERN(MV2, mv2_coll_timer_bcast_binomial);
