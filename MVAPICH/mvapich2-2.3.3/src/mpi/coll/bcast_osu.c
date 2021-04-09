@@ -3171,10 +3171,10 @@ skip_tuning_tables:
 #endif
 
 /*****************Add by Cong ************************************/
-if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
-    if(rank ==0 || rank ==18){
+if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+    /*if(rank ==0 || rank ==18){
     printf("MPIR_Bcast_ML_Shmem_MV2\n");
-    }
+    }*/
 
 	mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                             datatype, root,
@@ -3187,12 +3187,12 @@ if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_
 /******************************************************************/
 
 
-  /*else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
+  else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
 	mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
 
-    }*/
+    }
     else if (comm_ptr->dev.ch.shmem_coll_ok != 1) {
         if(nbytes < MPICH_LARGE_MSG_COLLECTIVE_SIZE) { 
             mpi_errno = MPIR_Bcast_intra(buffer, count, datatype, root, 
@@ -3478,9 +3478,9 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 
     /*****************Add by Cong ************************************/
     if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
-        if(rank ==0 || rank ==18){
+        /*if(rank ==0 || rank ==18){
             printf("MPIR_Bcast_ML_Shmem_MV2\n");
-        }
+        }*/
 
         mpi_errno = MPIR_Bcast_ML_Shmem_MV2(buffer, count,
                                 datatype, root,
@@ -3492,12 +3492,12 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
 /******************************************************************/
 
 
-  /* else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
+  else  if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
         mpi_errno = MPIR_Concurrent_Bcast_MV2(buffer, count,
                             datatype, root,
                             comm_ptr, errflag);
 
-    }*/
+    }
 
     else if (comm_ptr->dev.ch.shmem_coll_ok != 1) {
         if(nbytes < MPICH_LARGE_MSG_COLLECTIVE_SIZE) { 
@@ -3537,9 +3537,9 @@ int MPIR_Bcast_tune_intra_MV2(void *buffer,
             shmem_comm = comm_ptr->dev.ch.shmem_comm;
             MPID_Comm_get_ptr(shmem_comm, shmem_commptr);
             /*Debug*/
-            if(rank ==0 || rank ==18){
+           /* if(rank ==0 || rank ==18){
                     printf("MPIR_Bcast_tune_inter_node_helper_MV2\n");
-            }
+            }*/
 
 
             if (!is_contig || !is_homogeneous) {
