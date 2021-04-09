@@ -244,7 +244,7 @@ int MPI_Init( int *argc, char ***argv )
     MPID_Comm *comm_ptr = NULL;
     MPID_Comm_get_ptr(MPI_COMM_WORLD, comm_ptr);
 
-    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value, *a_value;
+    char *s_value, *o_value, *t_value, *sml_value, *c_value, *cb_value, *ob_value, *a_value, *b_value;
     char *rl_value;
     if ((s_value = getenv("SECURITY_APPROACH")) != NULL) {
         security_approach = (atoi(s_value));
@@ -286,7 +286,7 @@ int MPI_Init( int *argc, char ***argv )
         }
     }
 /***********************Added by Cong******************************/
-    if ((t_value = getenv("MV2_INTER_BCAST_TUNING")) != NULL) {
+    if ((b_value = getenv("MV2_INTER_BCAST_TUNING")) != NULL) {
         int alg = (atoi(t_value));
         if(alg == 13){
             allocated_shmem = 2;
