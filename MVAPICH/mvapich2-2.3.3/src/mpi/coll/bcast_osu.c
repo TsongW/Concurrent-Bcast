@@ -3171,7 +3171,7 @@ skip_tuning_tables:
 #endif
 
 /*****************Add by Cong ************************************/
-if(concurrent_comm == 1 && concurrent_bcast == 2 && comm_ptr->dev.ch.concurrent_comm != NULL){
+if(concurrent_comm == 1 && concurrent_bcast == 1 && comm_ptr->dev.ch.concurrent_comm != NULL){
     if(rank ==0 || rank ==18){
     printf("MPIR_Bcast_ML_Shmem_MV2\n");
     }
