@@ -417,8 +417,13 @@ int init_shmem(){
     MPID_Comm_get_ptr(comm_ptr->dev.ch.shmem_comm, shmem_comm_ptr);
     
     //TODO: Allocate Shmem
-    size_t shmem_size =  8 * (comm_ptr->local_size) * 1 * 1024 *1024;
-    size_t ciphertext_shmem_size =  (comm_ptr->local_size) * (1024 * 1024 * 2 + 16 + 12);
+    /*size_t shmem_size =  8 * (comm_ptr->local_size) * 1 * 1024 *1024;
+    size_t ciphertext_shmem_size =  (comm_ptr->local_size) * (1024 * 1024 * 2 + 16 + 12);*/
+
+    /*********************Add by Cong*********************/
+    size_t shmem_size = 4 * 1024 *1024;
+    size_t ciphertext_shmem_size = 4 * (1024 * 1024 * 2 + 16 + 12);
+     /******************************************************/
     shmem_key = 13579;
     ciphertext_shmem_key = 24680;
     
