@@ -1,0 +1,18 @@
+****Naive*****
+
+export SECURITY_APPROACH=1
+
+
+****Encrypted Concurrent Shared Mem*****
+export CONCURRENT_COMM=1
+export CONCURRENT_BCAST=2
+export MV2_INTER_BCAST_TUNING=13
+export SECURITY_APPROACH=3
+****************************************
+
+
+***Unencrypted Concurrent Shared Mem****
+export CONCURRENT_COMM=1
+export CONCURRENT_BCAST=2
+export MV2_INTER_BCAST_TUNING=13
+export SECURITY_APPROACH=0
